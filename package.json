@@ -1,0 +1,54 @@
+{
+  "name": "pot-js",
+  "description": "A script runner",
+  "version": "0.0.0",
+  "main": "lib/index",
+  "bin": {
+    "pot": "bin/pot"
+  },
+  "scripts": {
+    "start": "babel-node src/cli",
+    "prebuild": "rimraf lib",
+    "build": "babel src -d lib",
+    "prepublish": "npm run build"
+  },
+  "repository": "git@github.com:Cap32/pot-js.git",
+  "author": "Cap32 <webb.png@gmail.com>",
+  "licenses": "MIT",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "chokidar": "^1.6.1",
+    "cli-table": "^0.3.1",
+    "find-port-sync": "^1.0.0",
+    "fs-promise": "^1.0.0",
+    "globby": "^6.1.0",
+    "home-or-tmp": "^2.0.0",
+    "lodash": "^4.17.2",
+    "log4js": "^1.0.1",
+    "node-ipc": "^8.9.2",
+    "pidusage": "^1.1.0",
+    "process-exists": "^2.1.0",
+    "respawn": "^2.4.1",
+    "slice-file": "^1.0.0",
+    "yargs": "^6.5.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-core": "^6.13.2",
+    "babel-eslint": "^6.1.2",
+    "babel-plugin-transform-es2015-destructuring": "^6.19.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
+    "babel-plugin-transform-es2015-parameters": "^6.18.0",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.11.6",
+    "co-body": "^4.2.0",
+    "eslint": "^2.4.0",
+    "eslint-plugin-babel": "^3.2.0",
+    "eslint-plugin-import": "^2.2.0",
+    "get-my-ip": "0.0.1",
+    "mkdirp": "^0.5.1",
+    "qs": "^6.3.0",
+    "rimraf": "^2.5.4"
+  }
+}
