@@ -1,11 +1,11 @@
-Script runner.
+Script runner. Just like [forever](https://github.com/foreverjs/forever)
 
 ---
 
 ## Installing
 
 ```bash
-$ npm install pot-js
+$ npm install -g pot-js
 ```
 
 ## Usage
