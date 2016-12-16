@@ -1,12 +1,11 @@
 
 import respawn from 'respawn';
-import StdioIPC from './utils/StdioIPC';
-import watch from './utils/watch';
-import formatBytes from './utils/formatBytes';
-import logger from './utils/logger';
-import { startServer, stopServer } from './utils/unixDomainSocket';
-import workspace from './utils/workspace';
-import pidUsage from 'pidusage';
+import StdioIPC from '../utils/StdioIPC';
+import watch from '../utils/watch';
+import logger from '../utils/logger';
+import { startServer, stopServer } from '../utils/unixDomainSocket';
+import workspace from '../utils/workspace';
+import MonitorServer from './MonitorServer';
 
 const ipc = new StdioIPC(process);
 
@@ -14,39 +13,7 @@ const startSocketServer = async (monitor, name) => {
 	const socketsDir = await workspace.getSocketsDir();
 	const socket = await startServer(name, socketsDir);
 
-	socket.on('info', (data, sock) => {
-		const emit = (data = {}) => socket.emit(sock, 'info', {
-			memoryUsage: {
-				percent: '-',
-				formattedHeapUsed: '-',
-			},
-			...monitor.toJSON(),
-			...data,
-		});
-
-		const { pid } = monitor;
-		if (pid) {
-			pidUsage.stat(pid, (err, { memory }) => {
-				let resp = null;
-				if (err) { logger.error(err); }
-				else {
-					const { heapTotal } = process.memoryUsage();
-					resp = {
-						memoryUsage: {
-							percent: `${(memory / heapTotal / 100).toFixed(2)}%`,
-							formattedHeapUsed: formatBytes(memory),
-						},
-					};
-				}
-				emit(resp);
-			});
-			pidUsage.unmonitor(pid);
-		}
-		else {
-			emit();
-		}
-
-	});
+	MonitorServer.create(monitor, socket);
 };
 
 const lifecycle = (monitor, name) => {
@@ -89,8 +56,7 @@ const lifecycle = (monitor, name) => {
 const start = (options) => {
 	const { name } = options;
 	const {
-		watch: watchOptions, workspace: space,
-		port, logsDir, command,
+		watch: watchOptions, workspace: space, command,
 		...respawnOptions,
 	} = options;
 
@@ -100,9 +66,7 @@ const start = (options) => {
 		...respawnOptions,
 		stdio: ['ignore', 'inherit', 'inherit'],
 		data: {
-			port,
-			logsDir,
-			pid: process.pid,
+			parentPid: process.pid,
 		},
 	});
 

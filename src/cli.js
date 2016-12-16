@@ -75,7 +75,8 @@ yargs
 		},
 	})
 	.command({
-		command: 'ls',
+		command: 'list',
+		aliases: ['ls'],
 		desc: 'List processes',
 		handler() {
 			list().catch((err) => logger.error(err.message));

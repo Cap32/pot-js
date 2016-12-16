@@ -4,8 +4,8 @@ const { _ = '' } = process.env;
 
 if (_.endsWith('babel-node')) {
 	require('babel-register')();
-	require('../src/monitorProcess');
+	require('../src/monitor');
 }
 else {
-	require('../lib/monitorProcess');
+	require('../lib/monitor');
 }
