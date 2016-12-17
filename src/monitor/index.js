@@ -5,7 +5,7 @@ import watch from '../utils/watch';
 import logger from '../utils/logger';
 import { startServer, stopServer } from '../utils/unixDomainSocket';
 import workspace from '../utils/workspace';
-import MonitorServer from './MonitorServer';
+import { createAPIServer } from './api';
 
 const ipc = new StdioIPC(process);
 
@@ -13,7 +13,7 @@ const startSocketServer = async (monitor, name) => {
 	const socketsDir = await workspace.getSocketsDir();
 	const socket = await startServer(name, socketsDir);
 
-	MonitorServer.create(monitor, socket);
+	createAPIServer(monitor, socket);
 };
 
 const lifecycle = (monitor, name) => {

@@ -1,16 +1,16 @@
 
 import logger from './utils/logger';
 import { join } from 'path';
-import { execByName } from './utils/monitorHelper';
+import { requestByName } from './utils/socketsHelper';
 import sliceFile from 'slice-file';
 
 const log = async ({ name, line, category, follow }) => {
-	const info = await execByName(name, 'info');
-	if (!info || !info.data) {
+	const info = await requestByName(name, 'info');
+	if (!info) {
 		throw new Error(`"${name}" is NOT found.`);
 	}
 
-	const { logsDir } = info.data;
+	const { logsDir } = info;
 	const logFile = join(logsDir, `${category}.log`);
 	const sf = sliceFile(logFile);
 	const mode = follow ? 'follow' : 'slice';

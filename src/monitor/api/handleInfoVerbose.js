@@ -1,7 +1,7 @@
 
 import pidUsage from 'pidusage';
-import logger from '../utils/logger';
-import formatBytes from '../utils/formatBytes';
+import logger from '../../utils/logger';
+import formatBytes from '../../utils/formatBytes';
 import chalk from 'chalk';
 
 const { assign } = Object;
@@ -46,50 +46,51 @@ const styleStatus = (info) => {
 	return info;
 };
 
-export default {
-	create(monitor, socket) {
-		const handleInfo = (data, sock) => {
-			const emit = (rest = {}) => {
-				const { data, ...monitorInfo, } = monitor.toJSON();
-				const info = {
-					memoryUsage: {
-						heapUsed: '-',
-						heapTotal: '-',
-					},
-					...monitorInfo,
-					...data,
-					...rest,
-				};
+const startedLocal = (info) => {
+	info.startedLocal = new Date(info.started).toLocaleString();
+	return info;
+};
 
-				parseMemoryUsage(info);
-				styleStatus(info);
-
-				socket.emit(sock, 'info', info);
-			};
-
-			const { pid } = monitor;
-			if (pid) {
-				pidUsage.stat(pid, (err, { memory }) => {
-					let resp = null;
-					if (err) { logger.error(err); }
-					else {
-						resp = {
-							memoryUsage: {
-								heapUsed: memory,
-								heapTotal: process.memoryUsage().heapTotal,
-							},
-						};
-					}
-					emit(resp);
-				});
-				pidUsage.unmonitor(pid);
-			}
-			else {
-				emit();
-			}
-
+const handleInfoVerbose = (monitor, data, callback) => {
+	const emit = (rest = {}) => {
+		const { data, ...monitorInfo, } = monitor.toJSON();
+		const info = {
+			memoryUsage: {
+				heapUsed: '-',
+				heapTotal: '-',
+			},
+			...monitorInfo,
+			...data,
+			...rest,
 		};
 
-		socket.on('info', handleInfo);
-	},
+		parseMemoryUsage(info);
+		styleStatus(info);
+		startedLocal(info);
+
+		callback(info);
+	};
+
+	const { pid } = monitor;
+	if (pid) {
+		pidUsage.stat(pid, (err, { memory }) => {
+			let resp = null;
+			if (err) { logger.error(err); }
+			else {
+				resp = {
+					memoryUsage: {
+						heapUsed: memory,
+						heapTotal: process.memoryUsage().heapTotal,
+					},
+				};
+			}
+			emit(resp);
+		});
+		pidUsage.unmonitor(pid);
+	}
+	else {
+		emit();
+	}
 };
+
+export default handleInfoVerbose;

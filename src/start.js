@@ -2,7 +2,7 @@
 import { spawn } from 'child_process';
 import { resolve } from 'path';
 import StdioIPC from './utils/StdioIPC';
-import { getPid, getPidFile, writePidFile } from './utils/monitorHelper';
+import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
 import {
 	ensureName, ensureRoot, ensureWatch, setUpWorkspace,
 } from './utils/config';

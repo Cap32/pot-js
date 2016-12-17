@@ -1,12 +1,12 @@
 
 import logger from './utils/logger';
 import { setUpWorkspace } from './utils/config';
-import { execAll } from './utils/monitorHelper';
+import { requestAll } from './utils/socketsHelper';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';
 
 const list = async (options = {}) => {
-	const infoList = await execAll('info');
+	const infoList = await requestAll('infoVerbose');
 
 	if (!infoList.length) {
 		return logger.warn('No process.');
@@ -21,7 +21,7 @@ const list = async (options = {}) => {
 			info.styledStatus,
 			info.crashes,
 			info.memoryUsage.formattedString,
-			info.started,
+			info.startedLocal,
 			info.parentPid,
 		],
 	} = setUpWorkspace(options);
@@ -30,7 +30,7 @@ const list = async (options = {}) => {
 		head,
 		style: {
 			head: ['blue'],
-		}
+		},
 	});
 
 	infoList.filter(Boolean).forEach((info) => {
