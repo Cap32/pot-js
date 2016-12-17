@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
 import { ensureName, setUpWorkspace } from './utils/config';
+import stop from './stop';
 
 const ensureOptions = (options = {}) => {
 	options.root = options.root || process.cwd();
@@ -16,7 +17,7 @@ const ensureOptions = (options = {}) => {
 
 const start = async (options = {}) => {
 	const {
-		root, name, command, execCommand, daemon,
+		root, name, command, execCommand, daemon, force,
 	} = ensureOptions(options);
 
 	options.command = [execCommand, resolve(root, command)];
@@ -26,7 +27,8 @@ const start = async (options = {}) => {
 	const isExists = !!await getPid(pidFile, name);
 
 	if (isExists) {
-		throw new Error(`"${name}" is running.`);
+		if (force) { await stop(options); }
+		else { throw new Error(`"${name}" is running.`); }
 	}
 
 	const stdio = daemon ? 'ignore' : 'inherit';

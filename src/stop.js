@@ -5,9 +5,11 @@ import { setUpWorkspace } from './utils/config';
 import { getPid, getPidFile } from './utils/pidHelper';
 import { requestByName, getNames } from './utils/socketsHelper';
 import ensureSelected from './utils/ensureSelected';
+import inquirer from 'inquirer';
 
 const stop = async (options = {}) => {
 	let { name } = setUpWorkspace(options);
+	const { force } = options;
 
 	name = await ensureSelected({
 		value: name,
@@ -15,6 +17,19 @@ const stop = async (options = {}) => {
 		errorMessage: 'No process is running.',
 		getChoices: getNames,
 	});
+
+	if (!force) {
+		const confirmed = await inquirer.prompt({
+			type: 'confirm',
+			name: 'yes',
+			message: `Are you sure stop "${name}"?`,
+			default: false,
+		});
+
+		if (!confirmed.yes) {
+			return;
+		}
+	}
 
 	const pidFile = await getPidFile(name);
 

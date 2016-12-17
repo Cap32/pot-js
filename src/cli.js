@@ -58,6 +58,11 @@ yargs
 						],
 						default: 'INFO',
 					},
+					f: {
+						alias: 'force',
+						desc: 'Force restart even if the process is exists.',
+						type: 'bool',
+					},
 				})
 				.argv
 			;
@@ -70,6 +75,18 @@ yargs
 		command: 'stop [name]',
 		desc: 'Stop process',
 		demand: 2,
+		builder(yargs) {
+			yargs // eslint-disable-line
+				.options({
+					f: {
+						alias: 'force',
+						desc: 'Stop without confirming.',
+						type: 'bool',
+					},
+				})
+				.argv
+			;
+		},
 		handler(argv) {
 			stop(argv).catch((err) => logger.error(err.message));
 		},
