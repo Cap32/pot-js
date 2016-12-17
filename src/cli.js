@@ -3,6 +3,7 @@ import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
 import logger from './utils/logger';
+import resolveConfig from './utils/resolveConfig';
 import { start, stop, list, log } from './';
 
 // eslint-disable-next-line
@@ -10,9 +11,8 @@ yargs
 	.usage('$0 <command> [args]')
 	.demand(1, 'Please specify one of the commands!')
 	.command({
-		command: 'start <command>',
+		command: 'start [entry]',
 		desc: 'Start process',
-		demand: 2,
 		builder(yargs) {
 			yargs // eslint-disable-line
 				.options({
@@ -20,30 +20,11 @@ yargs
 						desc: 'Server name',
 						type: 'string',
 					},
-					port: {
-						desc: 'Server port',
-						type: 'number',
-					},
-					execCommand: {
-						desc: 'Exec command',
-						default: process.execPath,
-						type: 'string',
-					},
-					e: {
-						alias: 'entry',
-						desc: 'Entry directory',
-						type: 'string',
-					},
 					d: {
 						alias: 'daemon',
 						desc: 'Use as a daemon',
-						type: 'bool',
 						default: false,
-					},
-					c: {
-						alias: 'config',
-						desc: 'Path to the config file.',
-						type: 'string',
+						type: 'bool',
 					},
 					p: {
 						alias: 'production',
@@ -58,17 +39,59 @@ yargs
 						],
 						default: 'INFO',
 					},
+					w: {
+						alias: 'watch',
+						desc: 'Enable watch mode',
+						default: false,
+						type: 'bool',
+					},
+					'watch-dirs': {
+						desc: 'Watch dirs',
+						default: ['**/*'],
+						type: 'array',
+					},
+					'watch-ignore-dot-files': {
+						desc: 'Ignore watch dot files',
+						default: true,
+						type: 'bool',
+					},
 					f: {
 						alias: 'force',
-						desc: 'Force restart even if the process is exists.',
+						desc: 'Force restart even if the process is exists',
 						type: 'bool',
+					},
+					c: {
+						alias: 'config',
+						desc: 'Path to the config file',
+						default: '.potrc',
+						type: 'string',
+					},
+					'config-walk': {
+						desc: 'Walk to resolve config file',
+						default: true,
+						type: 'bool',
+					},
+					root: {
+						desc: 'Root dir. Defaults to `process.cwd()`',
+						type: 'string',
+					},
+					'exec-command': {
+						desc: 'Exec command',
+						default: process.execPath,
+						type: 'string',
+					},
+					'logs-dir': {
+						desc: 'Log files dir. Resolve from `root`',
+						default: '.logs',
+						type: 'string',
 					},
 				})
 				.argv
 			;
 		},
-		handler(argv) {
-			start(argv).catch((err) => logger.error(err.message));
+		async handler(argv) {
+			try { start(await resolveConfig(argv)); }
+			catch (err) { logger.error(err.message); }
 		},
 	})
 	.command({

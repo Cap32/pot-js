@@ -7,20 +7,23 @@ import { ensureName, setUpWorkspace } from './utils/config';
 import stop from './stop';
 
 const ensureOptions = (options = {}) => {
-	options.root = options.root || process.cwd();
+	const cwd = process.cwd();
+	options.root = resolve(cwd, (options.root || cwd));
 	const logsDir = options.logsDir || '.logs';
 	options.logsDir = resolve(options.root, logsDir);
 	options.logLevel = 'INFO';
 	options.watch = options.watch || {};
+	options.env = options.env || {};
+	if (options.production) { options.env.NODE_ENV = 'production'; }
 	return setUpWorkspace(ensureName(options));
 };
 
 const start = async (options = {}) => {
 	const {
-		root, name, command, execCommand, daemon, force,
+		root, name, entry, execCommand, daemon, force,
 	} = ensureOptions(options);
 
-	options.command = [execCommand, resolve(root, command)];
+	options.command = [execCommand, resolve(root, entry)];
 
 	const pidFile = await getPidFile(name);
 
