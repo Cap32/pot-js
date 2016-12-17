@@ -1,7 +1,7 @@
 
 import { unlink } from 'fs-promise';
 import logger from './utils/logger';
-import { setUpWorkspace } from './utils/config';
+import setUpWorkspace from './utils/setUpWorkspace';
 import { getPid, getPidFile } from './utils/pidHelper';
 import { requestByName, getNames } from './utils/socketsHelper';
 import ensureSelected from './utils/ensureSelected';

@@ -1,6 +1,6 @@
 
 import logger from './utils/logger';
-import { setUpWorkspace } from './utils/config';
+import setUpWorkspace from './utils/setUpWorkspace';
 import { requestAll } from './utils/socketsHelper';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';

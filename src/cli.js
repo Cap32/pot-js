@@ -90,7 +90,15 @@ yargs
 			;
 		},
 		async handler(argv) {
-			try { start(await resolveConfig(argv)); }
+			const { watch, watchDirs, watchIgnoreDotFiles, ...options } = argv;
+
+			options.watch = {
+				enable: watch,
+				dirs: watchDirs,
+				ignoreDotFiles: watchIgnoreDotFiles,
+			};
+
+			try { start(await resolveConfig(options)); }
 			catch (err) { logger.error(err.message); }
 		},
 	})

@@ -1,10 +1,26 @@
 
 import { spawn } from 'child_process';
-import { resolve } from 'path';
+import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
-import { ensureName, setUpWorkspace } from './utils/config';
+import setUpWorkspace from './utils/setUpWorkspace';
 import stop from './stop';
+
+const ensureName = (options = {}) => {
+	if (options.name) { return options; }
+
+	const { root } = options;
+
+	try {
+		const { name } = require(resolve(root, 'package.json'));
+		if (!name) { throw new Error(); }
+		options.name = name;
+	}
+	catch (err) {
+		const sepRegExp = new RegExp(sep, 'g');
+		options.name = root.replace(sepRegExp, '_');
+	}
+};
 
 const ensureOptions = (options = {}) => {
 	const cwd = process.cwd();
