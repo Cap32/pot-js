@@ -20,7 +20,8 @@ export const startServer = (id, socketsDir) => {
 			const { server } = ipc;
 
 			server.on('error', (err) => {
-				logger.error('server socket error', err);
+				logger.error(err.message);
+				logger.debug(err);
 			});
 
 			resolve(server);
@@ -48,7 +49,6 @@ export const startClient = (clientId, serverId, path) => {
 
 			socket.on('error', async (err) => {
 				logger.debug('socket error', err);
-				console.log('socket error', err);
 				if (err && err.code === 'ECONNREFUSED') {
 					await unlink(path);
 				}

@@ -2,7 +2,7 @@
 import respawn from 'respawn';
 import StdioIPC from '../utils/StdioIPC';
 import watch from '../utils/watch';
-import logger from '../utils/logger';
+import { getMonitorLogger, setMonitorLogger } from '../utils/logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer, stopServer } from '../utils/unixDomainSocket';
@@ -24,9 +24,12 @@ const start = (options) => {
 		...respawnOptions,
 	} = options;
 
+	const logger = getMonitorLogger();
+
 	workspace.set(space);
 
 	const stdio = daemon ? 'pipe' : 'inherit';
+
 	const monitor = respawn(command, {
 		...respawnOptions,
 		stdio: ['ignore', stdio, stdio],
@@ -42,7 +45,7 @@ const start = (options) => {
 	});
 
 	lifecycle(monitor, name);
-	daemon && logSystem(monitor, options);
+	logSystem(monitor);
 
 	const exit = () => {
 		logger.debug('exit');
@@ -71,8 +74,9 @@ const start = (options) => {
 	});
 };
 
-ipc.on('start', (options) => {
+ipc.on('start', async (options) => {
 	const { pid } = process;
+	const logger = await setMonitorLogger(options);
 	logger.debug('pid', pid);
 	ipc.send('pid', pid);
 	start(options);

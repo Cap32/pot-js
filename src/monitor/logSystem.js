@@ -1,9 +1,9 @@
 
-import getFileLogger from '../utils/getFileLogger';
+import { getMonitorLogger } from '../utils/logger';
 import { trim } from 'lodash';
 
-export default async function logSystem(monitor, { logsDir, logLevel }) {
-	const logger = await getFileLogger(logsDir, logLevel);
+export default function logSystem(monitor) {
+	const logger = getMonitorLogger();
 
 	monitor.on('stdout', (data) => {
 		logger.info(trim(data.toString()));

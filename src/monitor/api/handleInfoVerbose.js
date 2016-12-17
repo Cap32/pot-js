@@ -75,7 +75,10 @@ const handleInfoVerbose = (monitor, data, callback) => {
 	if (pid) {
 		pidUsage.stat(pid, (err, { memory }) => {
 			let resp = null;
-			if (err) { logger.error(err); }
+			if (err) {
+				logger.error(err.message);
+				logger.debug(err);
+			}
 			else {
 				resp = {
 					memoryUsage: {

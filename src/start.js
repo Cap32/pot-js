@@ -4,6 +4,7 @@ import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
 import setUpWorkspace from './utils/setUpWorkspace';
+import logger, { setLevel } from './utils/logger';
 import stop from './stop';
 
 const ensureName = (options = {}) => {
@@ -27,10 +28,10 @@ const ensureOptions = (options = {}) => {
 	options.root = resolve(cwd, (options.root || cwd));
 	const logsDir = options.logsDir || '.logs';
 	options.logsDir = resolve(options.root, logsDir);
-	options.logLevel = 'INFO';
 	options.watch = options.watch || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
+	setLevel(options.logLevel);
 	return setUpWorkspace(ensureName(options));
 };
 
@@ -43,10 +44,16 @@ const start = async (options = {}) => {
 
 	const pidFile = await getPidFile(name);
 
+	setTimeout(() => setLevel('WARN'), 2000);
+
 	const isExists = !!await getPid(pidFile, name);
 
 	if (isExists) {
-		if (force) { await stop(options); }
+		if (force) {
+			logger.trace(`force stop "${name}"`);
+			await stop(options);
+			logger.trace(`"${name}" stopped.`);
+		}
 		else { throw new Error(`"${name}" is running.`); }
 	}
 
@@ -68,6 +75,7 @@ const start = async (options = {}) => {
 			}
 		})
 		.on('start', () => {
+			logger.trace('monitor started');
 			monitor.emit('start');
 
 			if (daemon) {

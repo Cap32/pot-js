@@ -2,7 +2,7 @@
 import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
-import logger from './utils/logger';
+import logger, { setLevel } from './utils/logger';
 import resolveConfig from './utils/resolveConfig';
 import { start, stop, list, log } from './';
 
@@ -90,7 +90,9 @@ yargs
 			;
 		},
 		async handler(argv) {
-			const { watch, watchDirs, watchIgnoreDotFiles, ...options } = argv;
+			const {
+				watch, watchDirs, watchIgnoreDotFiles, ...options,
+			} = argv;
 
 			options.watch = {
 				enable: watch,
@@ -99,7 +101,10 @@ yargs
 			};
 
 			try { start(await resolveConfig(options)); }
-			catch (err) { logger.error(err.message); }
+			catch (err) {
+				setLevel(options.logLevel);
+				logger.error(err.message);
+			}
 		},
 	})
 	.command({
