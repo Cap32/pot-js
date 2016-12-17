@@ -217,10 +217,6 @@
         "wrap-regex": 0,
 
         "constructor-super": 2,
-        "generator-star-spacing": [2, {
-            "before" : true,
-            "after"  : true
-        }],
         "no-this-before-super": 2,
         "no-var": 0,
         "object-shorthand": 0,

@@ -27,13 +27,12 @@ const start = async (options = {}) => {
 		throw new Error(`"${name}" is running.`);
 	}
 
-	const stdOut = daemon ? 'ignore' : 'inherit';
-	const stdErr = daemon ? 'ignore' : 'inherit';
+	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
 	const monitor = spawn(execPath, [scriptFile], {
 		detached: daemon,
-		stdio: ['ipc', stdOut, stdErr],
+		stdio: ['ipc', stdio, stdio],
 		cwd: root,
 	});
 

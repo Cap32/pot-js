@@ -11,6 +11,9 @@ export const setUpWorkspace = (config = {}) => {
 
 export const ensureRoot = (config = {}) => {
 	config.root = config.root || process.cwd();
+	const logsDir = config.logsDir || '.logs';
+	config.logsDir = resolve(config.root, logsDir);
+	config.logLevel = 'INFO';
 	return config;
 };
 

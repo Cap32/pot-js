@@ -3,6 +3,8 @@ import respawn from 'respawn';
 import StdioIPC from '../utils/StdioIPC';
 import watch from '../utils/watch';
 import logger from '../utils/logger';
+import lifecycle from './lifecycle';
+import logSystem from './logSystem';
 import { startServer, stopServer } from '../utils/unixDomainSocket';
 import workspace from '../utils/workspace';
 import { createAPIServer } from './api';
@@ -12,67 +14,35 @@ const ipc = new StdioIPC(process);
 const startSocketServer = async (monitor, name) => {
 	const socketsDir = await workspace.getSocketsDir();
 	const socket = await startServer(name, socketsDir);
-
 	createAPIServer(monitor, socket);
-};
-
-const lifecycle = (monitor, name) => {
-	monitor.on('start', () => {
-		logger.info(`${name} started.`);
-		ipc.send('start');
-	});
-
-	monitor.on('stop', () => {
-		logger.info(`${name} stopped.`);
-	});
-
-	monitor.on('crash', () => {
-		logger.info(`${name} crashed.`);
-	});
-
-	monitor.on('sleep', () => {
-		logger.info(`${name} sleeped.`);
-	});
-
-	monitor.on('exit', async (code, signal) => {
-		logger.info(`${name} exit with code "${code}", signal "${signal}".`);
-	});
-
-	monitor.on('stdout', (data) => {
-		logger.info(`${name} stdout: ${data}`);
-	});
-
-	monitor.on('stderr', (data) => {
-		logger.error(`${name} stderr: ${data}`);
-	});
-
-	monitor.on('warn', (data) => {
-		logger.warn(`${name} warn: ${data}`);
-	});
-
-	monitor.start();
 };
 
 const start = (options) => {
 	const { name } = options;
 	const {
-		watch: watchOptions, workspace: space, command,
+		watch: watchOptions, workspace: space, command, daemon, logsDir,
 		...respawnOptions,
 	} = options;
 
 	workspace.set(space);
 
+	const stdio = daemon ? 'pipe' : 'inherit';
 	const monitor = respawn(command, {
 		...respawnOptions,
-		stdio: ['ignore', 'inherit', 'inherit'],
+		stdio: ['ignore', stdio, stdio],
 		data: {
 			parentPid: process.pid,
+			logsDir,
 		},
 	});
 
-	lifecycle(monitor, name);
+	monitor.once('start', () => {
+		ipc.send('start');
+		startSocketServer(monitor, name);
+	});
 
-	startSocketServer(monitor, name);
+	lifecycle(monitor, name);
+	daemon && logSystem(monitor, options);
 
 	const exit = () => {
 		logger.debug('exit');
