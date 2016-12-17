@@ -67,7 +67,7 @@ yargs
 		},
 	})
 	.command({
-		command: 'stop <name>',
+		command: 'stop [name]',
 		desc: 'Stop process',
 		demand: 2,
 		handler(argv) {
@@ -78,21 +78,44 @@ yargs
 		command: 'list',
 		aliases: ['ls'],
 		desc: 'List processes',
-		handler() {
-			list().catch((err) => logger.error(err.message));
+		builder(yargs) {
+			yargs // eslint-disable-line
+				.options({
+					t: {
+						alias: 'category',
+						desc: 'Log category',
+						default: 'out',
+						type: 'string',
+					},
+					f: {
+						alias: 'follow',
+						desc: 'Follow mode. Just like `trail -f`.',
+						type: 'bool',
+					},
+					n: {
+						alias: 'line',
+						desc: 'Max lines.',
+						type: 'number',
+						default: 200,
+					},
+				})
+				.argv
+			;
+		},
+		handler(argv) {
+			list(argv).catch((err) => logger.error(err.message));
 		},
 	})
 	.command({
-		command: 'log <name> [args]',
-		desc: 'Show logs',
-		demand: 2,
+		command: 'log [name]',
+		desc: 'Show log',
+		// demand: 2,
 		builder(yargs) {
 			yargs // eslint-disable-line
 				.options({
 					c: {
 						alias: 'category',
 						desc: 'Log category',
-						default: 'out',
 						type: 'string',
 					},
 					f: {

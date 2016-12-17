@@ -3,19 +3,21 @@ import { spawn } from 'child_process';
 import { resolve } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
-import {
-	ensureName, ensureRoot, ensureWatch, setUpWorkspace,
-} from './utils/config';
-import { flow } from 'lodash/fp';
+import { ensureName, setUpWorkspace } from './utils/config';
+
+const ensureOptions = (options = {}) => {
+	options.root = options.root || process.cwd();
+	const logsDir = options.logsDir || '.logs';
+	options.logsDir = resolve(options.root, logsDir);
+	options.logLevel = 'INFO';
+	options.watch = options.watch || {};
+	return setUpWorkspace(ensureName(options));
+};
 
 const start = async (options = {}) => {
-	const merge = flow([
-		ensureRoot, ensureName, ensureWatch, setUpWorkspace,
-	]);
-
 	const {
 		root, name, command, execCommand, daemon,
-	} = merge(options);
+	} = ensureOptions(options);
 
 	options.command = [execCommand, resolve(root, command)];
 

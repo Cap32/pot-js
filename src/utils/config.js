@@ -9,14 +9,6 @@ export const setUpWorkspace = (config = {}) => {
 	return config;
 };
 
-export const ensureRoot = (config = {}) => {
-	config.root = config.root || process.cwd();
-	const logsDir = config.logsDir || '.logs';
-	config.logsDir = resolve(config.root, logsDir);
-	config.logLevel = 'INFO';
-	return config;
-};
-
 export const ensureName = (config = {}) => {
 	if (config.name) { return config; }
 
@@ -32,9 +24,4 @@ export const ensureName = (config = {}) => {
 		const sepRegExp = new RegExp(sep, 'g');
 		return root.replace(sepRegExp, '_');
 	}
-};
-
-export const ensureWatch = (config = {}) => {
-	config.watch = config.watch || {};
-	return config;
 };

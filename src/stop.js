@@ -3,10 +3,19 @@ import { unlink } from 'fs-promise';
 import logger from './utils/logger';
 import { setUpWorkspace } from './utils/config';
 import { getPid, getPidFile } from './utils/pidHelper';
-import { requestByName } from './utils/socketsHelper';
+import { requestByName, getNames } from './utils/socketsHelper';
+import ensureSelected from './utils/ensureSelected';
 
 const stop = async (options = {}) => {
-	const { name } = setUpWorkspace(options);
+	let { name } = setUpWorkspace(options);
+
+	name = await ensureSelected({
+		value: name,
+		message: 'Please select the target app.',
+		errorMessage: 'No process is running.',
+		getChoices: getNames,
+	});
+
 	const pidFile = await getPidFile(name);
 
 	const pid = await getPid(pidFile);
