@@ -2,7 +2,14 @@
 
 const { _ = '' } = process.env;
 
-if (_.endsWith('babel-node')) {
+let useBabelNode = _.endsWith('babel-node');
+
+if (useBabelNode) {
+	try { require.resolve('../src/monitor'); }
+	catch (err) { useBabelNode = false; }
+}
+
+if (useBabelNode) {
 	require('babel-register')();
 	require('../src/monitor');
 }
