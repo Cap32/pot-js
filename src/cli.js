@@ -3,7 +3,7 @@ import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
 import logger, { setLevel } from './utils/logger';
-import resolveConfig from './utils/resolveConfig';
+import resolveConfig, { Defaults } from './utils/resolveConfig';
 import { start, stop, list, log } from './';
 
 // eslint-disable-next-line
@@ -15,6 +15,7 @@ yargs
 		desc: 'Start process',
 		builder(yargs) {
 			yargs // eslint-disable-line
+				.default('entry', Defaults.ENTRY)
 				.options({
 					name: {
 						desc: 'Server name',
@@ -29,6 +30,7 @@ yargs
 					p: {
 						alias: 'production',
 						desc: 'Short hand for set NODE_ENV="production" env',
+						default: false,
 						type: 'bool',
 					},
 					l: {
@@ -42,17 +44,17 @@ yargs
 					w: {
 						alias: 'watch',
 						desc: 'Enable watch mode',
-						default: false,
+						default: Defaults.WATCH,
 						type: 'bool',
 					},
 					'watch-dirs': {
 						desc: 'Watch dirs',
-						default: ['**/*'],
+						default: Defaults.WATCH_DIRS,
 						type: 'array',
 					},
 					'watch-ignore-dot-files': {
 						desc: 'Ignore watch dot files',
-						default: true,
+						default: Defaults.WATCH_IGNORE_DOT_FILES,
 						type: 'bool',
 					},
 					f: {
@@ -77,12 +79,12 @@ yargs
 					},
 					'exec-command': {
 						desc: 'Exec command',
-						default: process.execPath,
+						default: Defaults.EXEC_COMMAND,
 						type: 'string',
 					},
 					'logs-dir': {
 						desc: 'Log files dir. Resolve from `root`',
-						default: '.logs',
+						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},
 				})
@@ -100,10 +102,13 @@ yargs
 				ignoreDotFiles: watchIgnoreDotFiles,
 			};
 
-			try { start(await resolveConfig(options)); }
+			try {
+				await start(await resolveConfig(options));
+			}
 			catch (err) {
 				setLevel(options.logLevel);
 				logger.error(err.message);
+				logger.debug(err);
 			}
 		},
 	})

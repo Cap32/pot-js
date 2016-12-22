@@ -3,12 +3,15 @@ import { ensureDir } from 'fs-promise';
 import homeOrTmp from 'home-or-tmp';
 import { name } from '../../package.json';
 import { join } from 'path';
+import { isObject } from 'lodash';
+
+const { POT_WORKSPACE = 'defaults' } = process.env;
 
 const root = join(homeOrTmp, '.config', name);
 
 const workspace = {
 	_getConfigDir() {
-		return join(root, this._name || 'defaults');
+		return join(root, this._name || POT_WORKSPACE);
 	},
 
 	async _getDir(dirname) {
@@ -29,7 +32,7 @@ const workspace = {
 	},
 
 	set(name) {
-		this._name = name;
+		this._name = isObject(name) ? name.workspace : (name || POT_WORKSPACE);
 	},
 };
 

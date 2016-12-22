@@ -1,6 +1,6 @@
 
 import logger from './utils/logger';
-import setUpWorkspace from './utils/setUpWorkspace';
+import workspace from './utils/workspace';
 import { requestAll } from './utils/socketsHelper';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';
@@ -24,7 +24,9 @@ const list = async (options = {}) => {
 			info.startedLocal,
 			info.parentPid,
 		],
-	} = setUpWorkspace(options);
+	} = options;
+
+	workspace.set(options);
 
 	const table = new Table({
 		head,

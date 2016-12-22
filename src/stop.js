@@ -1,15 +1,17 @@
 
 import { unlink } from 'fs-promise';
 import logger from './utils/logger';
-import setUpWorkspace from './utils/setUpWorkspace';
+import workspace from './utils/workspace';
 import { getPid, getPidFile } from './utils/pidHelper';
 import { requestByName, getNames } from './utils/socketsHelper';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
 const stop = async (options = {}) => {
-	let { name } = setUpWorkspace(options);
+	let { name } = options;
 	const { force } = options;
+
+	workspace.set(options);
 
 	name = await ensureSelected({
 		value: name,

@@ -3,9 +3,10 @@ import { spawn } from 'child_process';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
-import setUpWorkspace from './utils/setUpWorkspace';
+import workspace from './utils/workspace';
 import logger, { setLevel } from './utils/logger';
 import stop from './stop';
+import { Defaults } from './utils/resolveConfig';
 
 const ensureName = (options = {}) => {
 	if (options.name) { return options; }
@@ -26,13 +27,15 @@ const ensureName = (options = {}) => {
 const ensureOptions = (options = {}) => {
 	const cwd = process.cwd();
 	options.root = resolve(cwd, (options.root || cwd));
-	const logsDir = options.logsDir || '.logs';
+	const logsDir = options.logsDir || Defaults.LOGS_DIR;
 	options.logsDir = resolve(options.root, logsDir);
+	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
+	options.entry = options.entry || Defaults.ENTRY;
 	options.watch = options.watch || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
-	setLevel(options.logLevel);
-	return setUpWorkspace(ensureName(options));
+	ensureName(options);
+	return options;
 };
 
 const start = async (options = {}) => {
@@ -40,11 +43,19 @@ const start = async (options = {}) => {
 		root, name, entry, execCommand, daemon, force,
 	} = ensureOptions(options);
 
-	options.command = [execCommand, resolve(root, entry)];
+	setLevel(options.logLevel);
+	workspace.set(options);
+
+	const commandModulePath = resolve(root, entry);
+
+	// throw error if `commandModulePath` is not exits.
+	require.resolve(commandModulePath);
+
+	options.command = [execCommand, commandModulePath];
+
+	logger.trace('command:', options.command);
 
 	const pidFile = await getPidFile(name);
-
-	setTimeout(() => setLevel('WARN'), 2000);
 
 	const isExists = !!await getPid(pidFile, name);
 
