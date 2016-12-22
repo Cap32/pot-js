@@ -44,7 +44,7 @@ const start = (options) => {
 		startSocketServer(monitor, name);
 	});
 
-	lifecycle(monitor, name);
+	lifecycle(monitor, options);
 	logSystem(monitor);
 
 	const exit = () => {
