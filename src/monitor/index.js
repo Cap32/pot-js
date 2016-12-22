@@ -18,6 +18,8 @@ const startSocketServer = async (monitor, name) => {
 };
 
 const start = (options) => {
+	options = eval(`(${options})`); // eslint-disable-line
+
 	const { name } = options;
 	const {
 		watch: watchOptions, workspace: space, command, daemon, logsDir,

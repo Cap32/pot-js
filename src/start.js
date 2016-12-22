@@ -7,8 +7,9 @@ import workspace from './utils/workspace';
 import logger, { setLevel } from './utils/logger';
 import stop from './stop';
 import { Defaults } from './utils/resolveConfig';
+import serialize from 'serialize-javascript';
 
-const ensureName = (options = {}) => {
+const ensureName = (options) => {
 	if (options.name) { return options; }
 
 	const { root } = options;
@@ -35,7 +36,7 @@ const ensureOptions = (options = {}) => {
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
 	ensureName(options);
-	return options;
+	return serialize(options);
 };
 
 const start = async (options = {}) => {
