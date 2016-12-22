@@ -7,7 +7,6 @@ import workspace from './utils/workspace';
 import logger, { setLevel } from './utils/logger';
 import stop from './stop';
 import { Defaults } from './utils/resolveConfig';
-import serialize from 'serialize-javascript';
 
 const ensureName = (options) => {
 	if (options.name) { return options; }
@@ -27,6 +26,9 @@ const ensureName = (options) => {
 
 const ensureOptions = (options = {}) => {
 	const cwd = process.cwd();
+	const { daemon } = options;
+	const std = daemon ? 'pipe' : 'inherit';
+	options.stdio = options.stdio || ['ignore', std, std];
 	options.root = resolve(cwd, (options.root || cwd));
 	const logsDir = options.logsDir || Defaults.LOGS_DIR;
 	options.logsDir = resolve(options.root, logsDir);
@@ -36,7 +38,7 @@ const ensureOptions = (options = {}) => {
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
 	ensureName(options);
-	return serialize(options);
+	return options;
 };
 
 const start = async (options = {}) => {

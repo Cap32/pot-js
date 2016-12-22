@@ -18,11 +18,9 @@ const startSocketServer = async (monitor, name) => {
 };
 
 const start = (options) => {
-	options = eval(`(${options})`); // eslint-disable-line
-
 	const { name } = options;
 	const {
-		watch: watchOptions, workspace: space, command, daemon, logsDir,
+		watch: watchOptions, workspace: space, command, logsDir,
 		...respawnOptions,
 	} = options;
 
@@ -30,11 +28,8 @@ const start = (options) => {
 
 	workspace.set(space);
 
-	const stdio = daemon ? 'pipe' : 'inherit';
-
 	const monitor = respawn(command, {
 		...respawnOptions,
-		stdio: ['ignore', stdio, stdio],
 		data: {
 			parentPid: process.pid,
 			logsDir,
