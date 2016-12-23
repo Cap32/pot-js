@@ -34,6 +34,7 @@ const ensureOptions = (options = {}) => {
 	options.logsDir = resolve(options.root, logsDir);
 	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
 	options.entry = options.entry || Defaults.ENTRY;
+	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
 	options.watch = options.watch || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
@@ -47,6 +48,9 @@ const start = async (options = {}) => {
 	} = ensureOptions(options);
 
 	setLevel(options.logLevel);
+
+	logger.trace('logLevel', options.logLevel);
+
 	workspace.set(options);
 
 	const commandModulePath = resolve(root, entry);
@@ -74,15 +78,15 @@ const start = async (options = {}) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
-	const monitor = spawn(execPath, [scriptFile], {
+	const child = spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
 		cwd: root,
 	});
 
-	const ipc = new StdioIPC(monitor);
+	const childIPC = new StdioIPC(child);
 
-	ipc
+	childIPC
 		.on('pid', async (pid) => {
 			if (daemon) {
 				await writePidFile(pidFile, pid);
@@ -90,17 +94,16 @@ const start = async (options = {}) => {
 		})
 		.on('start', () => {
 			logger.trace('monitor started');
-			monitor.emit('start');
 
 			if (daemon) {
-				monitor.disconnect();
-				monitor.unref();
+				child.disconnect();
+				child.unref();
 			}
 		})
 		.send('start', { pidFile, ...options })
 	;
 
-	return monitor;
+	return child;
 };
 
 export default start;

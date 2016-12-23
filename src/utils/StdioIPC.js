@@ -1,4 +1,5 @@
 
+import logger from './logger';
 import { serialize, deserialize } from './serialize';
 
 export default class StdioIPC {
@@ -17,6 +18,7 @@ export default class StdioIPC {
 	}
 
 	send(command, payload) {
+		logger.trace('send', this._process.connected);
 		if (this._process.connected) {
 			this._process.send(serialize({ command, payload }));
 		}

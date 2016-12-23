@@ -7,6 +7,7 @@ import JSON5 from 'json5';
 export const Defaults = {
 	ENTRY: 'index.js',
 	EXEC_COMMAND: process.execPath,
+	LOG_LEVEL: 'INFO',
 	LOGS_DIR: '.logs',
 	WATCH: false,
 	WATCH_DIRS: ['**/*'],

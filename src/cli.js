@@ -39,7 +39,7 @@ yargs
 						choices: [
 							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
 						],
-						default: 'INFO',
+						default: Defaults.LOG_LEVEL,
 					},
 					w: {
 						alias: 'watch',
