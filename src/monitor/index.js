@@ -7,8 +7,8 @@ import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer, stopServer } from '../utils/unixDomainSocket';
 import workspace from '../utils/workspace';
+import { serialize } from '../utils/serialize';
 import { createAPIServer } from './api';
-import { omit } from 'lodash';
 
 const parentIPC = new StdioIPC(process);
 
@@ -22,7 +22,7 @@ const start = (options) => {
 	const { name } = options;
 	const {
 		watch: watchOptions, workspace: space,
-		command, logsDir, env,
+		command, logsDir, /*env, */daemon, inject,
 		...respawnOptions,
 	} = options;
 
@@ -30,12 +30,15 @@ const start = (options) => {
 
 	workspace.set(space);
 
+	const std = daemon ? 'pipe' : 'inherit';
+
 	const monitor = respawn(command, {
+		stdio: [inject ? 'ipc' : 'ignore', std, std],
 		...respawnOptions,
-		env: {
-			...env,
-			POT_CONFIG: JSON.stringify(omit(options, ['env'])),
-		},
+		// env: {
+		// 	...env,
+		// 	POT_CONFIG: JSON.stringify(omit(options, ['env'])),
+		// },
 		data: {
 			parentPid: process.pid,
 			logsDir,
@@ -46,6 +49,16 @@ const start = (options) => {
 		startSocketServer(monitor, name);
 		parentIPC.send('start');
 	});
+
+	if (inject) {
+		monitor.on('spawn', (child) => {
+			logger.debug('child.connected', child.connected);
+			if (child.connected) {
+				child.send(serialize(options));
+				child.disconnect();
+			}
+		});
+	}
 
 	lifecycle(monitor, options);
 	logSystem(monitor);

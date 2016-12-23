@@ -87,6 +87,10 @@ yargs
 						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},
+					inject: {
+						desc: 'Enable to inject config data to child process',
+						type: 'bool',
+					},
 				})
 				.argv
 			;

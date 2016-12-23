@@ -26,9 +26,6 @@ const ensureName = (options) => {
 
 const ensureOptions = (options = {}) => {
 	const cwd = process.cwd();
-	const { daemon } = options;
-	const std = daemon ? 'pipe' : 'inherit';
-	options.stdio = options.stdio || ['ignore', std, std];
 	options.root = resolve(cwd, (options.root || cwd));
 	const logsDir = options.logsDir || Defaults.LOGS_DIR;
 	options.logsDir = resolve(options.root, logsDir);
@@ -36,6 +33,8 @@ const ensureOptions = (options = {}) => {
 	options.entry = options.entry || Defaults.ENTRY;
 	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
 	options.watch = options.watch || {};
+	options.data = options.data || {};
+	options.events = options.events || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
 	ensureName(options);
