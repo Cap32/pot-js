@@ -33,7 +33,6 @@ const ensureOptions = (options = {}) => {
 	options.entry = options.entry || Defaults.ENTRY;
 	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
 	options.watch = options.watch || {};
-	options.data = options.data || {};
 	options.events = options.events || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }

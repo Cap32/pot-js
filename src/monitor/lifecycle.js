@@ -1,6 +1,6 @@
 
 import { getMonitorLogger } from '../utils/logger';
-import { join } from 'path';
+import resolve, { requireES6 } from '../utils/resolve';
 
 export default function lifecycle(monitor, options) {
 	const { name, events, root } = options;
@@ -10,7 +10,8 @@ export default function lifecycle(monitor, options) {
 		if (!modulePath) { return; }
 
 		try {
-			require(join(root, modulePath))(...args);
+			const handler = requireES6(resolve(root, modulePath));
+			handler(...args);
 		}
 		catch (err) {
 			logger.error(err.message);
