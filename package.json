@@ -1,7 +1,7 @@
 {
   "name": "pot-js",
   "description": "A script runner",
-  "version": "0.0.0-alpha.11",
+  "version": "0.0.0-alpha.12",
   "main": "lib/index",
   "bin": {
     "pot": "bin/pot"
