@@ -7,6 +7,6 @@ process.on('message', (buf) => {
 	require('http').createServer((req, res) => {
 		console.log('[HTTP]', req.url);
 		res.end('hello, pot-js');
-	}).listen(config.data.port);
+	}).listen(3000);
 
 });

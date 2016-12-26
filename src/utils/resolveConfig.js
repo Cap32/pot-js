@@ -3,7 +3,7 @@ import findUp from 'find-up';
 import { readFile } from 'fs-promise';
 import { merge } from 'lodash';
 import JSON5 from 'json5';
-import { requireES6 } from './resolve';
+import importModule from './importModule';
 
 export const Defaults = {
 	ENTRY: 'index.js',
@@ -21,7 +21,7 @@ export default async function resolveConfig(options = {}) {
 
 	const resolveModule = async (modulePath) => {
 		if (modulePath.endsWith('.js')) {
-			return requireES6(modulePath);
+			return importModule(modulePath);
 		}
 		else {
 			const jsonStr = await readFile(configFile, 'utf-8');

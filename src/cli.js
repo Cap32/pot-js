@@ -96,21 +96,11 @@ yargs
 			;
 		},
 		async handler(argv) {
-			const {
-				watch, watchDirs, watchIgnoreDotFiles, ...options,
-			} = argv;
-
-			options.watch = {
-				enable: watch,
-				dirs: watchDirs,
-				ignoreDotFiles: watchIgnoreDotFiles,
-			};
-
 			try {
-				await start(await resolveConfig(options));
+				await start(await resolveConfig(argv));
 			}
 			catch (err) {
-				setLevel(options.logLevel);
+				setLevel(argv.logLevel);
 				logger.error(err.message);
 				logger.debug(err);
 			}

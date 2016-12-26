@@ -6,6 +6,8 @@ import Table from 'cli-table';
 import { isUndefined } from 'lodash';
 
 const list = async (options = {}) => {
+	workspace.set(options);
+
 	const infoList = await requestAll('infoVerbose');
 
 	if (!infoList.length) {
@@ -25,8 +27,6 @@ const list = async (options = {}) => {
 			info.parentPid,
 		],
 	} = options;
-
-	workspace.set(options);
 
 	const table = new Table({
 		head,

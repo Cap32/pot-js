@@ -24,6 +24,21 @@ const ensureName = (options) => {
 	}
 };
 
+const ensureWatch = (options) => {
+	if (!options.watch) { return options; }
+
+	let { watch } = options;
+
+	watch === true && (watch = { enable: true });
+
+	options.watch = {
+		ignoreDotFiles: watch.ignoreDotFiles || options.watchIgnoreDotFiles,
+		dirs: watch.dirs || options.watchDirs,
+		...watch,
+	};
+
+};
+
 const ensureOptions = (options = {}) => {
 	const cwd = process.cwd();
 	options.root = resolve(cwd, (options.root || cwd));
@@ -32,11 +47,11 @@ const ensureOptions = (options = {}) => {
 	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
 	options.entry = options.entry || Defaults.ENTRY;
 	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
-	options.watch = options.watch || {};
 	options.events = options.events || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
 	ensureName(options);
+	ensureWatch(options);
 	return options;
 };
 
