@@ -1,10 +1,6 @@
 
 const handleInfo = (monitor, _, callback) => {
-	const { data, ...monitorInfo, } = monitor.toJSON();
-	callback({
-		...monitorInfo,
-		...data,
-	});
+	callback(monitor.toJSON());
 };
 
 export default handleInfo;

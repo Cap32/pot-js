@@ -24,7 +24,7 @@ const list = async (options = {}) => {
 			info.crashes,
 			info.memoryUsage.formattedString,
 			info.startedLocal,
-			info.parentPid,
+			info.data.parentPid,
 		],
 	} = options;
 

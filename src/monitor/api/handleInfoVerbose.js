@@ -53,14 +53,12 @@ const startedLocal = (info) => {
 
 const handleInfoVerbose = (monitor, data, callback) => {
 	const emit = (rest = {}) => {
-		const { data, ...monitorInfo, } = monitor.toJSON();
 		const info = {
 			memoryUsage: {
 				heapUsed: '-',
 				heapTotal: '-',
 			},
-			...monitorInfo,
-			...data,
+			...monitor.toJSON(),
 			...rest,
 		};
 

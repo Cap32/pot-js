@@ -1,13 +1,11 @@
 
 import respawn from 'respawn';
 import StdioIPC from '../utils/StdioIPC';
-import watch from '../utils/watch';
-import { getMonitorLogger, setMonitorLogger } from '../utils/logger';
+import { setMonitorLogger } from '../utils/logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
-import { startServer, stopServer } from '../utils/unixDomainSocket';
+import { startServer } from '../utils/unixDomainSocket';
 import workspace from '../utils/workspace';
-import { serialize } from '../utils/serialize';
 import { createAPIServer } from './api';
 
 const parentIPC = new StdioIPC(process);
@@ -21,12 +19,10 @@ const startSocketServer = async (monitor, name) => {
 const start = (options) => {
 	const { name } = options;
 	const {
-		watch: watchOptions, workspace: space,
-		command, logsDir, /*env, */daemon, inject,
+		workspace: space,
+		command, daemon, inject,
 		...respawnOptions,
 	} = options;
-
-	const logger = getMonitorLogger();
 
 	workspace.set(space);
 
@@ -35,13 +31,9 @@ const start = (options) => {
 	const monitor = respawn(command, {
 		stdio: [inject ? 'ipc' : 'ignore', std, std],
 		...respawnOptions,
-		// env: {
-		// 	...env,
-		// 	POT_CONFIG: JSON.stringify(omit(options, ['env'])),
-		// },
 		data: {
+			...options,
 			parentPid: process.pid,
-			logsDir,
 		},
 	});
 
@@ -50,44 +42,8 @@ const start = (options) => {
 		parentIPC.send('start');
 	});
 
-	if (inject) {
-		monitor.on('spawn', (child) => {
-			logger.debug('child.connected', child.connected);
-			if (child.connected) {
-				child.send(serialize(options));
-				child.disconnect();
-			}
-		});
-	}
-
 	lifecycle(monitor, options);
 	logSystem(monitor);
-
-	const exit = () => {
-		logger.debug('exit');
-		stopServer();
-		monitor.stop(::process.exit);
-	};
-
-	process.on('SIGINT', exit);
-	process.on('SIGTERM', exit);
-	process.on('uncaughtException', (err) => {
-		logger.error(err);
-		exit();
-	});
-
-	watch(watchOptions, (file, stat) => {
-		logger.debug('watch:restart', stat);
-
-		process.emit('watch:restart', { file, stat });
-
-		return new Promise((resolve) => {
-			monitor.stop(() => {
-				monitor.start();
-				resolve();
-			});
-		});
-	});
 };
 
 parentIPC.on('start', async (options) => {
