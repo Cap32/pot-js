@@ -5,32 +5,37 @@ import { requestByName, getNames } from './utils/socketsHelper';
 import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';
+import workspace from './utils/workspace';
 
-const log = async ({ name, line, category, follow }) => {
-	name = await ensureSelected({
+const log = async (options) => {
+	workspace.set(options);
+
+	const { name, line, category, follow } = options;
+
+	const appName = await ensureSelected({
 		value: name,
 		message: 'Please select the target app.',
 		errorMessage: 'No process is running.',
 		getChoices: getNames,
 	});
 
-	const info = await requestByName(name, 'info');
+	const info = await requestByName(appName, 'info');
 	if (!info) {
-		throw new Error(`"${name}" is NOT found.`);
+		throw new Error(`"${appName}" is NOT found.`);
 	}
 
 	const { logsDir } = info;
 
-	category = await ensureSelected({
+	let appCategory = await ensureSelected({
 		value: category,
 		message: 'Please select a log file.',
 		errorMessage: 'Log file NOT found.',
 		getChoices: () => globby('*.log', { cwd: logsDir }),
 	});
 
-	if (!category.endsWith('.log')) { category += '.log'; }
+	if (!appCategory.endsWith('.log')) { appCategory += '.log'; }
 
-	const logFile = join(logsDir, category);
+	const logFile = join(logsDir, appCategory);
 	const sf = sliceFile(logFile);
 	const mode = follow ? 'follow' : 'slice';
 
