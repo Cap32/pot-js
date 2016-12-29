@@ -24,7 +24,7 @@ const log = async (options) => {
 		throw new Error(`"${appName}" is NOT found.`);
 	}
 
-	const { logsDir } = info;
+	const { logsDir } = info.data;
 
 	let appCategory = await ensureSelected({
 		value: category,
