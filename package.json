@@ -7,7 +7,8 @@
     "pot": "bin/pot"
   },
   "scripts": {
-    "start": "babel-node src/cli",
+    "start": "babel-node src/cli start test/server",
+    "test": "babel-node src/cli",
     "prebuild": "rimraf lib",
     "build": "babel src -d lib",
     "prepublish": "npm run build"
