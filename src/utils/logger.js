@@ -3,8 +3,6 @@ import { resolve } from 'path';
 import { ensureDir } from 'fs-promise';
 import log4js from 'log4js';
 
-let monitorLogger;
-
 log4js.configure({
 	appenders: [{
 		type: 'console',
@@ -27,13 +25,15 @@ export const setLevel = (newLevel) => {
 	return logger;
 };
 
-export const setMonitorLogger = async function setMonitorLogger(options) {
+let originMonitorLogger;
+
+export const initMonitorLogger = async function initMonitorLogger(options) {
 	const { logsDir, daemon, logLevel } = options;
 
 	if (!daemon) {
-		monitorLogger = log4js.getLogger();
-		monitorLogger.setLevel(logLevel);
-		return monitorLogger;
+		originMonitorLogger = log4js.getLogger();
+		originMonitorLogger.setLevel(logLevel);
+		return originMonitorLogger;
 	}
 
 	await ensureDir(logsDir);
@@ -65,11 +65,13 @@ export const setMonitorLogger = async function setMonitorLogger(options) {
 		],
 	});
 
-	monitorLogger = log4js.getLogger('out');
-	monitorLogger.setLevel(logLevel);
-	return monitorLogger;
+	originMonitorLogger = log4js.getLogger('out');
+	originMonitorLogger.setLevel(logLevel);
+	return originMonitorLogger;
 };
 
-export const getMonitorLogger = function getMonitorLogger() {
-	return monitorLogger;
-};
+export const monitorLogger = new Proxy({}, {
+	get(target, key) {
+		return originMonitorLogger[key];
+	}
+});

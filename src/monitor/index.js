@@ -1,7 +1,7 @@
 
 import respawn from 'respawn';
 import StdioIPC from '../utils/StdioIPC';
-import { setMonitorLogger } from '../utils/logger';
+import { initMonitorLogger } from '../utils/logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
@@ -48,7 +48,7 @@ const start = (options) => {
 
 parentIPC.on('start', async (options) => {
 	const { pid } = process;
-	const logger = await setMonitorLogger(options);
+	const logger = await initMonitorLogger(options);
 	logger.debug('pid', pid);
 	parentIPC.send('pid', pid);
 	start(options);

@@ -1,9 +1,8 @@
 
-import { getMonitorLogger } from '../utils/logger';
+import { monitorLogger, setLevel } from '../utils/logger';
 import importModule from '../utils/importModule';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
-import { setLevel } from '../utils/logger';
 import { stopServer } from '../utils/unixDomainSocket';
 import { once } from 'lodash';
 
@@ -12,7 +11,6 @@ const isProd = NODE_ENV === 'production';
 
 export default function lifecycle(monitor, options) {
 	const { name, events, inject, watch: watchOptions } = options;
-	const logger = getMonitorLogger();
 
 	const handle = (modulePath, ...args) => {
 		if (!modulePath) { return; }
@@ -22,13 +20,13 @@ export default function lifecycle(monitor, options) {
 			handler(...args);
 		}
 		catch (err) {
-			logger.error(err.message);
-			logger.debug(err);
+			monitorLogger.error(err.message);
+			monitorLogger.debug(err);
 		}
 	};
 
 	const logStart = () => {
-		logger.info(`${name} started.`);
+		monitorLogger.info(`${name} started.`);
 	};
 	const logStartOnce = once(logStart);
 
@@ -38,26 +36,26 @@ export default function lifecycle(monitor, options) {
 	});
 
 	monitor.on('stop', () => {
-		isProd && logger.warn(`${name} stopped.`);
+		isProd && monitorLogger.warn(`${name} stopped.`);
 		handle(events.stop);
 	});
 
 	monitor.on('crash', () => {
-		logger.fatal(`${name} crashed.`);
+		monitorLogger.fatal(`${name} crashed.`);
 		handle(events.crash);
 	});
 
 	monitor.on('sleep', () => {
-		logger.warn(`${name} sleeped.`);
+		monitorLogger.warn(`${name} sleeped.`);
 		handle(events.sleep);
 	});
 
 	monitor.on('spawn', (child) => {
-		logger.trace('spawn');
+		monitorLogger.trace('spawn');
 		handle(events.spawn, child);
 
 		if (inject) {
-			logger.trace('child.connected', child.connected);
+			monitorLogger.trace('child.connected', child.connected);
 			if (child.connected) {
 				child.send(serialize(options));
 				child.disconnect();
@@ -66,12 +64,14 @@ export default function lifecycle(monitor, options) {
 	});
 
 	monitor.on('exit', async (code, signal) => {
-		logger.debug(`${name} exit with code "${code}", signal "${signal}".`);
+		monitorLogger.debug(
+			`${name} exit with code "${code}", signal "${signal}".`
+		);
 		handle(events.exit, code, signal);
 	});
 
 	const exit = () => {
-		logger.debug('exit');
+		monitorLogger.debug('exit');
 		stopServer();
 		monitor.stop(::process.exit);
 	};
@@ -85,13 +85,13 @@ export default function lifecycle(monitor, options) {
 	process.on('SIGTERM', silentExit);
 	process.on('uncaughtException', (err) => {
 		handle(event.uncaughtException, err);
-		logger.error(err);
+		monitorLogger.error(err);
 		exit();
 	});
 
 	watch(watchOptions, (file, stat) => {
-		logger.info('restart');
-		logger.debug('watch:restart', stat);
+		monitorLogger.info('restart');
+		monitorLogger.debug('watch:restart', stat);
 
 		process.emit('watch:restart', { file, stat });
 		handle(events.restart);
