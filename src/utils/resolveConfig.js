@@ -4,6 +4,7 @@ import { readFile } from 'fs-promise';
 import { merge } from 'lodash';
 import JSON5 from 'json5';
 import importModule from './importModule';
+import { extname, isAbsolute } from 'path';
 
 export const Defaults = {
 	ENTRY: 'index.js',
@@ -17,10 +18,12 @@ export const Defaults = {
 
 export default async function resolveConfig(options = {}) {
 	const { config, configWalk } = options;
-	const configFile = configWalk ? await findUp(config) : config;
+	const shouldWalk = configWalk && !isAbsolute(config);
+	const configFile = shouldWalk ? await findUp(config) : config;
 
 	const resolveModule = async (modulePath) => {
-		if (modulePath.endsWith('.js')) {
+		const ext = extname(modulePath);
+		if (!ext || ext === '.js') {
 			return importModule(modulePath);
 		}
 		else {
