@@ -4,7 +4,7 @@ import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
 import logger, { setLevel } from './utils/logger';
 import resolveConfig, { Defaults } from './utils/resolveConfig';
-import { start, stop, list, log } from './';
+import { start, stop, list, log, dir } from './';
 
 // eslint-disable-next-line
 yargs
@@ -161,6 +161,13 @@ yargs
 		},
 		handler(argv) {
 			log(argv).catch((err) => logger.error(err.message));
+		},
+	})
+	.command({
+		command: 'dir [name]',
+		desc: 'Show dir',
+		handler(argv) {
+			dir(argv).catch((err) => logger.error(err.message));
 		},
 	})
 	.env(upperCase(name))
