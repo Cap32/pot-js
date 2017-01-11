@@ -78,12 +78,14 @@ const start = async (options = {}) => {
 	const pidFile = await getPidFile(name);
 
 	const isExists = !!await getPid(pidFile, name);
+	let isRestart = false;
 
 	if (isExists) {
 		if (force) {
 			logger.trace(`force stop "${name}"`);
 			await stop(options);
 			logger.trace(`"${name}" stopped.`);
+			isRestart = true;
 		}
 		else { throw new Error(`"${name}" is running.`); }
 	}
@@ -107,6 +109,10 @@ const start = async (options = {}) => {
 		})
 		.on('start', () => {
 			logger.trace('monitor started');
+
+			if (isRestart) {
+				logger.info(`"${name}" started.`);
+			}
 
 			if (daemon) {
 				child.disconnect();
