@@ -50,6 +50,10 @@ const ensureOptions = (options = {}) => {
 	options.events = options.events || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
+	options.env = {
+		...process.env,
+		...options.env,
+	};
 	ensureName(options);
 	ensureWatch(options);
 	return options;
@@ -57,7 +61,7 @@ const ensureOptions = (options = {}) => {
 
 const start = async (options = {}) => {
 	const {
-		root, name, entry, execCommand, daemon, force,
+		root, name, entry, execCommand, daemon, force, env,
 	} = ensureOptions(options);
 
 	setLevel(options.logLevel);
@@ -97,6 +101,7 @@ const start = async (options = {}) => {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
 		cwd: root,
+		env,
 	});
 
 	const childIPC = new StdioIPC(child);
