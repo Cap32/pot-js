@@ -1,12 +1,7 @@
 
-import { join } from 'path';
 import workspace from './workspace';
 import { startClient, disconnect } from '../utils/unixDomainSocket';
 import globby from 'globby';
-
-const getSocketPath = async (name) =>
-	join(await workspace.getSocketsDir(), name)
-;
 
 export const getNames = async () => {
 	return await globby(['*'], { cwd: await workspace.getSocketsDir() });
@@ -16,8 +11,8 @@ export const findSocketByName = async (name) => {
 	const names = await getNames();
 	for (const iteratorName of names) {
 		if (iteratorName === name) {
-			const socketPath = await getSocketPath(name);
-			return await startClient('monitor', name, socketPath);
+			const socketDir = await workspace.getSocketsDir();
+			return await startClient('monitor', name, socketDir);
 		}
 	}
 };
@@ -26,8 +21,8 @@ export const getSockets = async () => {
 	const names = await getNames();
 	const sockets = [];
 	for (const name of names) {
-		const socketPath = await getSocketPath(name);
-		sockets.push(await startClient('monitor', name, socketPath));
+		const socketDir = await workspace.getSocketsDir();
+		sockets.push(await startClient('monitor', name, socketDir));
 	}
 	return sockets.filter(Boolean);
 };

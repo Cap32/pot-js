@@ -32,7 +32,7 @@ export const startServer = (id, socketsDir) => {
 
 export const stopServer = () => ipc.server && ipc.server.stop();
 
-export const startClient = (clientId, serverId, path) => {
+export const startClient = (clientId, serverId, socketsDir) => {
 	return new Promise((resolve) => {
 		Object.assign(ipc.config, {
 			appspace,
@@ -40,6 +40,8 @@ export const startClient = (clientId, serverId, path) => {
 			silent: true,
 			stopRetrying: true,
 		});
+
+		const path = join(socketsDir, serverId);
 
 		ipc.connectTo(serverId, path, () => {
 			const socket = ipc.of[serverId];
