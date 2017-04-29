@@ -6,6 +6,12 @@
   "bin": {
     "pot": "bin/pot"
   },
+  "files": [
+    "LICENSE.md",
+    "README.md",
+    "bin",
+    "lib"
+  ],
   "scripts": {
     "start": "babel-node src/cli start test/server",
     "test": "babel-node src/cli",
