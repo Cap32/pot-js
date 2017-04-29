@@ -4,7 +4,7 @@ import { startClient, disconnect } from '../utils/unixDomainSocket';
 import globby from 'globby';
 
 export const getNames = async () => {
-	return await globby(['*'], { cwd: await workspace.getSocketsDir() });
+	return globby(['*'], { cwd: await workspace.getSocketsDir() });
 };
 
 export const findSocketByName = async (name) => {
@@ -12,7 +12,7 @@ export const findSocketByName = async (name) => {
 	for (const iteratorName of names) {
 		if (iteratorName === name) {
 			const socketDir = await workspace.getSocketsDir();
-			return await startClient('monitor', name, socketDir);
+			return startClient('monitor', name, socketDir);
 		}
 	}
 };
@@ -42,7 +42,7 @@ export const requestBySocket = (socket, command, arg) =>
 export const requestByName = async (name, command, arg) => {
 	const socket = await findSocketByName(name);
 	if (!socket) { return; }
-	return await requestBySocket(socket, command, arg);
+	return requestBySocket(socket, command, arg);
 };
 
 export const request = requestByName;
