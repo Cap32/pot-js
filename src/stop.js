@@ -58,9 +58,9 @@ const stop = async (options = {}) => {
 
 	const info = await requestByName(name, 'info');
 
-	if (info && info.parentPid) {
+	if (info && info.data && info.data.parentPid) {
 		try {
-			process.kill(info.parentPid);
+			process.kill(info.data.parentPid);
 			success();
 		}
 		catch (err) {
