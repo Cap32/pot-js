@@ -85,6 +85,7 @@ export default function lifecycle(monitor, options) {
 	process.on('SIGTERM', silentExit);
 	process.on('uncaughtException', (err) => {
 		handle(event.uncaughtException, err);
+		monitorLogger.debug('uncaughtException');
 		monitorLogger.error(err);
 		exit();
 	});

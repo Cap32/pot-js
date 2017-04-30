@@ -17,9 +17,8 @@ const startSocketServer = async (monitor, name) => {
 };
 
 const start = (options) => {
-	const { name } = options;
 	const {
-		workspace: space,
+		name, workspace: space,
 		command, daemon, inject,
 		...respawnOptions,
 	} = options;

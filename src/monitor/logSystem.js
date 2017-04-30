@@ -12,6 +12,6 @@ export default function logSystem(monitor) {
 	});
 
 	monitor.on('warn', (data) => {
-		monitorLogger.error(trim(data.toString()));
+		monitorLogger.warn(trim(data.toString()));
 	});
 }
