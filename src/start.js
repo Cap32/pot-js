@@ -50,10 +50,6 @@ const ensureOptions = (options = {}) => {
 	options.events = options.events || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
-	options.env = {
-		...process.env,
-		...options.env,
-	};
 	ensureName(options);
 	ensureWatch(options);
 	return options;
@@ -97,11 +93,15 @@ const start = async (options = {}) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
+
 	const child = spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
 		cwd: root,
-		env,
+		env: {
+			...process.env,
+			...env,
+		},
 	});
 
 	const childIPC = new StdioIPC(child);
