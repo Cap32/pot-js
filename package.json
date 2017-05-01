@@ -18,7 +18,7 @@
     "prebuild": "rimraf lib",
     "build": "babel src -d lib",
     "build:watch": "npm run build -- -w",
-    "prepublish": "npm run build"
+    "preversion": "npm run build"
   },
   "repository": "git@github.com:Cap32/pot-js.git",
   "author": "Cap32 <webb.png@gmail.com>",
