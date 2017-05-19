@@ -19,7 +19,7 @@ const list = async (options = {}) => {
 			'Name', 'Status', 'Crashes', 'Memory', 'Started', 'Pid',
 		],
 		setTable = (info) => [
-			info.name,
+			info.data.name,
 			info.styledStatus,
 			info.crashes,
 			info.memoryUsage.formattedString,
