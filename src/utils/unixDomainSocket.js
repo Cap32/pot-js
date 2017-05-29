@@ -1,5 +1,5 @@
 
-import { unlink } from 'fs-promise';
+import { unlink } from 'fs-extra';
 import ipc from 'node-ipc';
 import { join } from 'path';
 import logger from './logger';

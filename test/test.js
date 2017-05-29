@@ -1,5 +1,5 @@
 
-import { start, stop } from './utils';
+import { start, stop, writeConfig } from './utils';
 import { execSync } from 'child_process';
 import { getBridges } from '../src';
 
@@ -60,6 +60,15 @@ test('should auto restart after killed', async () => {
 		})
 		.assertUntil(/sleeped/)
 		.assertUntil('test server started') // restarted
+		.done()
+	;
+});
+
+test('shoule read `.potrc` config file', async () => {
+	await writeConfig(`module.exports = { entry: 'server.js' }`);
+	console.log('fork');
+	return start(['start'], { cwd: __dirname })
+		.assertUntil('test server started')
 		.done()
 	;
 });

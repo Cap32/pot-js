@@ -1,5 +1,5 @@
 
-import { unlink } from 'fs-promise';
+import { unlink } from 'fs-extra';
 import logger from './utils/logger';
 import workspace from './utils/workspace';
 import { getPid, getPidFile } from './utils/pidHelper';

@@ -1,6 +1,6 @@
 
 import findUp from 'find-up';
-import { readFile } from 'fs-promise';
+import { readFile } from 'fs-extra';
 import { merge } from 'lodash';
 import JSON5 from 'json5';
 import importModule from './importModule';

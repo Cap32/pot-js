@@ -1,6 +1,6 @@
 
 import { resolve } from 'path';
-import { ensureDir } from 'fs-promise';
+import { ensureDir } from 'fs-extra';
 import log4js from 'log4js';
 
 log4js.configure({

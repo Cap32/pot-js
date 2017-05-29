@@ -1,5 +1,5 @@
 
-import { ensureDir } from 'fs-promise';
+import { ensureDir } from 'fs-extra';
 import homeOrTmp from 'home-or-tmp';
 import { name } from '../../package.json';
 import { join } from 'path';

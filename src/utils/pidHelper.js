@@ -1,5 +1,5 @@
 
-import { writeFile, readFile, open, unlink } from 'fs-promise';
+import { writeFile, readFile, open, unlink } from 'fs-extra';
 import processExists from 'process-exists';
 import { join } from 'path';
 import { trim } from 'lodash';
