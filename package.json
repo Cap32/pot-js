@@ -2,6 +2,15 @@
   "name": "pot-js",
   "description": "A script runner",
   "version": "0.0.0-beta.20",
+  "scripts": {
+    "start": "npm test -- --watchAll",
+    "test": "cross-env POT_DEV=true jest",
+    "cli": "cross-env POT_DEV=true babel-node src/cli",
+    "prebuild": "rimraf lib",
+    "build": "babel src -d lib",
+    "build:watch": "npm run build -- -w",
+    "preversion": "npm run build"
+  },
   "main": "lib/index",
   "bin": {
     "pot": "bin/pot"
@@ -12,14 +21,6 @@
     "bin",
     "lib"
   ],
-  "scripts": {
-    "start": "babel-node src/cli start test/server",
-    "test": "babel-node src/cli",
-    "prebuild": "rimraf lib",
-    "build": "babel src -d lib",
-    "build:watch": "npm run build -- -w",
-    "preversion": "npm run build"
-  },
   "repository": "git@github.com:Cap32/pot-js.git",
   "author": "Cap32 <webb.png@gmail.com>",
   "licenses": "MIT",
@@ -56,6 +57,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "co-body": "^4.2.0",
+    "cross-env": "^5.0.0",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.2.0",
@@ -65,6 +67,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "get-my-ip": "0.0.1",
     "jest": "^19.0.2",
+    "kapok-js": "^0.4.1",
     "mkdirp": "^0.5.1",
     "qs": "^6.3.0",
     "rimraf": "^2.5.4"

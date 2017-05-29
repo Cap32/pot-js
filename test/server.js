@@ -1,5 +1,9 @@
 
+const { DEV_SERVER_PORT = 3000 } = process.env;
+
 require('http').createServer((req, res) => {
 	console.log('[HTTP]', req.url);
 	res.end('hello, pot-js');
-}).listen(3000);
+}).listen(DEV_SERVER_PORT, () => {
+	console.log('test server started');
+});
