@@ -38,19 +38,3 @@ export const requestBySocket = (socket, command, arg) =>
 		socket.emit(command, arg);
 	})
 ;
-
-export const requestByName = async (name, command, arg) => {
-	const socket = await getSocketByName(name);
-	if (!socket) { return; }
-	return requestBySocket(socket, command, arg);
-};
-
-export const request = requestByName;
-
-export const requestAll = async (command, arg) => {
-	const sockets = await getSockets();
-	const runners = sockets.map((socket) =>
-		requestBySocket(socket, command, arg)
-	);
-	return Promise.all(runners);
-};
