@@ -1,14 +1,17 @@
 
 import logger from './utils/logger';
 import workspace from './utils/workspace';
-import { requestAll } from './utils/socketsHelper';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';
+import { getBridges } from './utils/Bridge';
 
 const list = async (options = {}) => {
 	workspace.set(options);
 
-	const infoList = await requestAll('infoVerbose');
+	const bridges = await getBridges();
+	const infoList = await Promise.all(
+		bridges.map((bridge) => bridge.getInfo({ verbose: true }))
+	);
 
 	if (!infoList.length) {
 		return logger.warn('No process.');

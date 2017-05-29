@@ -6,5 +6,5 @@ export log from './log';
 export dir from './dir';
 export logger from './utils/logger';
 export * from './utils/serialize';
-export * from './utils/socketsHelper';
+export * from './utils/Bridge';
 export resolveConfig from './utils/resolveConfig';

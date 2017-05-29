@@ -3,7 +3,8 @@ import { unlink } from 'fs-promise';
 import logger from './utils/logger';
 import workspace from './utils/workspace';
 import { getPid, getPidFile } from './utils/pidHelper';
-import { requestByName, getNames } from './utils/socketsHelper';
+import { getNames } from './utils/socketsHelper';
+import { getBridgeByName } from './utils/Bridge';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
@@ -56,7 +57,8 @@ const stop = async (options = {}) => {
 		return;
 	}
 
-	const info = await requestByName(name, 'info');
+	const bridge = await getBridgeByName(name);
+	const info = await bridge.getInfo();
 
 	if (info && info.data && info.data.parentPid) {
 		try {

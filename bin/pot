@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { _ = '' } = process.env;
+const { POT_DEV } = process.env;
 
-if (_.endsWith('babel-node')) {
+if (POT_DEV && POT_DEV !== 'false') {
 	require('babel-register')();
 	require('../src/cli');
 }

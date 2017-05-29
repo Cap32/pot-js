@@ -8,20 +8,22 @@ import { startServer } from '../utils/unixDomainSocket';
 import workspace from '../utils/workspace';
 import { createAPIServer } from './api';
 
-const parentIPC = new StdioIPC(process);
+const potIPC = new StdioIPC(process);
 
 const startSocketServer = async (monitor, name) => {
 	const socketsDir = await workspace.getSocketsDir();
-	const socket = await startServer(name, socketsDir);
-	createAPIServer(monitor, socket);
+	const socketServer = await startServer(name, socketsDir);
+	createAPIServer(monitor, socketServer);
 };
 
-const start = (options) => {
+const start = async (options) => {
 	const {
 		name, workspace: space,
 		command, daemon, inject,
 		...respawnOptions,
 	} = options;
+
+	await initMonitorLogger(options);
 
 	workspace.set(space);
 
@@ -38,17 +40,11 @@ const start = (options) => {
 
 	monitor.once('start', () => {
 		startSocketServer(monitor, name);
-		parentIPC.send('start');
+		potIPC.send('start');
 	});
 
 	lifecycle(monitor, options);
 	logSystem(monitor);
 };
 
-parentIPC.on('start', async (options) => {
-	const { pid } = process;
-	const logger = await initMonitorLogger(options);
-	logger.debug('pid', pid);
-	parentIPC.send('pid', pid);
-	start(options);
-});
+potIPC.on('start', start);

@@ -1,6 +1,6 @@
 
 import handleInfo from './handleInfo';
-import handleInfoVerbose from './handleInfoVerbose';
+import { API_GET_INFO } from '../../constants';
 
 export const createAPIServer = function createAPIServer(monitor, socket) {
 	const listen = (eventType, handler) => {
@@ -11,6 +11,5 @@ export const createAPIServer = function createAPIServer(monitor, socket) {
 		});
 	};
 
-	listen('info', handleInfo);
-	listen('infoVerbose', handleInfoVerbose);
+	listen(API_GET_INFO, handleInfo);
 };

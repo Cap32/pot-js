@@ -1,7 +1,8 @@
 
 import logger from './utils/logger';
 import { join } from 'path';
-import { requestByName, getNames } from './utils/socketsHelper';
+import { getNames } from './utils/socketsHelper';
+import { getBridgeByName } from './utils/Bridge';
 import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';
@@ -19,7 +20,8 @@ const log = async (options) => {
 		getChoices: getNames,
 	});
 
-	const info = await requestByName(appName, 'info');
+	const bridge = await getBridgeByName(appName);
+	const info = await bridge.info();
 	if (!info) {
 		throw new Error(`"${appName}" is NOT found.`);
 	}

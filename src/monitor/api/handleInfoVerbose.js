@@ -51,7 +51,7 @@ const startedLocal = (info) => {
 	return info;
 };
 
-const handleInfoVerbose = (monitor, data, callback) => {
+export default function handleInfoVerbose(monitor, data, callback) {
 	const emit = (rest = {}) => {
 		const info = {
 			memoryUsage: {
@@ -93,5 +93,3 @@ const handleInfoVerbose = (monitor, data, callback) => {
 		emit();
 	}
 };
-
-export default handleInfoVerbose;

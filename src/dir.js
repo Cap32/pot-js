@@ -1,5 +1,6 @@
 
-import { requestByName, getNames } from './utils/socketsHelper';
+import { getNames } from './utils/socketsHelper';
+import { getBridgeByName } from './utils/Bridge';
 import ensureSelected from './utils/ensureSelected';
 import workspace from './utils/workspace';
 
@@ -15,7 +16,9 @@ const dir = async (options) => {
 		getChoices: getNames,
 	});
 
-	const info = await requestByName(appName, 'info');
+	const bridge = await getBridgeByName(appName);
+	const info = await bridge.info();
+
 	if (!info) {
 		throw new Error(`"${appName}" is NOT found.`);
 	}

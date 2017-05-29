@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { _ = '' } = process.env;
+const { POT_DEV } = process.env;
 
-let useBabelNode = _.endsWith('babel-node');
+let useBabelNode = POT_DEV && POT_DEV !== 'false';
 
 if (useBabelNode) {
 	try { require.resolve('../src/monitor'); }

@@ -55,7 +55,7 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
-const start = async (options = {}) => {
+export default async function start(options = {}) {
 	const {
 		root, name, entry, execCommand, daemon, force, env,
 	} = ensureOptions(options);
@@ -94,7 +94,7 @@ const start = async (options = {}) => {
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
 
-	const child = spawn(execPath, [scriptFile], {
+	const monitorChild = spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
 		cwd: root,
@@ -104,14 +104,16 @@ const start = async (options = {}) => {
 		},
 	});
 
-	const childIPC = new StdioIPC(child);
+	const { pid } = monitorChild;
+	logger.debug('monitor pid:', pid);
 
-	childIPC
-		.on('pid', async (pid) => {
-			if (daemon) {
-				await writePidFile(pidFile, pid);
-			}
-		})
+	if (daemon) {
+		await writePidFile(pidFile, pid);
+	}
+
+	const monitorIPC = new StdioIPC(monitorChild);
+
+	monitorIPC
 		.on('start', () => {
 			logger.trace('monitor started');
 
@@ -120,14 +122,12 @@ const start = async (options = {}) => {
 			}
 
 			if (daemon) {
-				child.disconnect();
-				child.unref();
+				monitorChild.disconnect();
+				monitorChild.unref();
 			}
 		})
 		.send('start', { pidFile, ...options })
 	;
 
-	return child;
-};
-
-export default start;
+	return monitorChild;
+}
