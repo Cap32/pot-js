@@ -6,10 +6,14 @@ import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
 import workspace from './utils/workspace';
 import logger, { setLevel } from './utils/logger';
 import stop from './stop';
+import { isNumber } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
 
 const ensureName = (options) => {
-	if (options.name) { return options; }
+	if (options.name) {
+		if (isNumber(options.name)) { options.name += ''; }
+		return options;
+	}
 
 	const { root } = options;
 

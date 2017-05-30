@@ -1,6 +1,6 @@
 
 import { monitorLogger, setLevel } from '../utils/logger';
-import importModule from '../utils/importModule';
+import inportFile from 'import-file';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 import { stopServer } from '../utils/unixDomainSocket';
@@ -16,7 +16,9 @@ export default function lifecycle(monitor, options) {
 		if (!modulePath) { return; }
 
 		try {
-			const handler = importModule(modulePath, options);
+			const handler = inportFile(modulePath, {
+				cwd: options.root,
+			});
 			handler(...args);
 		}
 		catch (err) {

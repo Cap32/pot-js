@@ -21,6 +21,8 @@ const stop = async (options = {}) => {
 		getChoices: getNames,
 	});
 
+	name += ''; // prevent `name` is `Number`
+
 	if (!force) {
 		const confirmed = await inquirer.prompt({
 			type: 'confirm',

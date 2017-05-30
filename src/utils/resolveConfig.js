@@ -1,10 +1,7 @@
 
-import findUp from 'find-up';
-import { readFile } from 'fs-extra';
 import { merge } from 'lodash';
-import JSON5 from 'json5';
-import importModule from './importModule';
-import { extname, isAbsolute } from 'path';
+import importFile from 'import-file';
+import { isAbsolute } from 'path';
 
 export const Defaults = {
 	ENTRY: 'index.js',
@@ -16,25 +13,16 @@ export const Defaults = {
 	WATCH_IGNORE_DOT_FILES: true,
 };
 
-export default async function resolveConfig(options = {}) {
+export default function resolveConfig(options = {}) {
 	const { config, configWalk } = options;
-	const shouldWalk = configWalk && !isAbsolute(config);
-	const configFile = shouldWalk ? await findUp(config) : config;
+	const useFindUp = configWalk && !isAbsolute(config);
 
-	const resolveModule = async (modulePath) => {
-		const ext = extname(modulePath);
-		if (!ext || ext === '.js') {
-			return importModule(modulePath);
+	if (config) {
+		try {
+			const configJSON = importFile(config, { useFindUp });
+			return merge(options, configJSON);
 		}
-		else {
-			const jsonStr = await readFile(configFile, 'utf-8');
-			return JSON5.parse(jsonStr);
-		}
-	};
-
-	if (configFile) {
-		const configJSON = await resolveModule(configFile);
-		return merge(options, configJSON);
+		catch (err) {}
 	}
 
 	return options;
