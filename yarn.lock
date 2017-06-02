@@ -1767,9 +1767,9 @@ ignore@^3.0.11, ignore@^3.2.0:
   version "3.2.7"
   resolved "http://registry.npm.taobao.org/ignore/download/ignore-3.2.7.tgz#4810ca5f1d8eca5595213a34b94f2eb4ed926bbd"
 
-import-file@^1.2.0:
-  version "1.2.0"
-  resolved "http://registry.npm.taobao.org/import-file/download/import-file-1.2.0.tgz#dd51b8620f20a26ec27a515c9712cfb72558fd7a"
+import-file@^1.2.2:
+  version "1.2.2"
+  resolved "http://registry.npm.taobao.org/import-file/download/import-file-1.2.2.tgz#612823cb946b29fe55ed5f8127b1bdc835db1f91"
   dependencies:
     find-up "^2.1.0"
     interpret "^1.0.1"
