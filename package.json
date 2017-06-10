@@ -9,7 +9,7 @@
     "prebuild": "rimraf lib",
     "build": "babel src -d lib",
     "build:watch": "npm run build -- -w",
-    "preversion": "npm run build"
+    "preversion": "npm test && npm run build"
   },
   "main": "lib/index",
   "bin": {
