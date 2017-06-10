@@ -131,3 +131,26 @@ test('cli `pot ls`', async () => {
 	;
 
 }, 10000);
+
+test('cli `pot dir`', async () => {
+	const createClient = async (port, name) => {
+		const kapok = start([
+			'start',
+			'--entry', 'test/server.js',
+		], {
+			env: {
+				...process.env,
+				PORT: port,
+			},
+		}, name);
+		return kapok.until('test server started').done();
+	};
+
+	await createClient(3001, 'app');
+
+	await new Kapok(command, ['dir'])
+		.assertUntil(process.cwd())
+		.done()
+	;
+});
+
