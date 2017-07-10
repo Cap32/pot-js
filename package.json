@@ -4,7 +4,7 @@
   "version": "0.0.0-beta.23",
   "scripts": {
     "start": "npm test -- --watchAll",
-    "test": "cross-env POT_DEV=true jest",
+    "test": "cross-env POT_DEV=true jest --runInBand",
     "cli": "cross-env POT_DEV=true babel-node src/cli",
     "prebuild": "rimraf lib",
     "build": "babel src -d lib",
@@ -68,7 +68,17 @@
     "jest": "^19.0.2",
     "kapok-js": "^0.4.1",
     "mkdirp": "^0.5.1",
+    "node-fetch": "^1.7.1",
     "qs": "^6.3.0",
     "rimraf": "^2.5.4"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "node_modules",
+      "lib"
+    ]
   }
 }
