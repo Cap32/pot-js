@@ -20,6 +20,7 @@ const start = async (options) => {
 	const {
 		name, workspace: space,
 		command, daemon, inject,
+		env, configToEnv,
 		...respawnOptions,
 	} = options;
 
@@ -36,6 +37,7 @@ const start = async (options) => {
 			...options,
 			parentPid: process.pid,
 		},
+		env: configToEnv ? { ...env, [configToEnv]: JSON.stringify(options) } : env,
 	});
 
 	monitor.once('start', () => {
