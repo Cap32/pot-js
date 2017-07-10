@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import logger from './logger';
 import { Defaults } from './resolveConfig';
 
-export default function watch(options, handler) {
+export default function watch(options = {}, handler) {
 	const {
 		enable = Defaults.WATCH,
 		dirs = Defaults.WATCH_DIRS,
@@ -18,7 +18,7 @@ export default function watch(options, handler) {
 
 	if (ignoreDotFiles) {
 		logger.trace('watch ignoreDotFiles');
-		other.ignored = /(^|[\/\\])\../;
+		other.ignored = /(^|[/\\])\../;
 	}
 
 	chokidar.watch(dirs, {
