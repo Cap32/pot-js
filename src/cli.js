@@ -82,14 +82,18 @@ yargs
 						default: Defaults.EXEC_COMMAND,
 						type: 'string',
 					},
+					'exec-args': {
+						desc: 'Exec args',
+						type: 'array',
+					},
 					'logs-dir': {
 						desc: 'Log files dir. Resolve from `root`',
 						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},
-					inject: {
-						desc: 'Enable to inject config data to child process',
-						type: 'bool',
+					inspect: {
+						desc: 'Activate inspector. Require Node.js >= v6.3.0',
+						type: 'string',
 					},
 				})
 				.argv

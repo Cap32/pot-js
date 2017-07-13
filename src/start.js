@@ -49,6 +49,13 @@ const ensureOptions = (options = {}) => {
 	const logsDir = options.logsDir || Defaults.LOGS_DIR;
 	options.logsDir = resolve(options.root, logsDir);
 	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
+	options.execArgs = [].concat(options.execArgs || []);
+	if (options.inspect) {
+		if (options.inspect === 'true' || options.inspect === true) {
+			options.inspect = '127.0.0.1:9229';
+		}
+		options.execArgs.push([`--inspect=${options.inspect}`]);
+	}
 	options.entry = options.entry || Defaults.ENTRY;
 	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
 	options.events = options.events || {};
@@ -61,7 +68,7 @@ const ensureOptions = (options = {}) => {
 
 export default async function start(options = {}) {
 	const {
-		root, name, entry, execCommand, daemon, force, env,
+		root, name, entry, execCommand, execArgs, daemon, force, env,
 	} = ensureOptions(options);
 
 	setLevel(options.logLevel);
@@ -75,7 +82,7 @@ export default async function start(options = {}) {
 	// throw error if `commandModulePath` is not exits.
 	require.resolve(commandModulePath);
 
-	options.command = [execCommand, commandModulePath];
+	options.command = [execCommand, commandModulePath, ...execArgs];
 
 	logger.trace('command:', options.command);
 
