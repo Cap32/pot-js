@@ -6,7 +6,7 @@ import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
 import workspace from './utils/workspace';
 import logger, { setLevel } from './utils/logger';
 import stop from './stop';
-import { isNumber } from 'lodash';
+import { isNumber, isUndefined } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
 
 const ensureName = (options) => {
@@ -61,6 +61,9 @@ const ensureOptions = (options = {}) => {
 	options.events = options.events || {};
 	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
+	if (isUndefined(options.maxRestarts)) {
+		options.maxRestarts = options.production ? -1 : 0;
+	}
 	ensureName(options);
 	ensureWatch(options);
 	return options;
