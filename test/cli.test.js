@@ -31,7 +31,11 @@ describe('cli `pot start`', () => {
 	});
 
 	test('should auto restart after killed', async () => {
-		return start(['start', '--entry', 'test/fixtures/server.js'])
+		return start([
+			'start',
+			'--entry=test/fixtures/server.js',
+			'--max-restarts=1',
+		])
 			.assertUntil(/started/)
 			.assertUntil('test server started', {
 				action: async () => {
