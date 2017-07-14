@@ -1,5 +1,7 @@
 
-import respawn from 'respawn';
+// import respawn from 'respawn';
+import respawn from './respawn';
+
 import StdioIPC from '../utils/StdioIPC';
 import { initMonitorLogger } from '../utils/logger';
 import lifecycle from './lifecycle';

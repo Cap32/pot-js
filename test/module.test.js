@@ -17,6 +17,17 @@ describe('api module `start`', () => {
 		expect(text).toBe('掂');
 	});
 
+	test('should `crashes` work', async () => {
+		await start({
+			entry: 'test/fixtures/crash.js',
+			maxRestarts: 1,
+		});
+		await delay(2000);
+		const bridges = await getBridges();
+		const info = await bridges[0].getInfo();
+		expect(info.crashes).toBe(2);
+	});
+
 	test('should `configToEnv` work', async () => {
 		const hello = 'world';
 		await start({ env: { PORT }, entry, hello, configToEnv: 'RESPONSE_DATA' });
