@@ -1,7 +1,7 @@
 {
   "name": "pot-js",
   "description": "A script runner",
-  "version": "0.0.0-beta.26",
+  "version": "0.0.0-beta.27",
   "scripts": {
     "start": "npm test -- --watchAll",
     "test": "cross-env POT_DEV=true jest --runInBand",
