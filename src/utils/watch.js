@@ -9,20 +9,30 @@ export default function watch(options = {}, handler) {
 		enable = Defaults.WATCH,
 		dirs = Defaults.WATCH_DIRS,
 		ignoreDotFiles = Defaults.WATCH_IGNORE_DOT_FILES,
+		ignoreNodeModulesDir = Defaults.WATCH_IGNORE_NODE_MODULE_DIR,
 		...other,
 	} = options;
 
 	if (!enable) { return; }
 
-	logger.trace('watch enabled');
+	logger.trace('[watch] enabled');
+
+	let { ignored } = other;
+	ignored = ignored ? [].concat(ignored) : [];
 
 	if (ignoreDotFiles) {
-		logger.trace('watch ignoreDotFiles');
-		other.ignored = /(^|[/\\])\../;
+		logger.trace('[watch] dot files ignored');
+		ignored.push(/(^|[/\\])\../);
+	}
+
+	if (ignoreNodeModulesDir) {
+		logger.trace('[watch] node_modules dir ignored');
+		ignored.push('node_modules/**/*');
 	}
 
 	chokidar.watch(dirs, {
 		...other,
+		ignored,
 		usePolling: true,
 		ignoreInitial: true,
 	}).on('all', debounce(handler, 1000));

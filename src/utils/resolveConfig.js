@@ -11,6 +11,7 @@ export const Defaults = {
 	WATCH: false,
 	WATCH_DIRS: ['**/*'],
 	WATCH_IGNORE_DOT_FILES: true,
+	WATCH_IGNORE_NODE_MODULE_DIR: true,
 };
 
 export default function resolveConfig(options = {}) {
