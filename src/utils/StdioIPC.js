@@ -20,6 +20,10 @@ export default class StdioIPC {
 	send(command, payload) {
 		logger.trace('send', this._process.connected);
 		if (this._process.connected) {
+			if (payload instanceof Error) {
+				const { message, code, stack } = payload;
+				payload = { message, code, stack };
+			}
 			this._process.send(serialize({ command, payload }));
 		}
 		return this;

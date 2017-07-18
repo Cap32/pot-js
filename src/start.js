@@ -70,78 +70,91 @@ const ensureOptions = (options = {}) => {
 };
 
 export default async function start(options = {}) {
-	const {
-		root, name, entry, execCommand, execArgs, daemon, force, env,
-	} = ensureOptions(options);
+	let monitorChild;
 
-	setLevel(options.logLevel);
+	try {
+		const {
+			root, name, entry, execCommand, execArgs, daemon, force, env,
+		} = ensureOptions(options);
 
-	logger.trace('logLevel', options.logLevel);
+		setLevel(options.logLevel);
 
-	workspace.set(options);
+		logger.trace('logLevel', options.logLevel);
 
-	const commandModulePath = resolve(root, entry);
+		workspace.set(options);
 
-	// throw error if `commandModulePath` is not exits.
-	require.resolve(commandModulePath);
+		const commandModulePath = resolve(root, entry);
 
-	options.command = [execCommand, commandModulePath, ...execArgs];
+		// throw error if `commandModulePath` is not exits.
+		require.resolve(commandModulePath);
 
-	logger.trace('command:', options.command);
+		options.command = [execCommand, commandModulePath, ...execArgs];
 
-	const pidFile = await getPidFile(name);
+		logger.trace('command:', options.command);
 
-	const isExists = !!await getPid(pidFile, name);
-	let isRestart = false;
+		const pidFile = await getPidFile(name);
 
-	if (isExists) {
-		if (force) {
-			logger.trace(`force stop "${name}"`);
-			await stop(options);
-			logger.trace(`"${name}" stopped.`);
-			isRestart = true;
+		const isExists = !!await getPid(pidFile, name);
+		let isRestart = false;
+
+		if (isExists) {
+			if (force) {
+				await stop(options);
+				isRestart = true;
+			}
+			else { throw new Error(`"${name}" is running.`); }
 		}
-		else { throw new Error(`"${name}" is running.`); }
+
+		const stdio = daemon ? 'ignore' : 'inherit';
+		const { execPath } = process;
+		const scriptFile = resolve(__dirname, '../bin/monitor');
+
+		monitorChild = spawn(execPath, [scriptFile], {
+			detached: daemon,
+			stdio: ['ipc', stdio, stdio],
+			cwd: root,
+			env: {
+				...process.env,
+				...env,
+			},
+		});
+
+		const { pid } = monitorChild;
+		logger.debug('monitor pid:', pid);
+
+		if (daemon) {
+			await writePidFile(pidFile, pid);
+		}
+
+		const monitorIPC = new StdioIPC(monitorChild);
+
+		logger.debug('name', options.name);
+
+		monitorIPC
+			.on('start', () => {
+				logger.trace('monitor started');
+
+				if (isRestart) {
+					logger.info(`"${name}" restarted.`);
+				}
+
+				if (daemon) {
+					monitorChild.disconnect();
+					monitorChild.unref();
+				}
+			})
+			.on('error', (err) => {
+				logger.error(err.message);
+				err.stack && logger.debug(err.stack);
+				monitorChild.kill();
+			})
+			.send('start', { pidFile, ...options })
+		;
+
+		return monitorChild;
 	}
-
-	const stdio = daemon ? 'ignore' : 'inherit';
-	const { execPath } = process;
-	const scriptFile = resolve(__dirname, '../bin/monitor');
-
-	const monitorChild = spawn(execPath, [scriptFile], {
-		detached: daemon,
-		stdio: ['ipc', stdio, stdio],
-		cwd: root,
-		env: {
-			...process.env,
-			...env,
-		},
-	});
-
-	const { pid } = monitorChild;
-	logger.debug('monitor pid:', pid);
-
-	if (daemon) {
-		await writePidFile(pidFile, pid);
+	catch (err) {
+		monitorChild && monitorChild.kill();
+		throw err;
 	}
-
-	const monitorIPC = new StdioIPC(monitorChild);
-
-	monitorIPC
-		.on('start', () => {
-			logger.trace('monitor started');
-
-			if (isRestart) {
-				logger.info(`"${name}" started.`);
-			}
-
-			if (daemon) {
-				monitorChild.disconnect();
-				monitorChild.unref();
-			}
-		})
-		.send('start', { pidFile, ...options })
-	;
-
-	return monitorChild;
 }

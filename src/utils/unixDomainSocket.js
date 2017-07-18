@@ -6,6 +6,7 @@ import logger from './logger';
 import { name as appspace } from '../../package.json';
 
 export const startServer = (id, socketsDir) => {
+	const path = join(socketsDir, id);
 	return new Promise((resolve) => {
 		Object.assign(ipc.config, {
 			appspace,
@@ -13,8 +14,6 @@ export const startServer = (id, socketsDir) => {
 			silent: true,
 			stopRetrying: true,
 		});
-
-		const path = join(socketsDir, id);
 
 		ipc.serve(path, () => {
 			const { server } = ipc;

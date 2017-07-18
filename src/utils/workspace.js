@@ -24,11 +24,11 @@ const workspace = {
 	},
 
 	async getPidsDir() {
-		return await this._getDir('pids');
+		return this._getDir('pids');
 	},
 
 	async getSocketsDir() {
-		return await this._getDir('sockets');
+		return this._getDir('sockets');
 	},
 
 	set(name) {

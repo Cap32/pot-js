@@ -32,7 +32,7 @@ const stop = async (options = {}) => {
 		});
 
 		if (!confirmed.yes) {
-			return;
+			return false;
 		}
 	}
 
@@ -50,13 +50,14 @@ const stop = async (options = {}) => {
 		try {
 			process.kill(pid);
 			success();
+			return true;
 		}
 		catch (err) {
 			logger.debug(err);
 			fail();
 		}
 
-		return;
+		return false;
 	}
 
 	const bridge = await getBridgeByName(name);
@@ -66,6 +67,7 @@ const stop = async (options = {}) => {
 		try {
 			process.kill(info.data.parentPid);
 			success();
+			return true;
 		}
 		catch (err) {
 			logger.debug(err);
@@ -76,6 +78,7 @@ const stop = async (options = {}) => {
 		throw new Error(`"${name}" not found.`);
 	}
 
+	return false;
 };
 
 export default stop;
