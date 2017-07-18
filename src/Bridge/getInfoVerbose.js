@@ -1,7 +1,7 @@
 
 import pidUsage from 'pidusage';
-import logger from '../../utils/logger';
-import formatBytes from '../../utils/formatBytes';
+import logger from '../utils/logger';
+import formatBytes from '../utils/formatBytes';
 import chalk from 'chalk';
 
 const { assign } = Object;
@@ -51,50 +51,47 @@ const startedLocal = (info) => {
 	return info;
 };
 
-export default function handleInfo(monitor, options = {}, callback) {
-	const { verbose } = options;
-	const data = monitor.toJSON();
+export default function handleInfoVerbose(state) {
+	return new Promise((resolve) => {
+		const callback = (rest = {}) => {
+			const info = {
+				memoryUsage: {
+					heapUsed: '-',
+					heapTotal: '-',
+				},
+				...state,
+				...rest,
+			};
 
-	if (!verbose) { return callback(data); }
+			parseMemoryUsage(info);
+			styleStatus(info);
+			startedLocal(info);
 
-	const emit = (rest = {}) => {
-		const info = {
-			memoryUsage: {
-				heapUsed: '-',
-				heapTotal: '-',
-			},
-			...data,
-			...rest,
+			resolve(info);
 		};
 
-		parseMemoryUsage(info);
-		styleStatus(info);
-		startedLocal(info);
-
-		callback(info);
-	};
-
-	const { pid } = monitor;
-	if (pid) {
-		pidUsage.stat(pid, (err, { memory }) => {
-			let resp = null;
-			if (err) {
-				logger.error(err.message);
-				logger.debug(err);
-			}
-			else {
-				resp = {
-					memoryUsage: {
-						heapUsed: memory,
-						heapTotal: process.memoryUsage().heapTotal,
-					},
-				};
-			}
-			emit(resp);
-		});
-		pidUsage.unmonitor(pid);
-	}
-	else {
-		emit();
-	}
+		const { pid } = state;
+		if (pid) {
+			pidUsage.stat(pid, (err, { memory }) => {
+				let resp = null;
+				if (err) {
+					logger.error(err.message);
+					logger.debug(err);
+				}
+				else {
+					resp = {
+						memoryUsage: {
+							heapUsed: memory,
+							heapTotal: process.memoryUsage().heapTotal,
+						},
+					};
+				}
+				callback(resp);
+			});
+			pidUsage.unmonitor(pid);
+		}
+		else {
+			callback();
+		}
+	});
 };

@@ -4,7 +4,7 @@ import logger from './utils/logger';
 import workspace from './utils/workspace';
 import { getPid, getPidFile } from './utils/pidHelper';
 import { getNames } from './utils/socketsHelper';
-import { getBridgeByName } from './utils/Bridge';
+import { getBridgeByName } from './Bridge';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 

@@ -2,7 +2,7 @@
 import logger from './utils/logger';
 import { join } from 'path';
 import { getNames } from './utils/socketsHelper';
-import { getBridgeByName } from './utils/Bridge';
+import { getBridgeByName } from './Bridge';
 import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';

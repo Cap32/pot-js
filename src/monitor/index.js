@@ -8,14 +8,17 @@ import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
 import workspace from '../utils/workspace';
-import { createAPIServer } from './api';
+import { BRIDGE_EVENT_TYPE } from '../constants';
 
 const potIPC = new StdioIPC(process);
 
 const startSocketServer = async (monitor, name) => {
 	const socketsDir = await workspace.getSocketsDir();
-	const socketServer = await startServer(name, socketsDir);
-	createAPIServer(monitor, socketServer);
+	const socket = await startServer(name, socketsDir);
+	socket.on(BRIDGE_EVENT_TYPE, (data, sock) => {
+		const monitorState = monitor.toJSON();
+		socket.emit(sock, BRIDGE_EVENT_TYPE, monitorState);
+	});
 };
 
 const start = async (options) => {

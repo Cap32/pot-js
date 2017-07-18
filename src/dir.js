@@ -1,6 +1,6 @@
 
 import { getNames } from './utils/socketsHelper';
-import { getBridgeByName } from './utils/Bridge';
+import { getBridgeByName } from './Bridge';
 import ensureSelected from './utils/ensureSelected';
 import workspace from './utils/workspace';
 

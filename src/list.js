@@ -3,14 +3,14 @@ import logger from './utils/logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';
-import { getBridges } from './utils/Bridge';
+import { getBridges } from './Bridge';
 
 const list = async (options = {}) => {
 	workspace.set(options);
 
 	const bridges = await getBridges();
 	const infoList = await Promise.all(
-		bridges.map((bridge) => bridge.getInfo({ verbose: true }))
+		bridges.map((bridge) => bridge.getInfoVerbose())
 	);
 
 	if (!infoList.length) {
