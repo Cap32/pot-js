@@ -3,11 +3,11 @@
 import respawn from './respawn';
 
 import StdioIPC from '../utils/StdioIPC';
-import logger, { initMonitorLogger } from '../utils/logger';
+import { initMonitorLogger } from '../utils/logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
-import { getNames } from '../utils/socketsHelper';
+import Bridge from '../Bridge';
 import workspace from '../utils/workspace';
 import { BRIDGE_EVENT_TYPE } from '../constants';
 import stop from '../stop';
@@ -25,7 +25,7 @@ const start = async (options) => {
 	const startSocketServer = async (monitor, name) => {
 		try {
 			const socketsDir = await workspace.getSocketsDir();
-			const names = await getNames();
+			const names = await Bridge.getNames();
 
 			if (names.indexOf(name) > -1) {
 				if (force) {

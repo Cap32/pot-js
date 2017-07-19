@@ -3,12 +3,12 @@ import logger from './utils/logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';
-import { getBridges } from './Bridge';
+import Bridge from './Bridge';
 
 const list = async (options = {}) => {
 	workspace.set(options);
 
-	const bridges = await getBridges();
+	const bridges = await Bridge.getList();
 
 	if (!bridges.length) {
 		return logger.warn('No process');

@@ -2,7 +2,7 @@
 import logger, { setLevel } from './utils/logger';
 import workspace from './utils/workspace';
 import PidManager from './utils/PidManager';
-import { getNames } from './utils/socketsHelper';
+import Bridge from './Bridge';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
@@ -17,7 +17,7 @@ const stop = async (options = {}) => {
 		value: name,
 		message: 'Please select the target app.',
 		errorMessage: 'No process is running',
-		getChoices: getNames,
+		getChoices: Bridge.getNames,
 	});
 
 	name += ''; // prevent `name` is `Number`

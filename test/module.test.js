@@ -1,6 +1,6 @@
 
 import { stop, delay } from './utils';
-import { start, getBridges } from '../src';
+import { start, Bridge } from '../src';
 import fetch from 'node-fetch';
 
 afterEach(stop);
@@ -23,7 +23,7 @@ describe('api module `start`', () => {
 			maxRestarts: 1,
 		});
 		await delay(2000);
-		const bridges = await getBridges();
+		const bridges = await Bridge.getList();
 		const info = await bridges[0].getInfo();
 		expect(info.crashes).toBe(2);
 	});
@@ -38,12 +38,12 @@ describe('api module `start`', () => {
 	});
 });
 
-describe('api module `getBridges`', () => {
+describe('api module `Bridge.getList()`', () => {
 	test('should `getInfo` work', async () => {
 		const name = 'hello';
 		await start({ env: { PORT }, name, entry });
 		await delay();
-		const bridges = await getBridges();
+		const bridges = await Bridge.getList();
 		const info = await bridges[0].getInfo();
 		expect(typeof info.pid).toBe('number');
 		expect(info.crashes).toBe(0);

@@ -1,7 +1,7 @@
 
 import { start, stop, writeConfig, command } from './utils';
 import { execSync } from 'child_process';
-import { getBridges } from '../src';
+import { Bridge } from '../src';
 import Kapok from 'kapok-js';
 
 afterEach(stop);
@@ -39,7 +39,7 @@ describe('cli `pot start`', () => {
 			.assertUntil(/started/)
 			.assertUntil('test server started', {
 				action: async () => {
-					const bridges = await getBridges();
+					const bridges = await Bridge.getList();
 					const { pid } = await bridges[0].getInfo();
 					execSync(`kill -9 ${pid}`); // kill client process
 				},

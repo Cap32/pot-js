@@ -5,7 +5,7 @@ import { join } from 'path';
 import { trim } from 'lodash';
 import logger, { setLevel } from './logger';
 import workspace from './workspace';
-import { getBridgeByName } from '../Bridge';
+import Bridge from '../Bridge';
 
 const getPidFile = async (name) =>
 	join(await workspace.getPidsDir(), `${name}.pid`)
@@ -42,7 +42,7 @@ export default class PidManager {
 			return new PidManager(name, { pid, pidFile, hasPidFile: true });
 		}
 
-		const bridge = await getBridgeByName(name);
+		const bridge = await Bridge.getByName(name);
 
 		if (bridge) {
 			const info = await bridge.getInfo();

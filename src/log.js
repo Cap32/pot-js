@@ -1,8 +1,7 @@
 
 import logger from './utils/logger';
 import { join } from 'path';
-import { getNames } from './utils/socketsHelper';
-import { getBridgeByName } from './Bridge';
+import Bridge from './Bridge';
 import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';
@@ -17,10 +16,10 @@ const log = async (options) => {
 		value: name,
 		message: 'Please select the target app.',
 		errorMessage: 'No process is running',
-		getChoices: getNames,
+		getChoices: Bridge.getNames,
 	});
 
-	const bridge = await getBridgeByName(appName);
+	const bridge = await Bridge.getByName(appName);
 	if (!bridge) {
 		throw new Error(`"${appName}" NOT found`);
 	}
