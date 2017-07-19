@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
-import logger, { setLevel } from './utils/logger';
+import { logger, setLevel } from './utils/logger';
 import { isNumber, isUndefined } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
 import chalk from 'chalk';

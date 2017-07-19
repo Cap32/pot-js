@@ -1,5 +1,5 @@
 
-import logger, { setLevel } from './utils/logger';
+import { logger, setLevel } from './utils/logger';
 import workspace from './utils/workspace';
 import PidManager from './utils/PidManager';
 import Bridge from './Bridge';

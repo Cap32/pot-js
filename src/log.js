@@ -1,5 +1,5 @@
 
-import logger from './utils/logger';
+import { logger } from './utils/logger';
 import { join } from 'path';
 import Bridge from './Bridge';
 import sliceFile from 'slice-file';

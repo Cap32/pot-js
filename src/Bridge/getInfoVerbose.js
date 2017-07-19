@@ -1,6 +1,6 @@
 
 import pidUsage from 'pidusage';
-import logger from '../utils/logger';
+import { logger } from '../utils/logger';
 import formatBytes from '../utils/formatBytes';
 import chalk from 'chalk';
 

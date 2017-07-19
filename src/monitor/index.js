@@ -3,7 +3,7 @@
 import respawn from './respawn';
 
 import StdioIPC from '../utils/StdioIPC';
-import { initMonitorLogger } from '../utils/logger';
+import { initMonitorLogger } from './monitorLogger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';

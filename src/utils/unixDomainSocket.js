@@ -2,7 +2,7 @@
 import { unlink } from 'fs-extra';
 import ipc from 'node-ipc';
 import { join } from 'path';
-import logger from './logger';
+import { logger } from './logger';
 import { name as appspace } from '../../package.json';
 
 export const startServer = (id, socketsDir) => {

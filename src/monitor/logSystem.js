@@ -1,5 +1,5 @@
 
-import { monitorLogger } from '../utils/logger';
+import monitorLogger from './monitorLogger';
 import { trim } from 'lodash';
 
 export default function logSystem(monitor) {

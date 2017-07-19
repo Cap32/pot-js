@@ -1,5 +1,5 @@
 
-import logger from './utils/logger';
+import { logger } from './utils/logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';

@@ -1,7 +1,7 @@
 
 import chokidar from 'chokidar';
 import { debounce } from 'lodash';
-import logger from './logger';
+import { logger } from './logger';
 import { Defaults } from './resolveConfig';
 
 export default function watch(options = {}, handler) {

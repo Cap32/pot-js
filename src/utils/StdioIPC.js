@@ -1,5 +1,5 @@
 
-import logger from './logger';
+import { logger } from './logger';
 import { serialize, deserialize } from './serialize';
 
 export default class StdioIPC {

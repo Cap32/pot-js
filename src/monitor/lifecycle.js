@@ -1,6 +1,7 @@
 
-import { monitorLogger, setLevel } from '../utils/logger';
 import importFile from 'import-file';
+import { setLevel } from '../utils/logger';
+import monitorLogger from './monitorLogger';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 import { stopServer } from '../utils/unixDomainSocket';

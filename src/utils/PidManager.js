@@ -3,7 +3,7 @@ import { writeFile, readFile, open, unlink } from 'fs-extra';
 import processExists from 'process-exists';
 import { join } from 'path';
 import { trim } from 'lodash';
-import logger, { setLevel } from './logger';
+import { logger, setLevel } from './logger';
 import workspace from './workspace';
 import Bridge from '../Bridge';
 

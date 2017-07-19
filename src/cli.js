@@ -2,7 +2,7 @@
 import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
-import logger, { setLevel } from './utils/logger';
+import { logger, setLevel } from './utils/logger';
 import resolveConfig, { Defaults } from './utils/resolveConfig';
 import { start, stop, list, log, dir } from './';
 
