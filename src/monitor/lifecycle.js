@@ -28,7 +28,7 @@ export default function lifecycle(monitor, options) {
 	};
 
 	const logStart = () => {
-		monitorLogger.info(`${name} started.`);
+		monitorLogger.info(`"${name}" started`);
 	};
 	const logStartOnce = once(logStart);
 
@@ -38,17 +38,17 @@ export default function lifecycle(monitor, options) {
 	});
 
 	monitor.on('stop', () => {
-		isProd && monitorLogger.warn(`${name} stopped.`);
+		isProd && monitorLogger.warn(`"${name}" stopped`);
 		handle(events.stop);
 	});
 
 	monitor.on('crash', () => {
-		monitorLogger.fatal(`${name} crashed.`);
+		monitorLogger.fatal(`"${name}" crashed`);
 		handle(events.crash);
 	});
 
 	monitor.on('sleep', () => {
-		monitorLogger.warn(`${name} sleeped.`);
+		monitorLogger.warn(`"${name}" sleeped`);
 		handle(events.sleep);
 	});
 
@@ -67,7 +67,7 @@ export default function lifecycle(monitor, options) {
 
 	monitor.on('exit', async (code, signal) => {
 		monitorLogger.debug(
-			`${name} exit with code "${code}", signal "${signal}".`
+			`"${name}" exit with code "${code}", signal "${signal}"`
 		);
 		handle(events.exit, code, signal);
 	});
@@ -93,8 +93,8 @@ export default function lifecycle(monitor, options) {
 	});
 
 	watch(watchOptions, (file, stat) => {
-		monitorLogger.info('restart');
-		monitorLogger.debug('watch:restart', stat);
+		monitorLogger.info('restarted');
+		monitorLogger.trace('watch:restart', stat);
 
 		process.emit('watch:restart', { file, stat });
 		handle(events.restart);

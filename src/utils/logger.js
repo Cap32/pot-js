@@ -20,7 +20,7 @@ const logger = log4js.getLogger();
 
 export default logger;
 
-export const setLevel = (newLevel) => {
+export const setLevel = (newLevel = 'INFO') => {
 	logger.setLevel(newLevel);
 	return logger;
 };

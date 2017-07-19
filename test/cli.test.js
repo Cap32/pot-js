@@ -25,7 +25,7 @@ describe('cli `pot start`', () => {
 	test('should `--name` work', async () => {
 		const name = 'hello';
 		return start(['start', '--entry', 'test/fixtures/server.js'], {}, name)
-			.assertUntil(new RegExp(`${name} started`, 'i'))
+			.assertUntil(new RegExp(`"${name}" started`, 'i'))
 			.done()
 		;
 	});
@@ -81,7 +81,7 @@ describe('cli `pot stop`', () => {
 
 	test('should throw error when no process is running', async () => {
 		return new Kapok(command, ['stop'])
-			.assert('ERROR No process is running.')
+			.assert('ERROR No process is running')
 			.done()
 		;
 	});

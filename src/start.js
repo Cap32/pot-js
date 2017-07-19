@@ -2,12 +2,14 @@
 import { spawn } from 'child_process';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
-import { getPid, getPidFile, writePidFile } from './utils/pidHelper';
 import workspace from './utils/workspace';
 import logger, { setLevel } from './utils/logger';
-import stop from './stop';
 import { isNumber, isUndefined } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
+import chalk from 'chalk';
+import PidManager from './utils/PidManager';
+
+process.on('unhandledRejection', (r) => logger.debug(r));
 
 const ensureName = (options) => {
 	if (options.name) {
@@ -69,92 +71,92 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
+const execMonitorProc = ({ root, daemon, env }) => {
+	const stdio = daemon ? 'ignore' : 'inherit';
+	const { execPath } = process;
+	const scriptFile = resolve(__dirname, '../bin/monitor');
+
+	return spawn(execPath, [scriptFile], {
+		detached: daemon,
+		stdio: ['ipc', stdio, stdio],
+		cwd: root,
+		env: {
+			...process.env,
+			...env,
+		},
+	});
+};
+
+const getCommand = (options) => {
+	const { root, entry, execCommand, execArgs } = options;
+
+	const commandModulePath = resolve(root, entry);
+
+	// throw error if `commandModulePath` is not exits.
+	require.resolve(commandModulePath);
+
+	const command = [execCommand, commandModulePath, ...execArgs];
+	logger.trace('command', chalk.gray(command.join(' ')));
+	return command;
+};
+
+const connectMonitor = (monitorProc, options, pidManager) => {
+	const ipc = new StdioIPC(monitorProc);
+	const command = getCommand(options);
+	const { pid } = monitorProc;
+	logger.debug('monitor pid:', pid);
+	const { pidFile } = pidManager;
+
+	return new Promise((resolve, reject) => {
+		ipc
+			.on('start', async () => {
+				logger.trace('monitor started');
+
+				if (pidManager.isRunning) {
+					logger.info(`"${options.name}" restarted`);
+				}
+
+				if (options.daemon) {
+					await pidManager.write(pid);
+					monitorProc.disconnect();
+					monitorProc.unref();
+				}
+
+				resolve();
+			})
+			.on('error', (err) => {
+				monitorProc.kill();
+				reject(err);
+			})
+			.send('start', { ...options, pidFile, command })
+		;
+	});
+};
+
 export default async function start(options = {}) {
-	let monitorChild;
+	let monitorProc;
 
 	try {
-		const {
-			root, name, entry, execCommand, execArgs, daemon, force, env,
-		} = ensureOptions(options);
+		const { name, force } = ensureOptions(options);
 
 		setLevel(options.logLevel);
-
 		logger.trace('logLevel', options.logLevel);
 
 		workspace.set(options);
 
-		const commandModulePath = resolve(root, entry);
+		const pidManager = await PidManager.find(name);
 
-		// throw error if `commandModulePath` is not exits.
-		require.resolve(commandModulePath);
-
-		options.command = [execCommand, commandModulePath, ...execArgs];
-
-		logger.trace('command:', options.command);
-
-		const pidFile = await getPidFile(name);
-
-		const isExists = !!await getPid(pidFile, name);
-		let isRestart = false;
-
-		if (isExists) {
-			if (force) {
-				await stop(options);
-				isRestart = true;
-			}
+		if (pidManager.isRunning) {
+			if (force) { await pidManager.kill(); }
 			else { throw new Error(`"${name}" is running.`); }
 		}
 
-		const stdio = daemon ? 'ignore' : 'inherit';
-		const { execPath } = process;
-		const scriptFile = resolve(__dirname, '../bin/monitor');
-
-		monitorChild = spawn(execPath, [scriptFile], {
-			detached: daemon,
-			stdio: ['ipc', stdio, stdio],
-			cwd: root,
-			env: {
-				...process.env,
-				...env,
-			},
-		});
-
-		const { pid } = monitorChild;
-		logger.debug('monitor pid:', pid);
-
-		if (daemon) {
-			await writePidFile(pidFile, pid);
-		}
-
-		const monitorIPC = new StdioIPC(monitorChild);
-
-		logger.debug('name', options.name);
-
-		monitorIPC
-			.on('start', () => {
-				logger.trace('monitor started');
-
-				if (isRestart) {
-					logger.info(`"${name}" restarted.`);
-				}
-
-				if (daemon) {
-					monitorChild.disconnect();
-					monitorChild.unref();
-				}
-			})
-			.on('error', (err) => {
-				logger.error(err.message);
-				err.stack && logger.debug(err.stack);
-				monitorChild.kill();
-			})
-			.send('start', { pidFile, ...options })
-		;
-
-		return monitorChild;
+		const monitorProc = execMonitorProc(options);
+		await connectMonitor(monitorProc, options, pidManager);
+		return monitorProc;
 	}
 	catch (err) {
-		monitorChild && monitorChild.kill();
+		monitorProc && monitorProc.kill();
 		throw err;
 	}
 }

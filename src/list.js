@@ -9,13 +9,14 @@ const list = async (options = {}) => {
 	workspace.set(options);
 
 	const bridges = await getBridges();
+
+	if (!bridges.length) {
+		return logger.warn('No process');
+	}
+
 	const infoList = await Promise.all(
 		bridges.map((bridge) => bridge.getInfoVerbose())
 	);
-
-	if (!infoList.length) {
-		return logger.warn('No process.');
-	}
 
 	const {
 		head = [

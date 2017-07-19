@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm test -- --watchAll",
     "test": "cross-env POT_DEV=true jest --runInBand",
-    "cli": "cross-env POT_DEV=true babel-node src/cli",
+    "cli": "cross-env POT_DEV=true ./bin/pot",
     "prebuild": "rimraf lib",
     "build": "babel src -d lib",
     "build:watch": "npm run build -- -w",

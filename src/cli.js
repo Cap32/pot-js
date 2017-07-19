@@ -125,6 +125,14 @@ yargs
 						desc: 'Stop without confirming',
 						type: 'bool',
 					},
+					l: {
+						alias: 'log-level',
+						desc: 'Log level',
+						choices: [
+							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
+						],
+						default: Defaults.LOG_LEVEL,
+					},
 				})
 				.argv
 			;

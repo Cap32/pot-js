@@ -16,16 +16,16 @@ const log = async (options) => {
 	const appName = await ensureSelected({
 		value: name,
 		message: 'Please select the target app.',
-		errorMessage: 'No process is running.',
+		errorMessage: 'No process is running',
 		getChoices: getNames,
 	});
 
 	const bridge = await getBridgeByName(appName);
-	const info = await bridge.getInfo();
-	if (!info) {
-		throw new Error(`"${appName}" is NOT found.`);
+	if (!bridge) {
+		throw new Error(`"${appName}" NOT found`);
 	}
 
+	const info = await bridge.getInfo();
 	const { logsDir } = info.data;
 
 	let appCategory = await ensureSelected({

@@ -25,7 +25,7 @@ class Bridge {
 
 export async function getBridgeByName(name) {
 	const socket = await getSocketByName(name);
-	return new Bridge(socket);
+	return socket && new Bridge(socket);
 }
 
 export async function getBridges() {

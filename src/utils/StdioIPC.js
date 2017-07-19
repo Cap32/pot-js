@@ -18,7 +18,9 @@ export default class StdioIPC {
 	}
 
 	send(command, payload) {
-		logger.trace('send', this._process.connected);
+		if (this._process.connected) { logger.trace('ipc connected'); }
+		else { logger.warn('ipc disconnected'); }
+
 		if (this._process.connected) {
 			if (payload instanceof Error) {
 				const { message, code, stack } = payload;

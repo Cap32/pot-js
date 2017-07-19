@@ -29,10 +29,7 @@ const start = async (options) => {
 
 			if (names.indexOf(name) > -1) {
 				if (force) {
-
-					logger.error('stop', options);
-					const result = await stop(options);
-					logger.error('stopped', result);
+					await stop(options);
 				}
 				else {
 					throw new Error(
