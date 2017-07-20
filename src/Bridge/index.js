@@ -2,7 +2,8 @@
 import workspace from '../utils//workspace';
 import { startClient, disconnect } from '../utils/unixDomainSocket';
 import globby from 'globby';
-import { BRIDGE_EVENT_TYPE } from '../constants';
+import { BRIDGE_EVENT_TYPE, DEPRECATED_BRIDGE_EVENT_TYPE } from '../constants';
+import { logger } from '../utils/logger';
 
 import getInfoVerbose from './getInfoVerbose';
 
@@ -29,17 +30,47 @@ const getSockets = async () => {
 	return sockets.filter(Boolean);
 };
 
-const requestBySocket = (socket, arg) =>
-	new Promise((resolve) => {
-		const handler = (data) => {
-			socket.off(BRIDGE_EVENT_TYPE, handler);
-			resolve(data);
-			disconnect(socket.id);
-		};
-		socket.on(BRIDGE_EVENT_TYPE, handler);
-		socket.emit(BRIDGE_EVENT_TYPE, arg);
-	})
-;
+// const requestBySocket = (socket, arg) =>
+// 	new Promise((resolve) => {
+// 		const handler = (data) => {
+// 			socket.off(BRIDGE_EVENT_TYPE, handler);
+// 			resolve(data);
+// 			disconnect(socket.id);
+// 		};
+// 		socket.on(BRIDGE_EVENT_TYPE, handler);
+// 		socket.emit(BRIDGE_EVENT_TYPE, arg);
+// 	})
+// ;
+
+// TODO: deprecated
+const requestBySocket = (socket, arg) => {
+	return Promise.race([
+		new Promise((resolve) => {
+			const handler = (data) => {
+				socket.off(BRIDGE_EVENT_TYPE, handler);
+				resolve(data);
+				disconnect(socket.id);
+			};
+			socket.on(BRIDGE_EVENT_TYPE, handler);
+			socket.emit(BRIDGE_EVENT_TYPE, arg);
+		}),
+		new Promise((resolve) => {
+			const handler = (data) => {
+				try {
+					logger.warn(
+						`The API of "pot-js" in "${data.data.name}" has DEPRECATED.`
+					);
+				}
+				catch (err) {}
+				socket.off(DEPRECATED_BRIDGE_EVENT_TYPE, handler);
+				resolve(data);
+				disconnect(socket.id);
+			};
+			socket.on(DEPRECATED_BRIDGE_EVENT_TYPE, handler);
+			socket.emit(DEPRECATED_BRIDGE_EVENT_TYPE, arg);
+		}),
+	]);
+};
 
 export default class Bridge {
 	static async getNames() {
