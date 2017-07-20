@@ -9,7 +9,7 @@ import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
 import Bridge from '../Bridge';
 import workspace from '../utils/workspace';
-import { BRIDGE_EVENT_TYPE, DEPRECATED_BRIDGE_EVENT_TYPE } from '../constants';
+import { BRIDGE_EVENT_TYPE } from '../constants';
 import stop from '../stop';
 
 const potIPC = new StdioIPC(process);
@@ -46,12 +46,6 @@ const start = async (options) => {
 			socket.on(BRIDGE_EVENT_TYPE, (data, sock) => {
 				const monitorState = monitor.toJSON();
 				socket.emit(sock, BRIDGE_EVENT_TYPE, monitorState);
-			});
-
-			// TODO: deprecated
-			socket.on(DEPRECATED_BRIDGE_EVENT_TYPE, (data, sock) => {
-				const monitorState = monitor.toJSON();
-				socket.emit(sock, DEPRECATED_BRIDGE_EVENT_TYPE, monitorState);
 			});
 
 			return true;
