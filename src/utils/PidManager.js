@@ -3,9 +3,10 @@ import { writeFile, readFile, open, unlink } from 'fs-extra';
 import processExists from 'process-exists';
 import { join } from 'path';
 import { trim } from 'lodash';
-import { logger, setLevel } from './logger';
+import { logger, setConfig as setLogger } from 'pot-logger';
 import workspace from './workspace';
 import Bridge from '../Bridge';
+import chalk from 'chalk';
 
 const getPidFile = async (name) =>
 	join(await workspace.getPidsDir(), `${name}.pid`)
@@ -30,7 +31,7 @@ const getPid = async (pidFile) => {
 export default class PidManager {
 	static async find(name, options) {
 		if (options) {
-			setLevel(options.logLevel);
+			setLogger('logLevel', options.logLevel);
 			workspace.set(options.space || name);
 		}
 
@@ -81,7 +82,7 @@ export default class PidManager {
 
 			process.kill(pid);
 			logger.trace(`killed pid ${pid}`);
-			shouldLog && logger.info(`"${name}" stopped.`);
+			shouldLog && logger.info(`"${name}" stopped`);
 			return true;
 		}
 		catch (err) {
@@ -92,6 +93,7 @@ export default class PidManager {
 	}
 
 	async write(pid) {
+		logger.trace('pid file saved in', chalk.gray(this.pidFile));
 		await writeFile(this.pidFile, pid);
 		this.pid = pid;
 	}

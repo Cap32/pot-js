@@ -1,8 +1,10 @@
 
 import chokidar from 'chokidar';
 import { debounce } from 'lodash';
-import { logger } from './logger';
+import { createLogger } from 'pot-logger';
 import { Defaults } from './resolveConfig';
+
+const logger = createLogger('watch');
 
 export default function watch(options = {}, handler) {
 	const {
@@ -15,18 +17,18 @@ export default function watch(options = {}, handler) {
 
 	if (!enable) { return; }
 
-	logger.trace('[watch] enabled');
+	logger.trace('enabled');
 
 	let { ignored } = other;
 	ignored = ignored ? [].concat(ignored) : [];
 
 	if (ignoreDotFiles) {
-		logger.trace('[watch] dot files ignored');
+		logger.trace('dot files ignored');
 		ignored.push(/(^|[/\\])\../);
 	}
 
 	if (ignoreNodeModulesDir) {
-		logger.trace('[watch] node_modules dir ignored');
+		logger.trace('node_modules dir ignored');
 		ignored.push('node_modules/**/*');
 	}
 

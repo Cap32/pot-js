@@ -2,7 +2,8 @@
 import { unlink } from 'fs-extra';
 import ipc from 'node-ipc';
 import { join } from 'path';
-import { logger } from './logger';
+import { logger } from 'pot-logger';
+import chalk from 'chalk';
 import { name as appspace } from '../../package.json';
 
 export const startServer = (id, socketsDir) => {
@@ -14,6 +15,8 @@ export const startServer = (id, socketsDir) => {
 			silent: true,
 			stopRetrying: true,
 		});
+
+		logger.trace('unix domain socket path', chalk.gray(path));
 
 		ipc.serve(path, () => {
 			const { server } = ipc;

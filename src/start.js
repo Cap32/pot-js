@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
-import { logger, setLevel } from './utils/logger';
+import { logger, setConfig as setLogger } from 'pot-logger';
 import { isNumber, isUndefined } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
 import chalk from 'chalk';
@@ -104,7 +104,7 @@ const connectMonitor = (monitorProc, options, pidManager) => {
 	const ipc = new StdioIPC(monitorProc);
 	const command = getCommand(options);
 	const { pid } = monitorProc;
-	logger.debug('monitor pid:', pid);
+	logger.debug('monitor pid', chalk.magenta(pid));
 	const { pidFile } = pidManager;
 
 	return new Promise((resolve, reject) => {
@@ -139,7 +139,8 @@ export default async function start(options = {}) {
 	try {
 		const { name, force } = ensureOptions(options);
 
-		setLevel(options.logLevel);
+		setLogger('logLevel', options.logLevel);
+		logger.trace('logs dir', chalk.gray(options.logsDir));
 		logger.trace('logLevel', options.logLevel);
 
 		workspace.set(options);

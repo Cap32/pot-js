@@ -1,17 +1,17 @@
 
-import monitorLogger from './monitorLogger';
+import logger from 'pot-logger';
 import { trim } from 'lodash';
 
 export default function logSystem(monitor) {
 	monitor.on('stdout', (data) => {
-		monitorLogger.info(trim(data.toString()));
+		logger.info(trim(data.toString()));
 	});
 
 	monitor.on('stderr', (data) => {
-		monitorLogger.error(trim(data.toString()));
+		logger.error(trim(data.toString()));
 	});
 
 	monitor.on('warn', (data) => {
-		monitorLogger.warn(trim(data.toString()));
+		logger.warn(trim(data.toString()));
 	});
 }

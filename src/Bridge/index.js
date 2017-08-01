@@ -1,9 +1,9 @@
 
-import workspace from '../utils//workspace';
+import workspace from '../utils/workspace';
 import { startClient, disconnect } from '../utils/unixDomainSocket';
 import globby from 'globby';
 import { BRIDGE_EVENT_TYPE, DEPRECATED_BRIDGE_EVENT_TYPE } from '../constants';
-import { logger } from '../utils/logger';
+import { logger } from 'pot-logger';
 
 import getInfoVerbose from './getInfoVerbose';
 

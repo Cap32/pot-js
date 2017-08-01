@@ -74,7 +74,7 @@ describe('cli `pot stop`', () => {
 			.done()
 		;
 		return new Kapok(command, ['stop', '-f'])
-			.assert('INFO "pot-js" stopped.')
+			.assert('INFO "pot-js" stopped')
 			.done()
 		;
 	});

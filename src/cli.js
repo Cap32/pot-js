@@ -2,7 +2,7 @@
 import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
-import { logger, setLevel } from './utils/logger';
+import { logger, setConfig as setLogger } from 'pot-logger';
 import resolveConfig, { Defaults } from './utils/resolveConfig';
 import { start, stop, list, log, dir } from './';
 
@@ -108,7 +108,7 @@ yargs
 				await start(await resolveConfig(argv));
 			}
 			catch (err) {
-				setLevel(argv.logLevel);
+				setLogger('logLevel', argv.logLevel);
 				logger.error(err.message);
 				logger.debug(err);
 			}

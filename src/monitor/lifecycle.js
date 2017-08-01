@@ -1,7 +1,6 @@
 
 import importFile from 'import-file';
-import { setLevel } from '../utils/logger';
-import monitorLogger from './monitorLogger';
+import { logger, setConfig as setLogger } from 'pot-logger';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 import { stopServer } from '../utils/unixDomainSocket';
@@ -23,13 +22,13 @@ export default function lifecycle(monitor, options) {
 			handler(...args);
 		}
 		catch (err) {
-			monitorLogger.error(err.message);
-			monitorLogger.debug(err);
+			logger.error(err.message);
+			logger.debug(err);
 		}
 	};
 
 	const logStart = () => {
-		monitorLogger.info(`"${name}" started`);
+		logger.info(`"${name}" started`);
 	};
 	const logStartOnce = once(logStart);
 
@@ -39,26 +38,25 @@ export default function lifecycle(monitor, options) {
 	});
 
 	monitor.on('stop', () => {
-		isProd && monitorLogger.warn(`"${name}" stopped`);
+		isProd && logger.warn(`"${name}" stopped`);
 		handle(events.stop);
 	});
 
 	monitor.on('crash', () => {
-		monitorLogger.fatal(`"${name}" crashed`);
+		logger.fatal(`"${name}" crashed`);
 		handle(events.crash);
 	});
 
 	monitor.on('sleep', () => {
-		monitorLogger.warn(`"${name}" sleeped`);
+		logger.warn(`"${name}" sleeped`);
 		handle(events.sleep);
 	});
 
 	monitor.on('spawn', (child) => {
-		monitorLogger.trace('spawn');
 		handle(events.spawn, child);
 
 		if (inject) {
-			monitorLogger.trace('child.connected', child.connected);
+			logger.trace('child.connected', child.connected);
 			if (child.connected) {
 				child.send(serialize(options));
 				child.disconnect();
@@ -67,20 +65,20 @@ export default function lifecycle(monitor, options) {
 	});
 
 	monitor.on('exit', async (code, signal) => {
-		monitorLogger.debug(
+		logger.debug(
 			`"${name}" exit with code "${code}", signal "${signal}"`
 		);
 		handle(events.exit, code, signal);
 	});
 
 	const exit = () => {
-		monitorLogger.debug('exit');
+		logger.debug('exit');
 		stopServer();
 		monitor.stop(::process.exit);
 	};
 
 	const silentExit = () => {
-		setLevel('OFF');
+		setLogger('logLevel', 'OFF');
 		exit();
 	};
 
@@ -88,14 +86,14 @@ export default function lifecycle(monitor, options) {
 	process.on('SIGTERM', silentExit);
 	process.on('uncaughtException', (err) => {
 		handle(event.uncaughtException, err);
-		monitorLogger.debug('uncaughtException');
-		monitorLogger.error(err);
+		logger.debug('uncaughtException');
+		logger.error(err);
 		exit();
 	});
 
 	watch(watchOptions, (file, stat) => {
-		monitorLogger.info('restarted');
-		monitorLogger.trace('watch:restart', stat);
+		logger.info('restarted');
+		logger.trace('watch:restart', stat);
 
 		process.emit('watch:restart', { file, stat });
 		handle(events.restart);

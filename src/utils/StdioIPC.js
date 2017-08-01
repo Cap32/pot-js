@@ -1,5 +1,5 @@
 
-import { logger } from './logger';
+import { logger } from 'pot-logger';
 import { serialize, deserialize } from './serialize';
 
 export default class StdioIPC {
@@ -18,15 +18,15 @@ export default class StdioIPC {
 	}
 
 	send(command, payload) {
-		if (this._process.connected) { logger.trace('ipc connected'); }
-		else { logger.warn('ipc disconnected'); }
-
 		if (this._process.connected) {
 			if (payload instanceof Error) {
 				const { message, code, stack } = payload;
 				payload = { message, code, stack };
 			}
 			this._process.send(serialize({ command, payload }));
+		}
+		else {
+			logger.warn('ipc disconnected');
 		}
 		return this;
 	}
