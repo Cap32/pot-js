@@ -34,7 +34,7 @@ yargs
 						type: 'bool',
 					},
 					l: {
-						alias: 'log-level',
+						alias: 'logLevel',
 						desc: 'Log level',
 						choices: [
 							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
@@ -45,16 +45,6 @@ yargs
 						alias: 'watch',
 						desc: 'Enable watch mode',
 						default: Defaults.WATCH,
-						type: 'bool',
-					},
-					'watch-dirs': {
-						desc: 'Watch dirs',
-						default: Defaults.WATCH_DIRS,
-						type: 'array',
-					},
-					'watch-ignore-dot-files': {
-						desc: 'Ignore watch dot files',
-						default: Defaults.WATCH_IGNORE_DOT_FILES,
 						type: 'bool',
 					},
 					f: {
@@ -77,21 +67,21 @@ yargs
 						desc: 'Root dir. Defaults to `process.cwd()`',
 						type: 'string',
 					},
-					'exec-command': {
+					execCommand: {
 						desc: 'Exec command',
 						default: Defaults.EXEC_COMMAND,
 						type: 'string',
 					},
-					'exec-args': {
+					execArgs: {
 						desc: 'Exec args',
 						type: 'array',
 					},
-					'logs-dir': {
+					logsDir: {
 						desc: 'Log files dir. Resolve from `root`',
 						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},
-					'max-restarts': {
+					maxRestarts: {
 						desc: 'How many restarts are allowed within 60s. `-1` for infinite restarts. If `production` is `true`, default value is `-1`, otherwise is `0`',
 						type: 'number',
 					},
@@ -126,7 +116,7 @@ yargs
 						type: 'bool',
 					},
 					l: {
-						alias: 'log-level',
+						alias: 'logLevel',
 						desc: 'Log level',
 						choices: [
 							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
@@ -162,7 +152,7 @@ yargs
 					},
 					f: {
 						alias: 'follow',
-						desc: 'Follow mode. Just like `trail -f`',
+						desc: 'Follow mode. Just like `tail -f`',
 						type: 'bool',
 					},
 					n: {
