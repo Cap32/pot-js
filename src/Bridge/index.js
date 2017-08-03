@@ -4,7 +4,6 @@ import { startClient, disconnect } from '../utils/unixDomainSocket';
 import globby from 'globby';
 import { BRIDGE_EVENT_TYPE, DEPRECATED_BRIDGE_EVENT_TYPE } from '../constants';
 import { logger } from 'pot-logger';
-
 import getInfoVerbose from './getInfoVerbose';
 
 const getNames = async () => {

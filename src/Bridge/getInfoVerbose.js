@@ -7,10 +7,14 @@ import chalk from 'chalk';
 const { assign } = Object;
 
 const parseMemoryUsage = (info) => {
-	const { memoryUsage: data } = info;
-	const { heapUsed, heapTotal } = data;
+	const { memoryUsage: { heapUsed, heapTotal }, data } = info;
 
-	if (heapUsed === '-') {
+	const total = (function () {
+		try { return data.memoryUsage.total; }
+		catch (err) { return heapTotal || NaN; }
+	}());
+
+	if (heapUsed === '-' || isNaN(total)) {
 		assign(data, {
 			percent: '-',
 			formattedHeapUsed: '-',
@@ -18,13 +22,25 @@ const parseMemoryUsage = (info) => {
 	}
 	else {
 		assign(data, {
-			percent: `${(heapUsed / heapTotal / 100).toFixed(2)}%`,
+			percent: `${(heapUsed / total / 100).toFixed(2)}%`,
 			formattedHeapUsed: formatBytes(heapUsed),
 		});
 	}
 
 	data.formattedString = `${data.formattedHeapUsed} (${data.percent})`;
 	info.memoryUsage = data;
+	return info;
+};
+
+const parseCpuUsage = (info) => {
+	const { cpuUsage, data } = info;
+	const total = (function () {
+		try { return data.cpuUsage.total; }
+		catch (err) { return NaN; }
+	}());
+	const val = cpuUsage.user / total;
+	cpuUsage.percent = isNaN(val) ? '-' : `${(val / 100).toFixed(2)}%`;
+	cpuUsage.formattedString = cpuUsage.percent;
 	return info;
 };
 
@@ -59,11 +75,16 @@ export default function handleInfoVerbose(state) {
 					heapUsed: '-',
 					heapTotal: '-',
 				},
+				cpuUsage: {
+					user: '-',
+					system: '-',
+				},
 				...state,
 				...rest,
 			};
 
 			parseMemoryUsage(info);
+			parseCpuUsage(info);
 			styleStatus(info);
 			startedLocal(info);
 
@@ -72,7 +93,7 @@ export default function handleInfoVerbose(state) {
 
 		const { pid } = state;
 		if (pid) {
-			pidUsage.stat(pid, (err, { memory }) => {
+			pidUsage.stat(pid, (err, { memory, cpu }) => {
 				let resp = null;
 				if (err) {
 					logger.error(err.message);
@@ -84,6 +105,7 @@ export default function handleInfoVerbose(state) {
 							heapUsed: memory,
 							heapTotal: process.memoryUsage().heapTotal,
 						},
+						cpuUsage: { user: cpu },
 					};
 				}
 				callback(resp);

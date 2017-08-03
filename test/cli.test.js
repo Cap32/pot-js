@@ -106,16 +106,14 @@ describe('cli `pot ls`', () => {
 		await createClient(3002, 'app-2');
 
 		await new Kapok(command, ['ls'])
-			.assertUntil(/┌/)
+			.until(/^\s*│/)
 			.assert((message) => {
-				return ['Name', 'Status', 'Crashes', 'Memory', 'Started', 'Pid']
+				return ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid']
 					.every((key) => message.contains(key))
 				;
 			})
-			.ignoreUntil(/├/)
-			.assert(/app-1/)
-			.ignoreUntil(/├/)
-			.assert(/app-2/)
+			.assertUntil(/app-1/)
+			.assertUntil(/app-2/)
 			.done()
 		;
 
