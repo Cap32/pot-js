@@ -3,7 +3,7 @@
 import respawn from './respawn';
 
 import StdioIPC from '../utils/StdioIPC';
-import { setConfig as setLogger } from 'pot-logger';
+import { setLoggers } from 'pot-logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
@@ -56,7 +56,7 @@ const start = async (options) => {
 		}
 	};
 
-	setLogger(options);
+	setLoggers(options);
 
 	workspace.set(space);
 

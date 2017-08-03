@@ -1,6 +1,6 @@
 
 import importFile from 'import-file';
-import { logger, setConfig as setLogger } from 'pot-logger';
+import { logger, setLoggers } from 'pot-logger';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 import { stopServer } from '../utils/unixDomainSocket';
@@ -78,7 +78,7 @@ export default function lifecycle(monitor, options) {
 	};
 
 	const silentExit = () => {
-		setLogger('logLevel', 'OFF');
+		setLoggers('logLevel', 'OFF');
 		exit();
 	};
 

@@ -1,5 +1,5 @@
 
-import { logger, setConfig as setLogger } from 'pot-logger';
+import { logger, setLoggers } from 'pot-logger';
 import workspace from './utils/workspace';
 import PidManager from './utils/PidManager';
 import Bridge from './Bridge';
@@ -11,7 +11,7 @@ const stop = async (options = {}) => {
 	const { force, logLevel } = options;
 
 	workspace.set(options);
-	setLogger('logLevel', logLevel);
+	setLoggers('logLevel', logLevel);
 
 	name = await ensureSelected({
 		value: name,

@@ -37,7 +37,7 @@
     "lodash": "^4.17.2",
     "node-ipc": "^8.9.2",
     "pidusage": "^1.1.0",
-    "pot-logger": "^0.0.0",
+    "pot-logger": "^0.1.0",
     "process-exists": "^2.1.0",
     "ps-tree": "0.0.3",
     "respawn": "^2.5.0",

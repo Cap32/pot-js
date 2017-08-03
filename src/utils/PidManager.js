@@ -3,7 +3,7 @@ import { writeFile, readFile, open, unlink } from 'fs-extra';
 import processExists from 'process-exists';
 import { join } from 'path';
 import { trim } from 'lodash';
-import { logger, setConfig as setLogger } from 'pot-logger';
+import { logger, setLoggers } from 'pot-logger';
 import workspace from './workspace';
 import Bridge from '../Bridge';
 import chalk from 'chalk';
@@ -31,7 +31,7 @@ const getPid = async (pidFile) => {
 export default class PidManager {
 	static async find(name, options) {
 		if (options) {
-			setLogger('logLevel', options.logLevel);
+			setLoggers('logLevel', options.logLevel);
 			workspace.set(options.space || name);
 		}
 

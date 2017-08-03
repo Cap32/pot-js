@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
-import { logger, setConfig as setLogger } from 'pot-logger';
+import { logger, setLoggers } from 'pot-logger';
 import { isNumber, isUndefined } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
 import chalk from 'chalk';
@@ -139,7 +139,7 @@ export default async function start(options = {}) {
 	try {
 		const { name, force } = ensureOptions(options);
 
-		setLogger('logLevel', options.logLevel);
+		setLoggers('logLevel', options.logLevel);
 		logger.trace('logs dir', chalk.gray(options.logsDir));
 		logger.trace('logLevel', options.logLevel);
 
