@@ -40,7 +40,7 @@
     "inquirer": "^2.0.0",
     "lodash": "^4.17.2",
     "log-update": "^2.1.0",
-    "node-ipc": "^8.9.2",
+    "node-ipc": "^9.1.0",
     "pidusage": "^1.1.0",
     "pot-logger": "^0.1.0",
     "process-exists": "^2.1.0",

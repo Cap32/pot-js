@@ -965,7 +965,7 @@ color-name@^1.1.1:
   version "1.1.2"
   resolved "http://registry.npm.taobao.org/color-name/download/color-name-1.1.2.tgz#5c8ab72b64bd2215d617ae9559ebb148475cf98d"
 
-colors@*, colors@1.0.3:
+colors@1.0.3:
   version "1.0.3"
   resolved "http://registry.npm.taobao.org/colors/download/colors-1.0.3.tgz#0433f44d809680fdeb60ed260f1b0c262e82a40b"
 
@@ -1183,6 +1183,10 @@ doctrine@^2.0.0:
 double-ended-queue@^2.1.0-0:
   version "2.1.0-0"
   resolved "http://registry.npm.taobao.org/double-ended-queue/download/double-ended-queue-2.1.0-0.tgz#103d3527fd31528f40188130c841efdd78264e5c"
+
+easy-stack@^1.0.0:
+  version "1.0.0"
+  resolved "http://registry.npm.taobao.org/easy-stack/download/easy-stack-1.0.0.tgz#12c91b3085a37f0baa336e9486eac4bf94e3e788"
 
 ecc-jsbn@~0.1.1:
   version "0.1.1"
@@ -1431,9 +1435,9 @@ event-emitter@~0.3.5:
     d "1"
     es5-ext "~0.10.14"
 
-event-pubsub@4.2.3:
-  version "4.2.3"
-  resolved "http://registry.npm.taobao.org/event-pubsub/download/event-pubsub-4.2.3.tgz#0d3142f47ac7e0da38cdc38402d97e2510bc5ecc"
+event-pubsub@4.2.4:
+  version "4.2.4"
+  resolved "http://registry.npm.taobao.org/event-pubsub/download/event-pubsub-4.2.4.tgz#634fb697fe4014dc5004722d859432baa2123257"
 
 event-stream@~0.5:
   version "0.5.3"
@@ -2495,13 +2499,15 @@ jodid25519@^1.0.0:
   dependencies:
     jsbn "~0.1.0"
 
-js-message@>=1.0.5:
+js-message@1.0.5:
   version "1.0.5"
   resolved "http://registry.npm.taobao.org/js-message/download/js-message-1.0.5.tgz#2300d24b1af08e89dd095bc1a4c9c9cfcb892d15"
 
-js-queue@>=1.0.0:
-  version "1.0.0"
-  resolved "http://registry.npm.taobao.org/js-queue/download/js-queue-1.0.0.tgz#bab2e22621fef2b24a34b80ce02b726941c3ba00"
+js-queue@2.0.0:
+  version "2.0.0"
+  resolved "http://registry.npm.taobao.org/js-queue/download/js-queue-2.0.0.tgz#362213cf860f468f0125fc6c96abc1742531f948"
+  dependencies:
+    easy-stack "^1.0.0"
 
 js-tokens@^2.0.0:
   version "2.0.0"
@@ -2887,10 +2893,6 @@ netmask@~1.0.4:
   version "1.0.6"
   resolved "http://registry.npm.taobao.org/netmask/download/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
 
-node-cmd@>=1.1.1:
-  version "1.1.1"
-  resolved "http://registry.npm.taobao.org/node-cmd/download/node-cmd-1.1.1.tgz#9c6159d36e6b35b59ec4ab40840d26ab14a9806d"
-
 node-fetch@^1.7.1:
   version "1.7.1"
   resolved "http://registry.npm.taobao.org/node-fetch/download/node-fetch-1.7.1.tgz#899cb3d0a3c92f952c47f1b876f4c8aeabd400d5"
@@ -2902,15 +2904,13 @@ node-int64@^0.4.0:
   version "0.4.0"
   resolved "http://registry.npm.taobao.org/node-int64/download/node-int64-0.4.0.tgz#87a9065cdb355d3182d8f94ce11188b825c68a3b"
 
-node-ipc@^8.9.2:
-  version "8.9.2"
-  resolved "http://registry.npm.taobao.org/node-ipc/download/node-ipc-8.9.2.tgz#1d01035955c5a6bd1f0b932174ea0330ab9dd976"
+node-ipc@^9.1.0:
+  version "9.1.0"
+  resolved "http://registry.npm.taobao.org/node-ipc/download/node-ipc-9.1.0.tgz#ad97783667165f5944ea41cf06618f1c4be1792a"
   dependencies:
-    colors "*"
-    event-pubsub "4.2.3"
-    js-message ">=1.0.5"
-    js-queue ">=1.0.0"
-    node-cmd ">=1.1.1"
+    event-pubsub "4.2.4"
+    js-message "1.0.5"
+    js-queue "2.0.0"
 
 node-notifier@^5.0.1:
   version "5.1.2"
