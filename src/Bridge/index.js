@@ -72,16 +72,19 @@ const requestBySocket = (socket, arg) => {
 };
 
 export default class Bridge {
-	static async getNames() {
+	static async getNames(space) {
+		if (space) { workspace.set(space); }
 		return getNames();
 	}
 
-	static async getByName(name) {
+	static async getByName(name, space) {
+		if (space) { workspace.set(space); }
 		const socket = await getSocketByName(name);
 		return socket && new Bridge(socket);
 	}
 
-	static async getList() {
+	static async getList(space) {
+		if (space) { workspace.set(space); }
 		const sockets = await getSockets();
 		return sockets.map((socket) => new Bridge(socket));
 	}
