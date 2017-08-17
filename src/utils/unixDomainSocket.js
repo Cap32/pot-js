@@ -1,10 +1,11 @@
 
-import { unlink } from 'fs-extra';
+import { unlink, writeFileSync } from 'fs-extra';
 import ipc from 'node-ipc';
 import { join } from 'path';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import { name as appspace } from '../../package.json';
+import isWin from './isWin';
 
 export const startServer = (id, socketsDir) => {
 	const path = join(socketsDir, id);
@@ -21,6 +22,10 @@ export const startServer = (id, socketsDir) => {
 		ipc.serve(path, () => {
 			const { server } = ipc;
 
+			if (isWin) {
+				writeFileSync(path);
+			}
+
 			server.on('error', (err) => {
 				logger.error(err.message);
 				logger.debug(err);
@@ -32,7 +37,14 @@ export const startServer = (id, socketsDir) => {
 	});
 };
 
-export const stopServer = () => ipc.server && ipc.server.stop();
+export const stopServer = () => {
+	if (ipc.server) {
+		ipc.server.stop();
+		if (isWin && ipc.server.path) {
+			unlink(ipc.server.path);
+		}
+	}
+};
 
 export const startClient = (clientId, serverId, socketsDir) => {
 	return new Promise((resolve) => {

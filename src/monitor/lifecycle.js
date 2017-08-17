@@ -83,7 +83,9 @@ export default function lifecycle(monitor, options) {
 	};
 
 	process.on('SIGINT', silentExit);
+	process.on('SIGHUP', silentExit);
 	process.on('SIGTERM', silentExit);
+	process.on('SIGBREAK', silentExit);
 	process.on('uncaughtException', (err) => {
 		handle(events.uncaughtException, err);
 		logger.debug('uncaughtException');

@@ -1,12 +1,14 @@
 
-import { writeFile, readFile, open, unlink } from 'fs-extra';
+import { writeFile, readFile, open, remove } from 'fs-extra';
 import processExists from 'process-exists';
 import { join } from 'path';
 import { trim } from 'lodash';
 import { logger, setLoggers } from 'pot-logger';
 import workspace from './workspace';
+import isWin from './isWin';
 import Bridge from '../Bridge';
 import chalk from 'chalk';
+import { stopServer } from './unixDomainSocket';
 
 const getPidFile = async (name) =>
 	join(await workspace.getPidsDir(), `${name}.pid`)
@@ -22,7 +24,7 @@ const getPid = async (pidFile) => {
 	if (isFileExists) {
 		const pid = +trim(await readFile(pidFile, 'utf-8'));
 		const isProcessExists = await processExists(pid);
-		if (!isProcessExists) { await unlink(pidFile); }
+		if (!isProcessExists) { await remove(pidFile); }
 		return isProcessExists && pid;
 	}
 	return false;
@@ -76,8 +78,15 @@ export default class PidManager {
 			const { shouldLog } = options;
 
 			if (hasPidFile) {
-				try { await unlink(pidFile); }
+				try { await remove(pidFile); }
 				catch (err) { logger.debug(err); }
+			}
+
+
+			if (isWin) {
+				const dir = await workspace.getSocketsDir();
+				await remove(join(dir, name));
+				stopServer();
 			}
 
 			process.kill(pid);
@@ -98,3 +107,4 @@ export default class PidManager {
 		this.pid = pid;
 	}
 }
+
