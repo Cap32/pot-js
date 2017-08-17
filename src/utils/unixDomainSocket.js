@@ -1,5 +1,5 @@
 
-import { unlink, writeFileSync } from 'fs-extra';
+import { remove, writeFileSync } from 'fs-extra';
 import ipc from 'node-ipc';
 import { join } from 'path';
 import { logger } from 'pot-logger';
@@ -40,9 +40,6 @@ export const startServer = (id, socketsDir) => {
 export const stopServer = () => {
 	if (ipc.server) {
 		ipc.server.stop();
-		if (isWin && ipc.server.path) {
-			unlink(ipc.server.path);
-		}
 	}
 };
 
@@ -66,7 +63,7 @@ export const startClient = (clientId, serverId, socketsDir) => {
 			socket.on('error', async (err) => {
 				logger.debug('socket error', err);
 				if (err && err.code === 'ECONNREFUSED') {
-					await unlink(path);
+					await remove(path);
 				}
 				resolve();
 			});
