@@ -44,6 +44,7 @@ const start = async (options) => {
 			const socket = await startServer(name, socketsDir);
 
 			socket.on(BRIDGE_EVENT_TYPE, (data, sock) => {
+				if (data) { Object.assign(monitor.data, data); }
 				const monitorState = monitor.toJSON();
 				socket.emit(sock, BRIDGE_EVENT_TYPE, monitorState);
 			});

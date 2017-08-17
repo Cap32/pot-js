@@ -39,16 +39,34 @@ describe('api module `start`', () => {
 });
 
 describe('api module `Bridge.getList()`', () => {
-	test('should `getInfo` work', async () => {
+	test('should `getState` work', async () => {
 		const name = 'hello';
-		await start({ env: { PORT }, name, entry });
+		await start({ name, entry });
 		await delay();
 		const bridges = await Bridge.getList();
-		const info = await bridges[0].getInfo();
-		expect(typeof info.pid).toBe('number');
-		expect(info.crashes).toBe(0);
-		expect(info.status).toBe('running');
-		expect(info.data.name).toBe(name);
-		expect(info.data.entry).toBe(entry);
+		const state = await bridges[0].getState();
+		expect(typeof state.pid).toBe('number');
+		expect(state.crashes).toBe(0);
+		expect(state.status).toBe('running');
+		expect(state.data.name).toBe(name);
+		expect(state.data.entry).toBe(entry);
+	});
+
+	test('should `setState` work', async () => {
+		const name = 'hello';
+		await start({ name, entry });
+		await delay();
+		{
+			const bridges = await Bridge.getList();
+			const state = await bridges[0].getState();
+			expect(state.data.name).toBe(name);
+			expect(state.data.hello).toBe(undefined);
+		}
+
+		{
+			const bridges = await Bridge.getList();
+			const state = await bridges[0].setState({ hello: 'world' });
+			expect(state.data.hello).toBe('world');
+		}
 	});
 });

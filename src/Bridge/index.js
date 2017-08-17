@@ -93,6 +93,10 @@ export default class Bridge {
 		this._socket = socket;
 	}
 
+	async setState(state) {
+		return requestBySocket(this._socket, state);
+	}
+
 	async getState() {
 		return requestBySocket(this._socket);
 	}
