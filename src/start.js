@@ -52,11 +52,11 @@ const ensureOptions = (options = {}) => {
 	options.logsDir = resolve(options.root, logsDir);
 	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
 	options.execArgs = [].concat(options.execArgs || []);
-	if (options.inspect) {
-		if (options.inspect === 'true' || options.inspect === true) {
-			options.inspect = '127.0.0.1:9229';
-		}
-		options.execArgs.push([`--inspect=${options.inspect}`]);
+	if (options.inspect === 'true' || options.inspect === true) {
+		options.inspect = '127.0.0.1:9229';
+	}
+	else if (options.inspect === 'false') {
+		delete options.inspect;
 	}
 	options.entry = options.entry || Defaults.ENTRY;
 	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
@@ -88,14 +88,16 @@ const execMonitorProc = ({ root, daemon, env }) => {
 };
 
 const getCommand = (options) => {
-	const { root, entry, execCommand, execArgs } = options;
+	const { root, entry, execCommand, execArgs, inspect } = options;
 
 	const commandModulePath = resolve(root, entry);
 
 	// throw error if `commandModulePath` is not exits.
 	require.resolve(commandModulePath);
 
-	const command = [execCommand, commandModulePath, ...execArgs];
+	const args = [commandModulePath, ...execArgs];
+	if (inspect) { args.unshift(`--inspect=${inspect}`); }
+	const command = [execCommand, ...args];
 	logger.trace('command', chalk.gray(command.join(' ')));
 	return command;
 };
