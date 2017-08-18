@@ -84,9 +84,7 @@ export default class PidManager {
 
 
 			if (isWin) {
-				const dir = await workspace.getSocketsDir();
-				await remove(join(dir, name));
-				stopServer();
+				await stopServer(name);
 			}
 
 			process.kill(pid);
@@ -107,4 +105,3 @@ export default class PidManager {
 		this.pid = pid;
 	}
 }
-

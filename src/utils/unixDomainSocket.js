@@ -5,6 +5,7 @@ import { join } from 'path';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import { name as appspace } from '../../package.json';
+import workspace from './workspace';
 import isWin from './isWin';
 
 export const startServer = (id, socketsDir) => {
@@ -37,7 +38,12 @@ export const startServer = (id, socketsDir) => {
 	});
 };
 
-export const stopServer = () => {
+export const stopServer = async (name) => {
+	if (isWin) {
+		const dir = await workspace.getSocketsDir();
+		await remove(join(dir, name));
+	}
+
 	if (ipc.server) {
 		ipc.server.stop();
 	}

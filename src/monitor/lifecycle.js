@@ -71,24 +71,24 @@ export default function lifecycle(monitor, options) {
 		handle(events.exit, code, signal);
 	});
 
-	const exit = () => {
+	const exit = async () => {
 		logger.debug('exit');
-		stopServer();
+		await stopServer(name);
 		monitor.stop(::process.exit);
 	};
 
-	const silentExit = () => {
+	const silentExit = async () => {
 		setLoggers('logLevel', 'OFF');
-		exit();
+		await exit();
 	};
 
 	process.on('SIGINT', silentExit);
 	process.on('SIGTERM', silentExit);
-	process.on('uncaughtException', (err) => {
+	process.on('uncaughtException', async (err) => {
 		handle(events.uncaughtException, err);
 		logger.debug('uncaughtException');
 		logger.error(err);
-		exit();
+		await exit();
 	});
 
 	watch(watchOptions, (file, stat) => {
