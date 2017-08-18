@@ -67,9 +67,11 @@ export const startClient = (clientId, serverId, socketsDir) => {
 			});
 
 			socket.on('error', async (err) => {
-				logger.debug('socket error', err);
-				if (err && err.code === 'ECONNREFUSED') {
+				if (err && ['ECONNREFUSED', 'ENOENT'].indexOf(err.code) > -1) {
 					await remove(path);
+				}
+				else {
+					logger.error('socket error', err);
 				}
 				resolve();
 			});
