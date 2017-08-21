@@ -1725,6 +1725,13 @@ get-stdin@^4.0.1:
   version "4.0.1"
   resolved "http://registry.npm.taobao.org/get-stdin/download/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
 
+get-stream@^2.1.0:
+  version "2.3.1"
+  resolved "http://registry.npm.taobao.org/get-stream/download/get-stream-2.3.1.tgz#5f38f93f346009666ee0150a054167f91bdd95de"
+  dependencies:
+    object-assign "^4.0.1"
+    pinkie-promise "^2.0.0"
+
 get-uri@2:
   version "2.0.1"
   resolved "http://registry.npm.taobao.org/get-uri/download/get-uri-2.0.1.tgz#dbdcacacd8c608a38316869368117697a1631c59"
@@ -2889,6 +2896,14 @@ neat-csv@^1.0.0:
     csv-parser "^1.6.0"
     into-stream "^2.0.0"
 
+neat-csv@^2.1.0:
+  version "2.1.0"
+  resolved "http://registry.npm.taobao.org/neat-csv/download/neat-csv-2.1.0.tgz#06f58360c4c3b955bd467ddc85ae4511a3907a4c"
+  dependencies:
+    csv-parser "^1.6.0"
+    get-stream "^2.1.0"
+    into-stream "^2.0.0"
+
 netmask@~1.0.4:
   version "1.0.6"
   resolved "http://registry.npm.taobao.org/netmask/download/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
@@ -3212,6 +3227,10 @@ pify@^2.0.0, pify@^2.2.0:
   version "2.3.0"
   resolved "http://registry.npm.taobao.org/pify/download/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
 
+pify@^3.0.0:
+  version "3.0.0"
+  resolved "http://registry.npm.taobao.org/pify/download/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
+
 pinkie-promise@^2.0.0:
   version "2.0.1"
   resolved "http://registry.npm.taobao.org/pinkie-promise/download/pinkie-promise-2.0.1.tgz#2135d6dfa7a358c069ac9b178776288228450ffa"
@@ -3301,6 +3320,13 @@ ps-list@^3.0.0:
     pify "^2.2.0"
     pinkie-promise "^2.0.0"
     tasklist "^2.0.0"
+
+ps-list@^4.0.0:
+  version "4.0.0"
+  resolved "http://registry.npm.taobao.org/ps-list/download/ps-list-4.0.0.tgz#57c8b3d38161ee8977811cd32a5dc52237fdb299"
+  dependencies:
+    pify "^3.0.0"
+    tasklist "^3.1.0"
 
 ps-tree@0.0.3:
   version "0.0.3"
@@ -3995,6 +4021,14 @@ tasklist@^2.0.0:
     neat-csv "^1.0.0"
     pify "^2.2.0"
     pinkie-promise "^2.0.0"
+    sec "^1.0.0"
+
+tasklist@^3.1.0:
+  version "3.1.0"
+  resolved "http://registry.npm.taobao.org/tasklist/download/tasklist-3.1.0.tgz#873a98a4e45cbdecfa2c2ee18865353057e63696"
+  dependencies:
+    neat-csv "^2.1.0"
+    pify "^2.2.0"
     sec "^1.0.0"
 
 test-exclude@^4.1.0:

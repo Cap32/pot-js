@@ -1,6 +1,8 @@
 
+import processExists from './process-exists';
+// import processExists from 'process-exists';
+
 import { writeFile, readFile, open, remove } from 'fs-extra';
-import processExists from 'process-exists';
 import { join } from 'path';
 import { trim } from 'lodash';
 import { logger, setLoggers } from 'pot-logger';
