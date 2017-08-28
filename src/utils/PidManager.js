@@ -1,7 +1,5 @@
 
-import processExists from './process-exists';
-// import processExists from 'process-exists';
-
+import processExists from 'process-exists';
 import { writeFile, readFile, open, remove } from 'fs-extra';
 import { join } from 'path';
 import { trim } from 'lodash';

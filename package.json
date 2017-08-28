@@ -43,7 +43,7 @@
     "node-ipc": "^9.1.0",
     "pidusage": "^1.1.0",
     "pot-logger": "^0.1.0",
-    "process-exists": "^2.1.0",
+    "process-exists": "^3.0.0",
     "ps-list": "^4.0.0",
     "ps-tree": "0.0.3",
     "respawn": "^2.5.0",

@@ -985,7 +985,7 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "http://registry.npm.taobao.org/concat-map/download/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
 
-concat-stream@^1.4.7, concat-stream@^1.4.8, concat-stream@^1.5.2:
+concat-stream@^1.4.7, concat-stream@^1.5.2:
   version "1.5.2"
   resolved "http://registry.npm.taobao.org/concat-stream/download/concat-stream-1.5.2.tgz#708978624d856af41a5a741defdd261da752c266"
   dependencies:
@@ -2888,14 +2888,6 @@ ndjson@^1.4.0:
     split2 "^2.1.0"
     through2 "^2.0.3"
 
-neat-csv@^1.0.0:
-  version "1.1.0"
-  resolved "http://registry.npm.taobao.org/neat-csv/download/neat-csv-1.1.0.tgz#357a412f84b55b21160259945def3a70be30301c"
-  dependencies:
-    concat-stream "^1.4.8"
-    csv-parser "^1.6.0"
-    into-stream "^2.0.0"
-
 neat-csv@^2.1.0:
   version "2.1.0"
   resolved "http://registry.npm.taobao.org/neat-csv/download/neat-csv-2.1.0.tgz#06f58360c4c3b955bd467ddc85ae4511a3907a4c"
@@ -3282,11 +3274,11 @@ private@^0.1.6:
   version "0.1.6"
   resolved "http://registry.npm.taobao.org/private/download/private-0.1.6.tgz#55c6a976d0f9bafb9924851350fe47b9b5fbb7c1"
 
-process-exists@^2.1.0:
-  version "2.1.0"
-  resolved "http://registry.npm.taobao.org/process-exists/download/process-exists-2.1.0.tgz#718c612887e787d54fac109bf4e67b18013746b8"
+process-exists@^3.0.0:
+  version "3.0.0"
+  resolved "http://registry.npm.taobao.org/process-exists/download/process-exists-3.0.0.tgz#75cf6b47a12721c9b4c06880e091da95717ded81"
   dependencies:
-    ps-list "^3.0.0"
+    ps-list "^4.0.0"
 
 process-nextick-args@~1.0.6:
   version "1.0.7"
@@ -3312,14 +3304,6 @@ proxy-agent@~2.0.0:
 prr@~0.0.0:
   version "0.0.0"
   resolved "http://registry.npm.taobao.org/prr/download/prr-0.0.0.tgz#1a84b85908325501411853d0081ee3fa86e2926a"
-
-ps-list@^3.0.0:
-  version "3.1.0"
-  resolved "http://registry.npm.taobao.org/ps-list/download/ps-list-3.1.0.tgz#07d53822ee6724bbf687687b27a9aa22bfdbbeb4"
-  dependencies:
-    pify "^2.2.0"
-    pinkie-promise "^2.0.0"
-    tasklist "^2.0.0"
 
 ps-list@^4.0.0:
   version "4.0.0"
@@ -4013,15 +3997,6 @@ tar@~2.2.1:
     block-stream "*"
     fstream "^1.0.2"
     inherits "2"
-
-tasklist@^2.0.0:
-  version "2.1.0"
-  resolved "http://registry.npm.taobao.org/tasklist/download/tasklist-2.1.0.tgz#53382e962e090adaf4c67d255057a97eec616e54"
-  dependencies:
-    neat-csv "^1.0.0"
-    pify "^2.2.0"
-    pinkie-promise "^2.0.0"
-    sec "^1.0.0"
 
 tasklist@^3.1.0:
   version "3.1.0"
