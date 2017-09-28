@@ -56,6 +56,8 @@ const requestBySocket = (socket, arg) => {
 		new Promise((resolve) => {
 			const handler = (data) => {
 				try {
+					if (requestBySocket.__warned) { return; }
+					requestBySocket.__warned = true;
 					logger.warn(
 						`The API of "pot-js" in "${data.data.name}" has DEPRECATED.`
 					);
