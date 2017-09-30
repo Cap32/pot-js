@@ -5,6 +5,7 @@ import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 import { stopServer } from '../utils/unixDomainSocket';
 import { once } from 'lodash';
+import { signals } from 'signal-exit';
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
@@ -77,13 +78,13 @@ export default function lifecycle(monitor, options) {
 		monitor.stop(::process.exit);
 	};
 
-	const silentExit = async () => {
-		setLoggers('logLevel', 'OFF');
-		await exit();
-	};
+	signals().forEach((signal) => {
+		process.on(signal, async () => {
+			setLoggers('logLevel', 'OFF');
+			await exit();
+		});
+	});
 
-	process.on('SIGINT', silentExit);
-	process.on('SIGTERM', silentExit);
 	process.on('uncaughtException', async (err) => {
 		handle(events.uncaughtException, err);
 		logger.debug('uncaughtException');
