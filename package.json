@@ -33,6 +33,7 @@
     "chokidar": "^1.6.1",
     "cli-table": "^0.3.1",
     "find-port-sync": "^1.0.0",
+    "fkill": "^5.1.0",
     "fs-extra": "^3.0.1",
     "globby": "^6.1.0",
     "home-or-tmp": "^2.0.0",

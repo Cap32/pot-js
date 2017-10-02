@@ -9,6 +9,7 @@ import isWin from './isWin';
 import Bridge from '../Bridge';
 import chalk from 'chalk';
 import { stopServer } from './unixDomainSocket';
+import fkill from 'fkill';
 
 const getPidFile = async (name) =>
 	join(await workspace.getPidsDir(), `${name}.pid`)
@@ -82,12 +83,12 @@ export default class PidManager {
 				catch (err) { logger.debug(err); }
 			}
 
-
 			if (isWin) {
 				await stopServer(name);
 			}
 
-			process.kill(pid);
+			await fkill(pid);
+
 			logger.trace(`killed pid ${pid}`);
 			shouldLog && logger.info(`"${name}" stopped`);
 			return true;
