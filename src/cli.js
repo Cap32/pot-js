@@ -81,6 +81,10 @@ yargs
 						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},
+					enableLog: {
+						desc: 'Enable log. Defaults to `true`',
+						type: 'bool',
+					},
 					maxRestarts: {
 						desc: 'How many restarts are allowed within 60s. `-1` for infinite restarts. If `production` is `true`, default value is `-1`, otherwise is `0`',
 						type: 'number',
