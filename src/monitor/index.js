@@ -16,7 +16,7 @@ const potIPC = new StdioIPC(process);
 
 const start = async (options) => {
 	const {
-		name, workspace: space,
+		name, workspace: space, enableLog,
 		command, daemon, inject, force,
 		env, configToEnv,
 		...respawnOptions,
@@ -57,7 +57,7 @@ const start = async (options) => {
 		}
 	};
 
-	setLoggers(options);
+	setLoggers({ ...options, enable: enableLog });
 
 	workspace.set(space);
 

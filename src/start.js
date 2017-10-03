@@ -50,6 +50,7 @@ const ensureOptions = (options = {}) => {
 	options.root = resolve(cwd, (options.root || cwd));
 	const logsDir = options.logsDir || Defaults.LOGS_DIR;
 	options.logsDir = resolve(options.root, logsDir);
+	options.enableLog = options.enableLog !== false;
 	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
 	options.execArgs = [].concat(options.execArgs || []);
 	if (options.inspect === 'true' || options.inspect === true) {
