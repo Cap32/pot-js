@@ -8,9 +8,13 @@ Script runner
 
 - [Features](#features)
 - [Installing](#installing)
-- [Usage](#usage)
-    - [CLI](#cli)
-    - [Node.js module API](#nodejs-module-api)
+- [CLI Reference](#cli-reference)
+- [Node.js module API Reference](#nodejs-module-api-reference)
+    - [start\(\[options\]\)](#startoptions)
+    - [stop\(\[options\]\)](#stopoptions)
+    - [list\(\[options\]\)](#listoptions)
+    - [log\(\[options\]\)](#logoptions)
+    - [dir\(\[options\]\)](#diroptions)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -38,11 +42,8 @@ $ npm install -g pot-js
 ```
 
 
-<a name="usage"></a>
-## Usage
-
-<a name="cli"></a>
-### CLI
+<a name="cli-reference"></a>
+## CLI Reference
 
 ```bash
 pot <command> [args]
@@ -59,14 +60,84 @@ Options:
   -h, --help  Show help                            [boolean]
 ```
 
-<a name="nodejs-module-api"></a>
-### Node.js module API
+<a name="nodejs-module-api-reference"></a>
+## Node.js module API Reference
 
-- start([options])
-- stop([options])
-- list([options])
-- log([options])
-- dir([options])
+<a name="startoptions"></a>
+#### start([options])
+
+Spawn a process
+
+###### Options
+
+- `name` (String): Process monitor name. Defaults to the basename of `process.cwd()`.
+- `workspace` (String): Workspace.
+- `entry` (String): Defining the source script. Defaults to `./index.js`.
+- `execArgs` (String|[String]): Executing arguments. Defaults to `[]`.
+- `execCommand` (String): Executing command. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
+- `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Defaults to `false`.
+- `enableLog` (Boolean): Enable log. Defaults to `true`.
+- `logLevel` (String|Object): Defining log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
+    + ALL
+    + TRACE
+    + DEBUG (default in `development` mode)
+    + INFO (default in `production` mode)
+    + WARN
+    + ERROR
+    + FATAL
+    + OFF
+- `logsDir` (String): Defining log files directory. If `daemon` mode actived, log messages will write to some `.log` files. Defaults to `.logs`.
+- `maxRestarts` (Number): Defining max restarts if crashed. Defaults to `-1` (`-1` equals to `Infinity`) in `production` mode, `0` in `development` mode.
+- `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `claypot stop ${name}`. Defaults to `false`.
+- `production` (Boolean): Enable `production` mode. Defaults to `false`.
+
+---
+
+<a name="stopoptions"></a>
+#### stop([options])
+
+Stop a process
+
+###### Options
+
+- `name` (String): Target process name.
+- `workspace` (String): Workspace.
+- `force` (Boolean): Force stopping without confirmation. Defaults to `false`.
+
+---
+
+<a name="listoptions"></a>
+#### list([options])
+
+List running processes
+
+###### Options
+
+- `workspace` (String): Workspace.
+
+---
+
+<a name="logoptions"></a>
+#### log([options])
+
+Displaying the last part of a process log files
+
+- `name` (String): Target process name.
+- `workspace` (String): Workspace.
+- `category` (String): The category of log files.
+- `line` (Number): The max lines of log messages. Defaults to 200.
+
+---
+
+<a name="diroptions"></a>
+#### dir([options])
+
+Displaying the directory of a pot process project.
+
+- `name` (String): Target process name.
+- `workspace` (String): Workspace.
+
+---
 
 
 <a name="license"></a>
