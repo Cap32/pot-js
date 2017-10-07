@@ -23,8 +23,9 @@ Script runner
 ## Features
 
 - Automatically restart process if it crashes
+- Supports workspace
+- Easy to run as a daemon on unix based systems
 - Provides both CLI and Node.js module API
-- Supports namespace
 - Built-in powerful logger system
 
 
