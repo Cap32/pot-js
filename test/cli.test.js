@@ -107,7 +107,7 @@ describe('cli `pot ls`', () => {
 
 		await new Kapok(command, ['ls'])
 			.ignoreUntil(/┐\s*$/)
-			.joinUntil(/│\s*$/)
+			.joinUntil(/Pid/)
 			.assert((message) => {
 				return ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid']
 					.every((key) => message.includes(key))
