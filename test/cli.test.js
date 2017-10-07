@@ -109,7 +109,7 @@ describe('cli `pot ls`', () => {
 			.until(/^\s*│/)
 			.assert((message) => {
 				return ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid']
-					.every((key) => message.contains(key))
+					.every((key) => message.includes(key))
 				;
 			})
 			.assertUntil(/app-1/)
