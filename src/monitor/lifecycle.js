@@ -11,7 +11,9 @@ const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
 
 export default function lifecycle(monitor, options) {
-	const { name, events, inject, watch: watchOptions } = options;
+	const {
+		name, events, inject, watch: watchOptions, monitorProcessTitle,
+	} = options;
 
 	const handle = (modulePath, ...args) => {
 		if (!modulePath) { return; }
@@ -84,6 +86,8 @@ export default function lifecycle(monitor, options) {
 			await exit();
 		});
 	});
+
+	process.title = monitorProcessTitle;
 
 	process.on('uncaughtException', async (err) => {
 		handle(events.uncaughtException, err);

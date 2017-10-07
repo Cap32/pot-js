@@ -2,16 +2,28 @@
 export default {
 	$schema: 'http://json-schema.org/draft-06/schema#',
 	properties: {
-		name: {
+		configToEnv: {
 			type: 'string',
 		},
-		workspace: {
+		cwd: {
 			type: 'string',
-			default: 'defaults',
+			default: process.cwd(),
+		},
+		daemon: {
+			type: 'boolean',
+			default: false,
+		},
+		enableLog: {
+			type: 'boolean',
+			default: true,
 		},
 		entry: {
 			type: 'string',
 			default: './index.js',
+		},
+		env: {
+			type: 'object',
+			default: {},
 		},
 		execArgs: {
 			anyOf: [
@@ -30,10 +42,6 @@ export default {
 		execCommand: {
 			type: 'string',
 			default: process.execPath,
-		},
-		cwd: {
-			type: 'string',
-			default: process.cwd(),
 		},
 		inspect: {
 			anyOf: [
@@ -57,10 +65,6 @@ export default {
 			],
 			default: false,
 		},
-		enableLog: {
-			type: 'boolean',
-			default: true,
-		},
 		logLevel: {
 			enum: [
 				'ALL',
@@ -81,17 +85,16 @@ export default {
 		maxRestarts: {
 			minimum: -1,
 		},
-		daemon: {
-			type: 'boolean',
-			default: false,
+		monitorProcessTitle: {
+			type: 'string',
+			default: 'node',
+		},
+		name: {
+			type: 'string',
 		},
 		production: {
 			type: 'boolean',
 			default: false,
-		},
-		env: {
-			type: 'object',
-			default: {},
 		},
 		watch: {
 			oneOf: [
@@ -124,8 +127,9 @@ export default {
 			],
 			default: false,
 		},
-		configToEnv: {
+		workspace: {
 			type: 'string',
+			default: 'defaults',
 		},
 	},
 };
