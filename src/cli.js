@@ -3,7 +3,7 @@ import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
 import { logger, setLoggers } from 'pot-logger';
-import resolveConfig, { Defaults } from './utils/resolveConfig';
+import resolveConfig from './utils/resolveConfig';
 import { start, stop, list, log, dir } from './';
 
 // eslint-disable-next-line
@@ -15,7 +15,7 @@ yargs
 		desc: 'Start process',
 		builder(yargs) {
 			yargs // eslint-disable-line
-				.default('entry', Defaults.ENTRY)
+				.default('entry', './index.js')
 				.options({
 					name: {
 						desc: 'Server name',
@@ -39,12 +39,10 @@ yargs
 						choices: [
 							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
 						],
-						default: Defaults.LOG_LEVEL,
 					},
 					w: {
 						alias: 'watch',
 						desc: 'Enable watch mode',
-						default: Defaults.WATCH,
 						type: 'bool',
 					},
 					f: {
@@ -69,7 +67,6 @@ yargs
 					},
 					execCommand: {
 						desc: 'Exec command',
-						default: Defaults.EXEC_COMMAND,
 						type: 'string',
 					},
 					execArgs: {
@@ -78,7 +75,6 @@ yargs
 					},
 					logsDir: {
 						desc: 'Log files dir. Resolve from `cwd`',
-						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},
 					enableLog: {
@@ -125,7 +121,7 @@ yargs
 						choices: [
 							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
 						],
-						default: Defaults.LOG_LEVEL,
+						default: 'INFO',
 					},
 				})
 				.argv

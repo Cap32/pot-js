@@ -110,6 +110,7 @@ export default {
 							items: {
 								type: 'string',
 							},
+							defaults: ['**/*'],
 						},
 						ignoreDotFiles: {
 							type: 'boolean',
