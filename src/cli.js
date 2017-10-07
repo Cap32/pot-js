@@ -63,7 +63,7 @@ yargs
 						default: true,
 						type: 'bool',
 					},
-					root: {
+					cwd: {
 						desc: 'Root dir. Defaults to `process.cwd()`',
 						type: 'string',
 					},
@@ -77,7 +77,7 @@ yargs
 						type: 'array',
 					},
 					logsDir: {
-						desc: 'Log files dir. Resolve from `root`',
+						desc: 'Log files dir. Resolve from `cwd`',
 						default: Defaults.LOGS_DIR,
 						type: 'string',
 					},

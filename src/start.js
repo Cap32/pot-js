@@ -3,8 +3,9 @@ import { spawn } from 'child_process';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
+import validateSchema from './utils/validateSchema';
 import { logger, setLoggers } from 'pot-logger';
-import { isNumber, isUndefined } from 'lodash';
+import { isNumber, isObject, isUndefined } from 'lodash';
 import { Defaults } from './utils/resolveConfig';
 import chalk from 'chalk';
 import PidManager from './utils/PidManager';
@@ -17,16 +18,16 @@ const ensureName = (options) => {
 		return options;
 	}
 
-	const { root } = options;
+	const { cwd } = options;
 
 	try {
-		const { name } = require(resolve(root, 'package.json'));
+		const { name } = require(resolve(cwd, 'package.json'));
 		if (!name) { throw new Error(); }
 		options.name = name;
 	}
 	catch (err) {
 		const sepRegExp = new RegExp(sep, 'g');
-		options.name = root.replace(sepRegExp, '_');
+		options.name = cwd.replace(sepRegExp, '_');
 	}
 };
 
@@ -34,24 +35,19 @@ const ensureWatch = (options) => {
 	if (!options.watch) { return options; }
 
 	let { watch } = options;
-
-	watch === true && (watch = { enable: true });
-
+	if (watch === true) { watch = { enable: true }; }
 	options.watch = {
 		ignoreDotFiles: watch.ignoreDotFiles || options.watchIgnoreDotFiles,
 		dirs: watch.dirs || options.watchDirs,
 		...watch,
 	};
-
 };
 
 const ensureOptions = (options = {}) => {
-	const cwd = process.cwd();
-	options.root = resolve(cwd, (options.root || cwd));
+	validateSchema(options);
+	options.cwd = resolve(options.root || options.cwd);
 	const logsDir = options.logsDir || Defaults.LOGS_DIR;
-	options.logsDir = resolve(options.root, logsDir);
-	options.enableLog = options.enableLog !== false;
-	options.execCommand = options.execCommand || Defaults.EXEC_COMMAND;
+	options.logsDir = resolve(options.cwd, logsDir);
 	options.execArgs = [].concat(options.execArgs || []);
 	if (options.inspect === 'true' || options.inspect === true) {
 		options.inspect = '127.0.0.1:9229';
@@ -59,10 +55,11 @@ const ensureOptions = (options = {}) => {
 	else if (options.inspect === 'false') {
 		delete options.inspect;
 	}
-	options.entry = options.entry || Defaults.ENTRY;
-	options.logLevel = options.logLevel || Defaults.LOG_LEVEL;
+	else if (isObject(options.inspect)) {
+		const { port = 9229, host = '127.0.0.1' } = options.inspect;
+		options.inspect = `${host}:${port}`;
+	}
 	options.events = options.events || {};
-	options.env = options.env || {};
 	if (options.production) { options.env.NODE_ENV = 'production'; }
 	if (isUndefined(options.maxRestarts)) {
 		options.maxRestarts = options.production ? -1 : 0;
@@ -72,7 +69,7 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
-const execMonitorProc = ({ root, daemon, env }) => {
+const execMonitorProc = ({ cwd, daemon, env }) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
@@ -80,7 +77,7 @@ const execMonitorProc = ({ root, daemon, env }) => {
 	return spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
-		cwd: root,
+		cwd,
 		env: {
 			...process.env,
 			...env,
@@ -89,9 +86,9 @@ const execMonitorProc = ({ root, daemon, env }) => {
 };
 
 const getCommand = (options) => {
-	const { root, entry, execCommand, execArgs, inspect } = options;
+	const { cwd, entry, execCommand, execArgs, inspect } = options;
 
-	const commandModulePath = resolve(root, entry);
+	const commandModulePath = resolve(cwd, entry);
 
 	// throw error if `commandModulePath` is not exits.
 	require.resolve(commandModulePath);

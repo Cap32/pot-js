@@ -22,9 +22,9 @@ const dir = async (options) => {
 	}
 
 	const info = await bridge.getInfo();
-	const { root } = info.data;
+	const { cwd, root } = info.data;
 
-	console.log(root);
+	console.log(cwd || root);
 };
 
 export default dir;

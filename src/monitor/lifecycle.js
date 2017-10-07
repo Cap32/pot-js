@@ -18,7 +18,7 @@ export default function lifecycle(monitor, options) {
 
 		try {
 			const handler = importFile(modulePath, {
-				cwd: options.root,
+				cwd: options.cwd,
 			});
 			handler(...args);
 		}
