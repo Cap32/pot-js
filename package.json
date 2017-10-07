@@ -23,7 +23,7 @@
     "lib"
   ],
   "engines": {
-    "node": ">= 6.1.0"
+    "node": ">=6.0.0"
   },
   "repository": "git@github.com:Cap32/pot-js.git",
   "author": "Cap32 <webb.png@gmail.com>",
