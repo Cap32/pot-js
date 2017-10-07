@@ -88,6 +88,7 @@ Spawn a process
   - OFF
 - `logsDir` (String): Defining log files directory. If `daemon` mode actived, log messages will write to some `.log` files. Defaults to `.logs`.
 - `maxRestarts` (Number): Defining max restarts if crashed. Defaults to `-1` (`-1` equals to `Infinity`) in `production` mode, `0` in `development` mode.
+- `monitorProcessTitle` (String): Monitor process title. Defaults to "node".
 - `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `claypot stop ${name}`. Defaults to `false`.
 - `production` (Boolean): Enable `production` mode. Defaults to `false`.
 - `env` (Object): Defining custom environments. Defaults to `process.env`.
