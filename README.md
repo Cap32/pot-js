@@ -1,5 +1,7 @@
 # pot-js
 
+[![Build Status](https://travis-ci.org/Cap32/pot-js.svg?branch=master)](https://travis-ci.org/Cap32/pot-js)
+
 Script runner
 
 ## Table of Contents
