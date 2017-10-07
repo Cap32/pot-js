@@ -10,11 +10,11 @@ Script runner
 - [Installing](#installing)
 - [CLI Reference](#cli-reference)
 - [Node.js module API Reference](#nodejs-module-api-reference)
-    - [start\(\[options\]\)](#startoptions)
-    - [stop\(\[options\]\)](#stopoptions)
-    - [list\(\[options\]\)](#listoptions)
-    - [log\(\[options\]\)](#logoptions)
-    - [dir\(\[options\]\)](#diroptions)
+  - [start\(\[options\]\)](#startoptions)
+  - [stop\(\[options\]\)](#stopoptions)
+  - [list\(\[options\]\)](#listoptions)
+  - [log\(\[options\]\)](#logoptions)
+  - [dir\(\[options\]\)](#diroptions)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -78,18 +78,26 @@ Spawn a process
 - `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Defaults to `false`.
 - `enableLog` (Boolean): Enable log. Defaults to `true`.
 - `logLevel` (String|Object): Defining log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
-    + ALL
-    + TRACE
-    + DEBUG (default in `development` mode)
-    + INFO (default in `production` mode)
-    + WARN
-    + ERROR
-    + FATAL
-    + OFF
+  - ALL
+  - TRACE
+  - DEBUG (default in `development` mode)
+  - INFO (default in `production` mode)
+  - WARN
+  - ERROR
+  - FATAL
+  - OFF
 - `logsDir` (String): Defining log files directory. If `daemon` mode actived, log messages will write to some `.log` files. Defaults to `.logs`.
 - `maxRestarts` (Number): Defining max restarts if crashed. Defaults to `-1` (`-1` equals to `Infinity`) in `production` mode, `0` in `development` mode.
 - `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `claypot stop ${name}`. Defaults to `false`.
 - `production` (Boolean): Enable `production` mode. Defaults to `false`.
+- `env` (Object): Defining custom environments. Defaults to `process.env`.
+- `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
+- `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
+  - `enable` (Boolean): Enable `watch`. Defaults to `true`.
+  - `dirs` (String|[String]): Defining watching directories.
+  - `ignoreDotFiles` (Boolean): Ignore watching `.*` files. Defaults to `true`.
+  - `ignoreNodeModulesDir` (Boolean): Ignore watching `node_modules` directory. Defaults to `true`.
+- `configToEnv` (String): Setting an env name and pass the config json string to child process `env`.
 
 ---
 
