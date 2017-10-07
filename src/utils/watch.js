@@ -2,16 +2,15 @@
 import chokidar from 'chokidar';
 import { debounce } from 'lodash';
 import { createLogger } from 'pot-logger';
-import { Defaults } from './resolveConfig';
 
 const logger = createLogger('watch');
 
 export default function watch(options = {}, handler) {
 	const {
-		enable = Defaults.WATCH,
-		dirs = Defaults.WATCH_DIRS,
-		ignoreDotFiles = Defaults.WATCH_IGNORE_DOT_FILES,
-		ignoreNodeModulesDir = Defaults.WATCH_IGNORE_NODE_MODULE_DIR,
+		enable = true,
+		dirs = ['**/*'],
+		ignoreDotFiles = true,
+		ignoreNodeModulesDir = true,
 		...other,
 	} = options;
 

@@ -6,7 +6,6 @@ import workspace from './utils/workspace';
 import validateSchema from './utils/validateSchema';
 import { logger, setLoggers } from 'pot-logger';
 import { isNumber, isObject, isUndefined } from 'lodash';
-import { Defaults } from './utils/resolveConfig';
 import chalk from 'chalk';
 import PidManager from './utils/PidManager';
 
@@ -46,8 +45,7 @@ const ensureWatch = (options) => {
 const ensureOptions = (options = {}) => {
 	validateSchema(options);
 	options.cwd = resolve(options.root || options.cwd);
-	const logsDir = options.logsDir || Defaults.LOGS_DIR;
-	options.logsDir = resolve(options.cwd, logsDir);
+	options.logsDir = resolve(options.cwd, options.logsDir);
 	options.execArgs = [].concat(options.execArgs || []);
 	if (options.inspect === 'true' || options.inspect === true) {
 		options.inspect = '127.0.0.1:9229';
