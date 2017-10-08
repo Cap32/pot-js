@@ -1,6 +1,6 @@
 
 import Ajv from 'ajv';
-import schema from './schema';
+import getSchema from './getSchema';
 
 const ajv = new Ajv({
 	useDefaults: true,
@@ -9,7 +9,7 @@ const ajv = new Ajv({
 });
 
 export default function validateSchema(config) {
-	const valid = ajv.validate(schema, config);
+	const valid = ajv.validate(getSchema(config.production), config);
 	if (!valid) {
 		const error = new Error(ajv.errorsText(ajv.errors, {
 			dataVar: 'config',

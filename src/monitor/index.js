@@ -2,6 +2,7 @@
 // import respawn from 'respawn';
 import respawn from './respawn';
 
+import { resolve } from 'path';
 import StdioIPC from '../utils/StdioIPC';
 import { setLoggers } from 'pot-logger';
 import lifecycle from './lifecycle';
@@ -16,7 +17,7 @@ const potIPC = new StdioIPC(process);
 
 const start = async (options) => {
 	const {
-		name, workspace: space, enableLog,
+		name, workspace: space, logsDir,
 		command, daemon, inject, force,
 		env, configToEnv,
 		...respawnOptions,
@@ -57,7 +58,11 @@ const start = async (options) => {
 		}
 	};
 
-	setLoggers({ ...options, enable: enableLog });
+	setLoggers({
+		...options,
+		enable: !daemon || logsDir,
+		logsDir: resolve(options.cwd, logsDir || '.logs'),
+	});
 
 	workspace.set(space);
 

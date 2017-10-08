@@ -45,7 +45,6 @@ const ensureWatch = (options) => {
 const ensureOptions = (options = {}) => {
 	validateSchema(options);
 	options.cwd = resolve(options.root || options.cwd);
-	options.logsDir = resolve(options.cwd, options.logsDir);
 	options.execArgs = [].concat(options.execArgs || []);
 	if (options.inspect === 'true' || options.inspect === true) {
 		options.inspect = '127.0.0.1:9229';
@@ -138,7 +137,9 @@ export default async function start(options = {}) {
 		const { name, force } = ensureOptions(options);
 
 		setLoggers('logLevel', options.logLevel);
-		logger.trace('logs dir', chalk.gray(options.logsDir));
+		if (options.logsDir) {
+			logger.trace('logs dir', chalk.gray(options.logsDir));
+		}
 		logger.trace('logLevel', options.logLevel);
 
 		workspace.set(options);

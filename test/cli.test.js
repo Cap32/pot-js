@@ -34,7 +34,7 @@ describe('cli `pot start`', () => {
 		return start([
 			'start',
 			'--entry=test/fixtures/server.js',
-			'--max-restarts=1',
+			'--maxRestarts=1',
 		])
 			.assertUntil(/started/)
 			.assertUntil('test server started', {
@@ -89,7 +89,7 @@ describe('cli `pot stop`', () => {
 
 describe('cli `pot ls`', () => {
 	test('should work`', async () => {
-		jest.setTimeout(10000);
+		jest.setTimeout(20000);
 		const createClient = async (port, name) => {
 			const kapok = start([
 				'start',

@@ -79,7 +79,6 @@ Spawn a process
 - `execArgs` (String|[String]): Executing arguments. Defaults to `[]`.
 - `execCommand` (String): Executing command. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
 - `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Defaults to `false`.
-- `enableLog` (Boolean): Enable log. Defaults to `true`.
 - `logLevel` (String|Object): Defining log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
   - ALL
   - TRACE

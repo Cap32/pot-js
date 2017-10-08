@@ -7,4 +7,4 @@ export dir from './dir';
 export Bridge from './Bridge';
 export workspace from './utils/workspace';
 export resolveConfig from './utils/resolveConfig';
-export schema from './utils/schema';
+export getSchema from './utils/getSchema';

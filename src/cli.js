@@ -21,42 +21,42 @@ yargs
 						desc: 'Server name',
 						type: 'string',
 					},
-					d: {
-						alias: 'daemon',
+					daemon: {
+						alias: 'd',
 						desc: 'Use as a daemon',
 						default: false,
 						type: 'bool',
 					},
-					p: {
-						alias: 'production',
+					production: {
+						alias: 'p',
 						desc: 'Short hand for set NODE_ENV="production" env',
 						default: false,
 						type: 'bool',
 					},
-					l: {
-						alias: 'logLevel',
+					logLevel: {
+						alias: 'l',
 						desc: 'Log level',
 						choices: [
 							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
 						],
 					},
-					w: {
-						alias: 'watch',
+					watch: {
+						alias: 'w',
 						desc: 'Enable watch mode',
 						type: 'bool',
 					},
-					f: {
-						alias: 'force',
+					force: {
+						alias: 'f',
 						desc: 'Force restart even if the process is exists',
 						type: 'bool',
 					},
-					c: {
-						alias: 'config',
+					config: {
+						alias: 'c',
 						desc: 'Path to the config file',
 						default: '.potrc',
 						type: 'string',
 					},
-					'config-walk': {
+					configWalk: {
 						desc: 'Walk to resolve config file',
 						default: true,
 						type: 'bool',
@@ -76,10 +76,6 @@ yargs
 					logsDir: {
 						desc: 'Log files dir. Resolve from `cwd`',
 						type: 'string',
-					},
-					enableLog: {
-						desc: 'Enable log. Defaults to `true`',
-						type: 'bool',
 					},
 					maxRestarts: {
 						desc: 'How many restarts are allowed within 60s. `-1` for infinite restarts. If `production` is `true`, default value is `-1`, otherwise is `0`',
