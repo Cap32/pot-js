@@ -8,16 +8,16 @@ Script runner
 
 <!-- MarkdownTOC -->
 
-- [Features](#features)
-- [Installing](#installing)
-- [CLI Reference](#cli-reference)
-- [Node.js module API Reference](#nodejs-module-api-reference)
-  - [start\(\[options\]\)](#startoptions)
-  - [stop\(\[options\]\)](#stopoptions)
-  - [list\(\[options\]\)](#listoptions)
-  - [log\(\[options\]\)](#logoptions)
-  - [dir\(\[options\]\)](#diroptions)
-- [License](#license)
+- [Features][features]
+- [Installing][installing]
+- [CLI Reference][cli-reference]
+- [Node.js module API Reference][nodejs-module-api-reference]
+  - [start\(\[options\]\)][startoptions]
+  - [stop\(\[options\]\)][stopoptions]
+  - [list\(\[options\]\)][listoptions]
+  - [log\(\[options\]\)][logoptions]
+  - [dir\(\[options\]\)][diroptions]
+- [License][license]
 
 <!-- /MarkdownTOC -->
 
@@ -92,7 +92,7 @@ Spawn a process
 - `maxRestarts` (Number): Defining max restarts if crashed. Defaults to `-1` (`-1` equals to `Infinity`) in `production` mode, `0` in `development` mode.
 - `monitorProcessTitle` (String): Monitor process title. Defaults to "node".
 - `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `claypot stop ${name}`. Defaults to `false`.
-- `production` (Boolean): Enable `production` mode. Defaults to `false`.
+- `production` (Boolean): Enable `production` mode. Defaults to `true`.
 - `env` (Object): Defining custom environments. Defaults to `process.env`.
 - `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
 - `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
