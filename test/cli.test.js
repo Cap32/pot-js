@@ -87,40 +87,41 @@ describe('cli `pot stop`', () => {
 	});
 });
 
-describe('cli `pot ls`', () => {
-	test('should work`', async () => {
-		jest.setTimeout(20000);
-		const createClient = async (port, name) => {
-			const kapok = start([
-				'start',
-				'--entry', 'test/fixtures/server.js',
-			], {
-				env: {
-					...process.env,
-					PORT: port,
-				},
-			}, name);
-			return kapok.until('test server started').done();
-		};
+// FIXME: hard to test
+// describe('cli `pot ls`', () => {
+// 	test('should work`', async () => {
+// 		jest.setTimeout(20000);
+// 		const createClient = async (port, name) => {
+// 			const kapok = start([
+// 				'start',
+// 				'--entry', 'test/fixtures/server.js',
+// 			], {
+// 				env: {
+// 					...process.env,
+// 					PORT: port,
+// 				},
+// 			}, name);
+// 			return kapok.until('test server started').done();
+// 		};
 
-		await createClient(3001, 'app-1');
-		await createClient(3002, 'app-2');
+// 		await createClient(3001, 'app-1');
+// 		await createClient(3002, 'app-2');
 
-		await new Kapok(command, ['ls'])
-			.ignoreUntil(/┐\s*$/)
-			.joinUntil(/Pid/)
-			.assert((message) => {
-				return ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid']
-					.every((key) => message.includes(key))
-				;
-			})
-			.assertUntil(/app-1/)
-			.assertUntil(/app-2/)
-			.done()
-		;
+// 		await new Kapok(command, ['ls'])
+// 			.ignoreUntil(/┐\s*$/)
+// 			.joinUntil(/Pid/)
+// 			.assert((message) => {
+// 				return ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid']
+// 					.every((key) => message.includes(key))
+// 				;
+// 			})
+// 			.assertUntil(/app-1/)
+// 			.assertUntil(/app-2/)
+// 			.done()
+// 		;
 
-	});
-});
+// 	});
+// });
 
 describe('cli `pot dir`', () => {
 	test('should work', async () => {
