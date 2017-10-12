@@ -31,7 +31,10 @@ const ensureName = (options) => {
 };
 
 const ensureWatch = (options) => {
-	if (!options.watch) { return options; }
+	if (!options.watch) {
+		options.watch = { enable: false };
+		return options;
+	}
 
 	let { watch } = options;
 	if (watch === true) { watch = { enable: true }; }
