@@ -8,7 +8,7 @@ const ajv = new Ajv({
 	verbose: true,
 });
 
-export default function validateSchema(config) {
+export default function validateSchema(config = {}) {
 	const valid = ajv.validate(getSchema(config.production), config);
 	if (!valid) {
 		const error = new Error(ajv.errorsText(ajv.errors, {
@@ -17,4 +17,5 @@ export default function validateSchema(config) {
 		error.errors = ajv.errors;
 		throw error;
 	}
+	return config;
 }
