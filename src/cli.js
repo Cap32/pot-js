@@ -17,6 +17,10 @@ yargs
 			yargs // eslint-disable-line
 				.default('entry', './index.js')
 				.options({
+					baseDir: {
+						desc: 'The base directory for resolving modules or directories. Defaults to the current working directory',
+						type: 'string',
+					},
 					name: {
 						desc: 'Server name',
 						type: 'string',

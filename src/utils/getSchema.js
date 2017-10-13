@@ -3,6 +3,10 @@ export default function getSchema(production = true) {
 	return {
 		$schema: 'http://json-schema.org/draft-06/schema#',
 		properties: {
+			baseDir: {
+				type: 'string',
+				default: '.',
+			},
 			configToEnv: {
 				type: 'string',
 			},

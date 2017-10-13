@@ -47,7 +47,15 @@ const ensureWatch = (options) => {
 
 const ensureOptions = (options = {}) => {
 	validateSchema(options);
-	options.cwd = resolve(options.root || options.cwd);
+
+	options.cwd = resolve(options.cwd);
+
+	// TODO: root is deprecated
+	options.baseDir = resolve(options.cwd, options.root || options.baseDir);
+
+	// DEPRECATED
+	options.root = options.baseDir;
+
 	options.execArgs = [].concat(options.execArgs || []);
 	if (options.inspect === 'true' || options.inspect === true) {
 		options.inspect = '127.0.0.1:9229';
@@ -69,7 +77,7 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
-const execMonitorProc = ({ cwd, daemon, env }) => {
+const execMonitorProc = ({ baseDir, daemon, env }) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
@@ -77,7 +85,7 @@ const execMonitorProc = ({ cwd, daemon, env }) => {
 	return spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
-		cwd,
+		cwd: baseDir,
 		env: {
 			...process.env,
 			...env,
@@ -86,9 +94,9 @@ const execMonitorProc = ({ cwd, daemon, env }) => {
 };
 
 const getCommand = (options) => {
-	const { cwd, entry, execCommand, execArgs, inspect } = options;
+	const { baseDir, entry, execCommand, execArgs, inspect } = options;
 
-	const commandModulePath = resolve(cwd, entry);
+	const commandModulePath = resolve(baseDir, entry);
 
 	// throw error if `commandModulePath` is not exits.
 	require.resolve(commandModulePath);

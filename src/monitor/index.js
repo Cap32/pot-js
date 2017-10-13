@@ -61,7 +61,7 @@ const start = async (options) => {
 	setLoggers({
 		...options,
 		enable: !daemon || logsDir,
-		logsDir: resolve(options.cwd, logsDir || '.logs'),
+		logsDir: resolve(options.baseDir, logsDir || '.logs'),
 	});
 
 	workspace.set(space);

@@ -20,7 +20,7 @@ export default function lifecycle(monitor, options) {
 
 		try {
 			const handler = importFile(modulePath, {
-				cwd: options.cwd,
+				cwd: options.baseDir,
 			});
 			handler(...args);
 		}
