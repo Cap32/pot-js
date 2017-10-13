@@ -27,7 +27,7 @@
   },
   "repository": "git@github.com:Cap32/pot-js.git",
   "author": "Cap32 <webb.png@gmail.com>",
-  "licenses": "MIT",
+  "license": "MIT",
   "dependencies": {
     "ajv": "^5.2.3",
     "chalk": "^1.1.3",
