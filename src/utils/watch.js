@@ -3,8 +3,6 @@ import chokidar from 'chokidar';
 import { debounce } from 'lodash';
 import { createLogger } from 'pot-logger';
 
-const logger = createLogger('watch');
-
 export default function watch(options = {}, handler) {
 	const {
 		enable = true,
@@ -16,6 +14,7 @@ export default function watch(options = {}, handler) {
 
 	if (!enable) { return; }
 
+	const logger = createLogger('watch');
 	logger.trace('enabled');
 
 	let { ignored } = other;
