@@ -73,7 +73,8 @@ Spawn a process
 
 ###### Options
 
-- `name` (String): Process monitor name. Defaults to the basename of `process.cwd()`.
+- `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`
+- `name` (String): Process monitor name. Defaults to the basename of `baseDir`.
 - `workspace` (String): Workspace.
 - `entry` (String): Defining the source script. Defaults to `./index.js`.
 - `execArgs` (String|[String]): Executing arguments. Defaults to `[]`.
