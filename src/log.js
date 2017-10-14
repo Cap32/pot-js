@@ -27,10 +27,15 @@ const log = async (options) => {
 	const info = await bridge.getInfo();
 	const { logsDir } = info.data;
 
+	if (!logsDir) {
+		logger.warn('Logger is disabled');
+		return;
+	}
+
 	let appCategory = await ensureSelected({
 		value: category,
-		message: 'Please select a log file.',
-		errorMessage: 'Log file NOT found.',
+		message: 'Please select a log file',
+		errorMessage: 'Log file NOT found',
 		getChoices: () => globby('*.log', { cwd: logsDir }),
 	});
 
@@ -42,7 +47,7 @@ const log = async (options) => {
 
 	sf.on('error', (err) => {
 		if (err.code !== 'ENOENT') { throw err; }
-		logger.warn('Log file NOT found.');
+		logger.warn('Log file NOT found');
 	});
 	sf[mode](-line).pipe(process.stdout);
 };
