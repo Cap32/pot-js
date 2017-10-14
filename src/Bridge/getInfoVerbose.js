@@ -93,13 +93,14 @@ export default function handleInfoVerbose(state) {
 
 		const { pid } = state;
 		if (pid) {
-			pidUsage.stat(pid, (err, { memory, cpu }) => {
+			pidUsage.stat(pid, (err, pidState = {}) => {
 				let resp = null;
 				if (err) {
 					logger.error(err.message);
 					logger.debug(err);
 				}
 				else {
+					const { memory, cpu } = pidState;
 					resp = {
 						memoryUsage: {
 							heapUsed: memory,
