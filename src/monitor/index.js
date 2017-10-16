@@ -2,7 +2,6 @@
 // import respawn from 'respawn';
 import respawn from './respawn';
 
-import { resolve } from 'path';
 import StdioIPC from '../utils/StdioIPC';
 import { setLoggers } from 'pot-logger';
 import lifecycle from './lifecycle';
@@ -61,7 +60,7 @@ const start = async (options) => {
 	setLoggers({
 		...options,
 		enable: !daemon || logsDir,
-		logsDir: resolve(options.baseDir, logsDir || '.logs'),
+		logsDir: logsDir || '.logs',
 	});
 
 	workspace.set(space);

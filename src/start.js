@@ -9,8 +9,6 @@ import { isNumber, isObject, isUndefined } from 'lodash';
 import chalk from 'chalk';
 import PidManager from './utils/PidManager';
 
-process.on('unhandledRejection', (r) => logger.debug(r));
-
 const ensureName = (options) => {
 	if (options.name) {
 		if (isNumber(options.name)) { options.name += ''; }
@@ -55,6 +53,10 @@ const ensureOptions = (options = {}) => {
 
 	// DEPRECATED
 	options.root = options.baseDir;
+
+	if (options.logsDir) {
+		options.logsDir = resolve(options.baseDir, options.logsDir);
+	}
 
 	options.execArgs = [].concat(options.execArgs || []);
 	if (options.inspect === 'true' || options.inspect === true) {
