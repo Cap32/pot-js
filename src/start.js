@@ -5,9 +5,11 @@ import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
 import validateSchema from './utils/validateSchema';
 import { logger, setLoggers } from 'pot-logger';
-import { isNumber, isObject, isUndefined } from 'lodash';
+import { isNumber, isObject, isUndefined, noop } from 'lodash';
 import chalk from 'chalk';
 import PidManager from './utils/PidManager';
+import onExit from 'signal-exit';
+import fkill from 'fkill';
 
 const ensureName = (options) => {
 	if (options.name) {
@@ -146,6 +148,17 @@ const connectMonitor = (monitorProc, options, pidManager) => {
 export default async function start(options = {}) {
 	let monitorProc;
 
+	const kill = async () => {
+		if (monitorProc) {
+			await fkill(monitorProc.pid).catch(noop);
+		}
+	};
+
+	onExit(async () => {
+		if (!options.daemon) { await kill(); }
+		process.exit();
+	});
+
 	try {
 		const { name, force } = ensureOptions(options);
 
@@ -164,12 +177,13 @@ export default async function start(options = {}) {
 			else { throw new Error(`"${name}" is running.`); }
 		}
 
-		const monitorProc = execMonitorProc(options);
+		monitorProc = execMonitorProc(options);
 		await connectMonitor(monitorProc, options, pidManager);
-		return monitorProc;
 	}
 	catch (err) {
-		monitorProc && monitorProc.kill();
+		await kill();
 		throw err;
 	}
+
+	return kill;
 }
