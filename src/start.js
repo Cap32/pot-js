@@ -105,7 +105,7 @@ const getCommand = (options) => {
 	// throw error if `commandModulePath` is not exits.
 	require.resolve(commandModulePath);
 
-	const args = [commandModulePath, ...execArgs];
+	const args = [...execArgs, commandModulePath];
 	if (inspect) { args.unshift(`--inspect=${inspect}`); }
 	const command = [execCommand, ...args];
 	logger.trace('command', chalk.gray(command.join(' ')));
