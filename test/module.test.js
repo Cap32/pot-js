@@ -1,24 +1,29 @@
 
-import { stop, delay } from './utils';
+import delay from 'delay';
 import { start, Bridge } from '../src';
 import fetch from 'node-fetch';
-
-afterEach(stop);
 
 const entry = 'test/fixtures/server.js';
 const PORT = 3010;
 
+let kill;
+
+afterEach(async () => {
+	if (typeof kill === 'function') { await kill(); }
+});
+
 describe('api module `start`', () => {
+
 	test('should `entry` and `port` work', async () => {
-		await start({ env: { PORT }, entry });
-		await delay();
+		kill = await start({ env: { PORT }, entry });
+		await delay(1000);
 		const res = await fetch('http://127.0.0.1:3010');
 		const text = await res.text();
 		expect(text).toBe('掂');
 	});
 
 	test('should `crashes` work', async () => {
-		await start({
+		kill = await start({
 			entry: 'test/fixtures/crash.js',
 			maxRestarts: 1,
 		});
@@ -30,8 +35,8 @@ describe('api module `start`', () => {
 
 	test('should `configToEnv` work', async () => {
 		const hello = 'world';
-		await start({ env: { PORT }, entry, hello, configToEnv: 'RESPONSE_DATA' });
-		await delay();
+		kill = await start({ env: { PORT }, entry, hello, configToEnv: 'RESPONSE_DATA' });
+		await delay(1000);
 		const res = await fetch('http://127.0.0.1:3010');
 		const data = await res.json();
 		expect(data.hello).toBe(hello);
@@ -41,8 +46,8 @@ describe('api module `start`', () => {
 describe('api module `Bridge.getList()`', () => {
 	test('should `getState` work', async () => {
 		const name = 'hello';
-		await start({ name, entry });
-		await delay();
+		kill = await start({ name, entry });
+		await delay(1000);
 		const bridges = await Bridge.getList();
 		const state = await bridges[0].getState();
 		expect(typeof state.pid).toBe('number');
@@ -54,8 +59,8 @@ describe('api module `Bridge.getList()`', () => {
 
 	test('should `setState` work', async () => {
 		const name = 'hello';
-		await start({ name, entry });
-		await delay();
+		kill = await start({ name, entry });
+		await delay(1000);
 		{
 			const bridges = await Bridge.getList();
 			const state = await bridges[0].getState();
