@@ -4,8 +4,8 @@ import { writeFile, remove } from 'fs-extra';
 import { execSync } from 'child_process';
 import { Bridge } from '../src';
 import Kapok from 'kapok-js';
-import fetch from 'node-fetch';
 import delay from 'delay';
+import { Client } from 'promise-ws';
 
 const command = resolve('bin/pot');
 
@@ -82,15 +82,17 @@ describe('cli `pot start` with daemon mode', async () => {
 				'start',
 				'--name', name,
 				'--env.PORT', 3010,
-				'--entry', 'test/fixtures/server.js',
+				'--entry', 'test/fixtures/socket.js',
 				'--daemon',
 			])
 			.done()
 		;
-		await delay(2000);
-		const res = await fetch('http://127.0.0.1:3010');
-		const text = await res.text();
-		expect(text).toBe('掂');
+
+		await delay(1000);
+		await Client.connect('ws://127.0.0.1:3010', async (client) => {
+			const text = await client.emit('test', 'test');
+			expect(text).toBe('test');
+		});
 	});
 });
 

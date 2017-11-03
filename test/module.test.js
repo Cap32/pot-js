@@ -1,9 +1,9 @@
 
 import delay from 'delay';
 import { start, Bridge } from '../src';
-import fetch from 'node-fetch';
+import { Client } from 'promise-ws';
 
-const entry = 'test/fixtures/server.js';
+const entry = 'test/fixtures/socket.js';
 const PORT = 3010;
 
 let kill;
@@ -17,8 +17,8 @@ describe('api module `start`', () => {
 	test('should `entry` and `port` work', async () => {
 		kill = await start({ env: { PORT }, entry });
 		await delay(1000);
-		const res = await fetch('http://127.0.0.1:3010');
-		const text = await res.text();
+		const client = await Client.create('ws://127.0.0.1:3010');
+		const text = await client.emit('test', '掂');
 		expect(text).toBe('掂');
 	});
 
@@ -35,11 +35,20 @@ describe('api module `start`', () => {
 
 	test('should `configToEnv` work', async () => {
 		const hello = 'world';
-		kill = await start({ env: { PORT }, entry, hello, configToEnv: 'RESPONSE_DATA' });
+		kill = await start({
+			env: { PORT },
+			entry,
+			hello,
+			configToEnv: 'POT_TESTING',
+		});
 		await delay(1000);
-		const res = await fetch('http://127.0.0.1:3010');
-		const data = await res.json();
-		expect(data.hello).toBe(hello);
+		const client = await Client.create('ws://127.0.0.1:3010');
+		const envString = await client.emit('env');
+		expect(JSON.parse(envString)).toMatchObject({
+			hello: 'world',
+			entry,
+			configToEnv: 'POT_TESTING',
+		});
 	});
 });
 
