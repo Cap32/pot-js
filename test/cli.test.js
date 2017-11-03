@@ -88,7 +88,7 @@ describe('cli `pot start` with daemon mode', async () => {
 			.done()
 		;
 
-		await delay(1000);
+		await delay(2000);
 		await Client.connect('ws://127.0.0.1:3010', async (client) => {
 			const text = await client.emit('test', 'test');
 			expect(text).toBe('test');
