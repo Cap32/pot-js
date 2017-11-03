@@ -8,16 +8,16 @@ Script runner
 
 <!-- MarkdownTOC -->
 
-- [Features][features]
-- [Installing][installing]
-- [CLI Reference][cli-reference]
-- [Node.js module API Reference][nodejs-module-api-reference]
-  - [start\(\[options\]\)][startoptions]
-  - [stop\(\[options\]\)][stopoptions]
-  - [list\(\[options\]\)][listoptions]
-  - [log\(\[options\]\)][logoptions]
-  - [dir\(\[options\]\)][diroptions]
-- [License][license]
+- [Features](#features)
+- [Installing](#installing)
+- [CLI Reference](#cli-reference)
+- [Node.js module API Reference](#nodejs-module-api-reference)
+  - [start\(\[options\]\)](#startoptions)
+  - [stop\(\[options\]\)](#stopoptions)
+  - [list\(\[options\]\)](#listoptions)
+  - [log\(\[options\]\)](#logoptions)
+  - [dir\(\[options\]\)](#diroptions)
+- [License](#license)
 
 <!-- /MarkdownTOC -->
 
