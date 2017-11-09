@@ -22,7 +22,7 @@ const parseMemoryUsage = (info) => {
 	}
 	else {
 		assign(data, {
-			percent: `${(heapUsed / total / 100).toFixed(2)}%`,
+			percent: `${(heapUsed / total * 100).toFixed(2)}%`,
 			formattedHeapUsed: formatBytes(heapUsed),
 		});
 	}
