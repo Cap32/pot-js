@@ -2,8 +2,12 @@
 
 // TODO: This module should be remove after `https://github.com/mafintosh/respawn/pull/20` merged
 
+
+var spawn = require('cross-spawn')
+// var spawn = require('child_process').spawn
+
+
 var events = require('events')
-var spawn = require('child_process').spawn
 var fork = require('child_process').fork
 var exec = require('child_process').exec
 var ps = require('ps-tree')

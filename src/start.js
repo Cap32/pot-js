@@ -1,5 +1,5 @@
 
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import { resolve, sep } from 'path';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
