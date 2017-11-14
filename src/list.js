@@ -48,7 +48,7 @@ const list = async (options = {}) => {
 
 		logUpdate(table.toString());
 
-		setTimeout(loop, 100);
+		setTimeout(loop, 1000);
 	};
 
 	await loop();
