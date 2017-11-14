@@ -9,8 +9,6 @@ import { Client } from 'promise-ws';
 
 const command = resolve('bin/pot');
 
-Kapok.config.shouldKillOnDone = true;
-
 afterEach(async () => {
 	await Kapok.killAll();
 });
@@ -21,7 +19,7 @@ describe('cli `pot start`', () => {
 			.start(command, ['start', '--entry', 'test/fixtures/server.js'])
 			.assertUntil(/started/)
 			.assertUntil('test server started')
-			.done()
+			.doneAndKill()
 		;
 	});
 
@@ -29,7 +27,7 @@ describe('cli `pot start`', () => {
 		return Kapok
 			.start(command, ['start'])
 			.assertUntil(/^ERROR Cannot find module/)
-			.done()
+			.doneAndKill()
 		;
 	});
 
@@ -40,7 +38,7 @@ describe('cli `pot start`', () => {
 				'start', '--entry', 'test/fixtures/server.js', '--name', name,
 			])
 			.assertUntil(new RegExp(`"${name}" started`, 'i'))
-			.done()
+			.doneAndKill()
 		;
 	});
 
@@ -61,7 +59,7 @@ describe('cli `pot start`', () => {
 			})
 			.assertUntil(/sleeped/)
 			.assertUntil('test server started') // restarted
-			.done()
+			.doneAndKill()
 		;
 	});
 });
@@ -71,7 +69,7 @@ describe('cli `pot start` with daemon mode', async () => {
 
 	afterEach(async () => {
 		try {
-			await Kapok.start(command, ['stop', name, '-f']).done();
+			await Kapok.start(command, ['stop', name, '-f']).doneAndKill();
 		}
 		catch (err) {}
 	});
@@ -85,7 +83,7 @@ describe('cli `pot start` with daemon mode', async () => {
 				'--entry', 'test/fixtures/socket.js',
 				'--daemon',
 			])
-			.done()
+			.doneAndKill()
 		;
 
 		await delay(2000);
@@ -112,7 +110,7 @@ describe('cli `pot start` with config file', async () => {
 		return Kapok
 			.start(command, ['start'], { cwd: __dirname })
 			.assertUntil('test server started')
-			.done()
+			.doneAndKill()
 		;
 	});
 
@@ -121,7 +119,7 @@ describe('cli `pot start` with config file', async () => {
 		return Kapok
 			.start(command, ['start'], { cwd: __dirname })
 			.assertUntil('test server started')
-			.done()
+			.doneAndKill()
 		;
 	});
 });
@@ -135,11 +133,11 @@ describe('cli `pot stop`', () => {
 					return Kapok
 						.start(command, ['stop', '-f'])
 						.assert('INFO "pot-js" stopped')
-						.done()
+						.doneAndKill()
 					;
 				},
 			})
-			.done()
+			.doneAndKill()
 		;
 	});
 
@@ -147,27 +145,26 @@ describe('cli `pot stop`', () => {
 		return Kapok
 			.start(command, ['stop'])
 			.assert('ERROR No process is running')
-			.done()
+			.doneAndKill()
 		;
 	});
 });
 
-// FIXME: hard to test
-describe.skip('cli `pot ls`', () => {
+describe('cli `pot ls`', () => {
 	test('should work`', async () => {
-		jest.setTimeout(20000);
 		const createClient = async (port, name) => {
-			await Kapok
+			return Kapok
 				.start(command, [
 					'start',
+					'--name', name,
 					'--entry', 'test/fixtures/server.js',
 				], {
 					env: {
 						...process.env,
 						PORT: port,
 					},
-				}, name)
-				.until('test server started')
+				})
+				.until(/started/)
 				.done()
 			;
 		};
@@ -177,8 +174,8 @@ describe.skip('cli `pot ls`', () => {
 
 		await Kapok
 			.start(command, ['ls'])
-			.ignoreUntil(/┐\s*$/)
-			.joinUntil(/Pid/)
+			.until(/^┌/)
+			.joinUntil(/┤/)
 			.assert((message) => {
 				return ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid']
 					.every((key) => message.includes(key))
@@ -186,7 +183,7 @@ describe.skip('cli `pot ls`', () => {
 			})
 			.assertUntil(/app-1/)
 			.assertUntil(/app-2/)
-			.done()
+			.doneAndKill()
 		;
 	});
 });
@@ -204,11 +201,11 @@ describe('cli `pot dir`', () => {
 					return Kapok
 						.start(command, ['dir'])
 						.assertUntil(process.cwd())
-						.done()
+						.doneAndKill()
 					;
 				}
 			})
-			.done()
+			.doneAndKill()
 		;
 	});
 });

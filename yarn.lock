@@ -2793,9 +2793,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.3.6"
 
-kapok-js@^0.9.1:
-  version "0.9.1"
-  resolved "http://registry.npm.taobao.org/kapok-js/download/kapok-js-0.9.1.tgz#5b36b1fde5c78885fb61111500b7467fff418763"
+kapok-js@^0.10.1:
+  version "0.10.1"
+  resolved "http://registry.npm.taobao.org/kapok-js/download/kapok-js-0.10.1.tgz#1debb318f7ed0f04352bda850d83f240b432e0f8"
   dependencies:
     call-me-maybe "^1.0.1"
     chalk "^2.1.0"

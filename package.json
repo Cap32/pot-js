@@ -79,7 +79,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "get-my-ip": "0.0.1",
     "jest": "^21.2.1",
-    "kapok-js": "^0.9.1",
+    "kapok-js": "^0.10.1",
     "mkdirp": "^0.5.1",
     "node-fetch": "^1.7.1",
     "promise-ws": "^0.0.0-1",
