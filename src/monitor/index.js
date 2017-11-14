@@ -73,15 +73,6 @@ const start = async (options) => {
 		data: {
 			...options,
 			parentPid: process.pid,
-			memoryUsage: {
-				total: process.memoryUsage().heapTotal,
-			},
-			cpuUsage: {
-				total: (function () {
-					const { user, system } = process.cpuUsage();
-					return user + system;
-				}()),
-			},
 		},
 		env: configToEnv ? { ...env, [configToEnv]: JSON.stringify(options) } : env,
 	});

@@ -3,32 +3,40 @@ import pidUsage from 'pidusage';
 import { logger } from 'pot-logger';
 import formatBytes from '../utils/formatBytes';
 import chalk from 'chalk';
+import { totalmem } from 'os';
 
 const { assign } = Object;
 
 const parseMemoryUsage = (info) => {
-	const { memoryUsage: { heapUsed, heapTotal }, data } = info;
+	const {
+		memoryUsage: {
+			heapUsed, heapTotal, rss, total: totalMemory,
+		},
+		memoryUsage,
+	} = info;
 
-	const total = (function () {
-		try { return data.memoryUsage.total; }
-		catch (err) { return heapTotal || NaN; }
-	}());
+	// DEPRECATED: `heapTotal` is wrong value
+	const total = totalMemory || heapTotal;
+	const used = rss || heapUsed;
 
-	if (heapUsed === '-' || isNaN(total)) {
-		assign(data, {
+	if (isNaN(used) || isNaN(total)) {
+		assign(memoryUsage, {
 			percent: '-',
-			formattedHeapUsed: '-',
+			formattedHeapUsed: '-', // DEPRECATED
+			formattedUsed: '-',
 		});
 	}
 	else {
-		assign(data, {
-			percent: `${(heapUsed / total * 100).toFixed(2)}%`,
-			formattedHeapUsed: formatBytes(heapUsed),
+		const formattedUsed = formatBytes(used);
+		assign(memoryUsage, {
+			percent: `${(used / total * 100).toFixed(2)}%`,
+			formattedHeapUsed: formattedUsed, // DEPRECATED
+			formattedUsed,
 		});
 	}
 
-	data.formattedString = `${data.formattedHeapUsed} (${data.percent})`;
-	info.memoryUsage = data;
+	memoryUsage.formattedString =
+		`${memoryUsage.formattedHeapUsed} (${memoryUsage.percent})`;
 	return info;
 };
 
@@ -72,12 +80,14 @@ export default function handleInfoVerbose(state) {
 		const callback = (rest = {}) => {
 			const info = {
 				memoryUsage: {
-					heapUsed: '-',
-					heapTotal: '-',
+					heapUsed: NaN,
+					heapTotal: NaN,
+					rss: NaN,
+					total: NaN,
 				},
 				cpuUsage: {
-					user: '-',
-					system: '-',
+					user: NaN,
+					system: NaN,
 				},
 				...state,
 				...rest,
@@ -101,10 +111,13 @@ export default function handleInfoVerbose(state) {
 				}
 				else {
 					const { memory, cpu } = pidState;
+					const total = totalmem();
 					resp = {
 						memoryUsage: {
-							heapUsed: memory,
-							heapTotal: process.memoryUsage().heapTotal,
+							heapUsed: memory, // DEPRECATED: it's wrong value here
+							heapTotal: total, // DEPRECATED: it's wrong value here
+							rss: memory,
+							total,
 						},
 						cpuUsage: { user: cpu },
 					};
