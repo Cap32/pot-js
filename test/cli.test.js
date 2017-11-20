@@ -152,6 +152,8 @@ describe('cli `pot stop`', () => {
 
 describe('cli `pot ls`', () => {
 	test('should work`', async () => {
+		jest.setTimeout(10000);
+
 		const createClient = async (port, name) => {
 			return Kapok
 				.start(command, [
