@@ -9,6 +9,10 @@ import { Client } from 'promise-ws';
 
 const command = resolve('bin/pot');
 
+beforeEach(async () => {
+	jest.setTimeout(10000);
+});
+
 afterEach(async () => {
 	await Kapok.killAll();
 });
@@ -152,8 +156,6 @@ describe('cli `pot stop`', () => {
 
 describe('cli `pot ls`', () => {
 	test('should work`', async () => {
-		jest.setTimeout(10000);
-
 		const createClient = async (port, name) => {
 			return Kapok
 				.start(command, [
