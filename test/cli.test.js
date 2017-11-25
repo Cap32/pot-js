@@ -129,7 +129,7 @@ describe('cli `pot start` with config file', async () => {
 });
 
 describe('cli `pot stop`', () => {
-	test('should work', async () => {
+	test('should `pot stop` work', async () => {
 		await Kapok
 			.start(command, ['start', '--entry', 'test/fixtures/server.js'])
 			.until('test server started', {
@@ -150,6 +150,43 @@ describe('cli `pot stop`', () => {
 			.start(command, ['stop'])
 			.assert('ERROR No process is running')
 			.doneAndKill()
+		;
+	});
+});
+
+describe('cli `pot stopall`', () => {
+	test('should `pot stopall` work', async () => {
+		await Kapok
+			.start(command, [
+				'start',
+				'--name', 'a',
+				'--env.PORT', 3010,
+				'--entry', 'test/fixtures/socket.js',
+			])
+			.until('socket server started', {
+				async action() {
+					return Kapok
+						.start(command, [
+							'start',
+							'--name', 'b',
+							'--env.PORT', 3011,
+							'--entry', 'test/fixtures/socket.js',
+						])
+						.until('socket server started', {
+							async action() {
+								return Kapok
+									.start(command, ['stopall', '-f'])
+									.assert('INFO "a" stopped')
+									.assert('INFO "b" stopped')
+									.doneAndKill()
+								;
+							},
+						})
+						.done()
+					;
+				},
+			})
+			.done()
 		;
 	});
 });
