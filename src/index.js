@@ -1,6 +1,6 @@
 
 export start from './start';
-export stop from './stop';
+export { stop, stopAll } from './stop';
 export list from './list';
 export log from './log';
 export dir from './dir';

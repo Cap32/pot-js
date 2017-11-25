@@ -6,7 +6,7 @@ import Bridge from './Bridge';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
-const stop = async (options = {}) => {
+export const stop = async function stop(options = {}) {
 	let { name } = options;
 	const { force, logLevel } = options;
 
@@ -43,6 +43,13 @@ const stop = async (options = {}) => {
 	}
 
 	return pidManager.kill({ shouldLog: true });
+};
+
+export const stopAll = async function stopAll(options = {}) {
+	const names = await Bridge.getNames();
+	return Promise.all(
+		names.map(async (name) => stop({ ...options, name }))
+	);
 };
 
 export default stop;

@@ -4,7 +4,7 @@ import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
 import { logger, setLoggers } from 'pot-logger';
 import resolveConfig from './utils/resolveConfig';
-import { start, stop, list, log, dir } from './';
+import { start, stop, stopAll, list, log, dir } from './';
 
 // eslint-disable-next-line
 yargs
@@ -129,6 +129,34 @@ yargs
 		},
 		handler(argv) {
 			stop(argv).catch((err) => logger.error(err.message));
+		},
+	})
+	.command({
+		command: 'stopall',
+		desc: 'Stop all processes',
+		builder(yargs) {
+			yargs // eslint-disable-line
+				.options({
+					f: {
+						alias: 'force',
+						desc: 'Stop without confirming',
+						type: 'bool',
+					},
+					l: {
+						alias: 'logLevel',
+						desc: 'Log level',
+						choices: [
+							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
+						],
+						default: 'INFO',
+					},
+				})
+				.argv
+			;
+		},
+		handler(argv) {
+			stopAll(argv).catch((err) => logger.error(err));
+			// stopAll(argv).catch((err) => logger.error(err.message));
 		},
 	})
 	.command({
