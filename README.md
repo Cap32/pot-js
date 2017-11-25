@@ -14,6 +14,7 @@ Script runner
 - [Node.js module API Reference](#nodejs-module-api-reference)
   - [start\(\[options\]\)](#startoptions)
   - [stop\(\[options\]\)](#stopoptions)
+  - [stopall\(\[options\]\)](#stopalloptions)
   - [list\(\[options\]\)](#listoptions)
   - [log\(\[options\]\)](#logoptions)
   - [dir\(\[options\]\)](#diroptions)
@@ -54,6 +55,7 @@ pot <command> [args]
 Commands:
   start [entry]  Start process
   stop [name]    Stop process
+  stopall        Stop all processes
   list           List processes                [aliases: ls]
   log [name]     Show log
   dir [name]     Show dir
@@ -113,6 +115,18 @@ Stop a process
 ###### Options
 
 - `name` (String): Target process name.
+- `workspace` (String): Workspace.
+- `force` (Boolean): Force stopping without confirmation. Defaults to `false`.
+
+---
+
+<a name="stopalloptions"></a>
+#### stopall([options])
+
+Stop all processes
+
+###### Options
+
 - `workspace` (String): Workspace.
 - `force` (Boolean): Force stopping without confirmation. Defaults to `false`.
 
