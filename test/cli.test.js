@@ -10,7 +10,7 @@ import { Client } from 'promise-ws';
 const command = resolve('bin/pot');
 
 beforeEach(async () => {
-	jest.setTimeout(10000);
+	jest.setTimeout(15000);
 });
 
 afterEach(async () => {
@@ -176,8 +176,8 @@ describe('cli `pot stopall`', () => {
 							async action() {
 								return Kapok
 									.start(command, ['stopall', '-f'])
-									.assert('INFO "a" stopped')
-									.assert('INFO "b" stopped')
+									.assert(/INFO "[ab]" stopped/)
+									.assert(/INFO "[ab]" stopped/)
 									.doneAndKill()
 								;
 							},
