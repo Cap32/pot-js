@@ -1,6 +1,7 @@
 
 import spawn from 'cross-spawn';
 import { resolve, sep } from 'path';
+import { ensureDir } from 'fs-extra';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
 import validateSchema from './utils/validateSchema';
@@ -160,7 +161,9 @@ export default async function start(options = {}) {
 	});
 
 	try {
-		const { name, force } = ensureOptions(options);
+		const { name, force, baseDir } = ensureOptions(options);
+
+		await ensureDir(baseDir);
 
 		setLoggers('logLevel', options.logLevel);
 		if (options.logsDir) {
