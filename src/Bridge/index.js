@@ -1,10 +1,10 @@
-
 import workspace from '../utils/workspace';
-import { startClient, disconnect } from '../utils/unixDomainSocket';
+import { startClient } from '../utils/unixDomainSocket';
 import globby from 'globby';
-import { BRIDGE_EVENT_TYPE, DEPRECATED_BRIDGE_EVENT_TYPE } from '../constants';
-import { logger } from 'pot-logger';
+import { BRIDGE_STATE } from '../constants';
 import getInfoVerbose from './getInfoVerbose';
+
+// import { logger } from 'pot-logger';
 
 const getNames = async () => {
 	return globby(['*'], { cwd: await workspace.getSocketsDir() });
@@ -15,7 +15,7 @@ const getSocketByName = async (name) => {
 	const socketDir = await workspace.getSocketsDir();
 	for (const iteratorName of names) {
 		if (iteratorName === name) {
-			return startClient('monitor', name, socketDir);
+			return startClient(name, socketDir);
 		}
 	}
 };
@@ -23,70 +23,34 @@ const getSocketByName = async (name) => {
 const getSockets = async () => {
 	const names = await getNames();
 	const socketDir = await workspace.getSocketsDir();
-	const sockets = await Promise.all(names.map(async (name) => {
-		return startClient('monitor', name, socketDir);
-	}));
+	const sockets = await Promise.all(
+		names.map(async (name) => {
+			return startClient(name, socketDir);
+		}),
+	);
 	return sockets.filter(Boolean);
-};
-
-// const requestBySocket = (socket, arg) =>
-// 	new Promise((resolve) => {
-// 		const handler = (data) => {
-// 			socket.off(BRIDGE_EVENT_TYPE, handler);
-// 			resolve(data);
-// 			disconnect(socket.id);
-// 		};
-// 		socket.on(BRIDGE_EVENT_TYPE, handler);
-// 		socket.emit(BRIDGE_EVENT_TYPE, arg);
-// 	})
-// ;
-
-// TODO: deprecated
-const requestBySocket = (socket, arg) => {
-	return Promise.race([
-		new Promise((resolve) => {
-			const handler = (data) => {
-				socket.off(BRIDGE_EVENT_TYPE, handler);
-				resolve(data);
-				disconnect(socket.id);
-			};
-			socket.on(BRIDGE_EVENT_TYPE, handler);
-			socket.emit(BRIDGE_EVENT_TYPE, arg);
-		}),
-		new Promise((resolve) => {
-			const handler = (data) => {
-				try {
-					if (requestBySocket.__warned) { return; }
-					requestBySocket.__warned = true;
-					logger.warn(
-						`The API of "pot-js" in "${data.data.name}" has DEPRECATED.`
-					);
-				}
-				catch (err) {}
-				socket.off(DEPRECATED_BRIDGE_EVENT_TYPE, handler);
-				resolve(data);
-				disconnect(socket.id);
-			};
-			socket.on(DEPRECATED_BRIDGE_EVENT_TYPE, handler);
-			socket.emit(DEPRECATED_BRIDGE_EVENT_TYPE, arg);
-		}),
-	]);
 };
 
 export default class Bridge {
 	static async getNames(space) {
-		if (space) { workspace.set(space); }
+		if (space) {
+			workspace.set(space);
+		}
 		return getNames();
 	}
 
 	static async getByName(name, space) {
-		if (space) { workspace.set(space); }
+		if (space) {
+			workspace.set(space);
+		}
 		const socket = await getSocketByName(name);
 		return socket && new Bridge(socket);
 	}
 
 	static async getList(space) {
-		if (space) { workspace.set(space); }
+		if (space) {
+			workspace.set(space);
+		}
 		const sockets = await getSockets();
 		return sockets.map((socket) => new Bridge(socket));
 	}
@@ -96,11 +60,15 @@ export default class Bridge {
 	}
 
 	async setState(state) {
-		return requestBySocket(this._socket, state);
+		const res = await this._socket.request(BRIDGE_STATE, state);
+		await this.disconnect();
+		return res;
 	}
 
 	async getState() {
-		return requestBySocket(this._socket);
+		const res = await this._socket.request(BRIDGE_STATE);
+		await this.disconnect();
+		return res;
 	}
 
 	async getInfo() {
@@ -110,5 +78,9 @@ export default class Bridge {
 	async getInfoVerbose() {
 		const monitor = await this.getState();
 		return getInfoVerbose(monitor);
+	}
+
+	async disconnect() {
+		return this._socket.close();
 	}
 }

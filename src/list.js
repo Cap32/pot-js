@@ -1,4 +1,3 @@
-
 import { logger } from 'pot-logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
@@ -10,9 +9,7 @@ const list = async (options = {}) => {
 	workspace.set(options);
 
 	const {
-		head = [
-			'Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid',
-		],
+		head = ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid'],
 		setTable = (info) => [
 			info.data.name,
 			info.styledStatus,
@@ -39,11 +36,11 @@ const list = async (options = {}) => {
 		}
 
 		const infoList = await Promise.all(
-			bridges.map((bridge) => bridge.getInfoVerbose())
+			bridges.map((bridge) => bridge.getInfoVerbose()),
 		);
 
 		infoList.filter(Boolean).forEach((info) => {
-			table.push(setTable(info).map((val) => isUndefined(val) ? '-' : val));
+			table.push(setTable(info).map((val) => (isUndefined(val) ? '-' : val)));
 		});
 
 		logUpdate(table.toString());

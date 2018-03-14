@@ -1,4 +1,3 @@
-
 // import respawn from 'respawn';
 import respawn from './respawn';
 
@@ -9,22 +8,27 @@ import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
 import Bridge from '../Bridge';
 import workspace from '../utils/workspace';
-import { BRIDGE_EVENT_TYPE } from '../constants';
-import stop from '../stop';
+import { BRIDGE_STATE } from '../constants';
+import { stop } from '../stop';
 
 const potIPC = new StdioIPC(process);
 
 const start = async (options) => {
 	const {
-		name, workspace: space, logsDir,
-		command, daemon, inject, force,
-		env, configToEnv,
-		...respawnOptions,
+		name,
+		workspace: space,
+		logsDir,
+		command,
+		daemon,
+		inject,
+		force,
+		env,
+		configToEnv,
+		...respawnOptions
 	} = options;
 
 	const startSocketServer = async (monitor, name) => {
 		try {
-			const socketsDir = await workspace.getSocketsDir();
 			const names = await Bridge.getNames();
 
 			if (names.indexOf(name) > -1) {
@@ -34,19 +38,21 @@ const start = async (options) => {
 				else {
 					throw new Error(
 						`Name "${name}" has already EXISTED. ` +
-						'Please make sure if your program is NOT running, ' +
-						'or use another name.\n' +
-						`To stop "${name}", please run \`pot stop ${name}\``,
+							'Please make sure if your program is NOT running, ' +
+							'or use another name.\n' +
+							`To stop "${name}", please run \`pot stop ${name}\``,
 					);
 				}
 			}
 
-			const socket = await startServer(name, socketsDir);
+			const socketServer = await startServer(name);
 
-			socket.on(BRIDGE_EVENT_TYPE, (data, sock) => {
-				if (data) { Object.assign(monitor.data, data); }
+			socketServer.reply(BRIDGE_STATE, async (data) => {
+				if (data) {
+					Object.assign(monitor.data, data);
+				}
 				const monitorState = monitor.toJSON();
-				socket.emit(sock, BRIDGE_EVENT_TYPE, monitorState);
+				return monitorState;
 			});
 
 			return true;
@@ -79,7 +85,9 @@ const start = async (options) => {
 
 	monitor.once('start', async () => {
 		const success = await startSocketServer(monitor, name);
-		if (success) { potIPC.send('start'); }
+		if (success) {
+			potIPC.send('start');
+		}
 	});
 
 	lifecycle(monitor, options);

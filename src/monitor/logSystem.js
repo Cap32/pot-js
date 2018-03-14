@@ -1,4 +1,3 @@
-
 import logger from 'pot-logger';
 import { trim } from 'lodash';
 

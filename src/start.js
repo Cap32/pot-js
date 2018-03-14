@@ -1,4 +1,3 @@
-
 import spawn from 'cross-spawn';
 import { resolve, sep } from 'path';
 import { ensureDir } from 'fs-extra';
@@ -14,7 +13,9 @@ import fkill from 'fkill';
 
 const ensureName = (options) => {
 	if (options.name) {
-		if (isNumber(options.name)) { options.name += ''; }
+		if (isNumber(options.name)) {
+			options.name += '';
+		}
 		return options;
 	}
 
@@ -22,7 +23,9 @@ const ensureName = (options) => {
 
 	try {
 		const { name } = require(resolve(cwd, 'package.json'));
-		if (!name) { throw new Error(); }
+		if (!name) {
+			throw new Error();
+		}
 		options.name = name;
 	}
 	catch (err) {
@@ -38,7 +41,9 @@ const ensureWatch = (options) => {
 	}
 
 	let { watch } = options;
-	if (watch === true) { watch = { enable: true }; }
+	if (watch === true) {
+		watch = { enable: true };
+	}
 	options.watch = {
 		ignoreDotFiles: watch.ignoreDotFiles || options.watchIgnoreDotFiles,
 		dirs: watch.dirs || options.watchDirs,
@@ -73,7 +78,9 @@ const ensureOptions = (options = {}) => {
 		options.inspect = `${host}:${port}`;
 	}
 	options.events = options.events || {};
-	if (options.production) { options.env.NODE_ENV = 'production'; }
+	if (options.production) {
+		options.env.NODE_ENV = 'production';
+	}
 	if (isUndefined(options.maxRestarts)) {
 		options.maxRestarts = options.production ? -1 : 0;
 	}
@@ -107,7 +114,9 @@ const getCommand = (options) => {
 	require.resolve(commandModulePath);
 
 	const args = [...execArgs, commandModulePath];
-	if (inspect) { args.unshift(`--inspect=${inspect}`); }
+	if (inspect) {
+		args.unshift(`--inspect=${inspect}`);
+	}
 	const command = [execCommand, ...args];
 	logger.trace('command', chalk.gray(command.join(' ')));
 	return command;
@@ -141,8 +150,7 @@ const connectMonitor = (monitorProc, options, pidManager) => {
 				monitorProc.kill();
 				reject(err);
 			})
-			.send('start', { ...options, pidFile, command })
-		;
+			.send('start', { ...options, pidFile, command });
 	});
 };
 
@@ -156,7 +164,9 @@ export default async function start(options = {}) {
 	};
 
 	onExit(async () => {
-		if (!options.daemon) { await kill(); }
+		if (!options.daemon) {
+			await kill();
+		}
 		process.exit();
 	});
 
@@ -176,8 +186,12 @@ export default async function start(options = {}) {
 		const pidManager = await PidManager.find(name);
 
 		if (pidManager.isRunning) {
-			if (force) { await pidManager.kill(); }
-			else { throw new Error(`"${name}" is running.`); }
+			if (force) {
+				await pidManager.kill();
+			}
+			else {
+				throw new Error(`"${name}" is running.`);
+			}
 		}
 
 		monitorProc = execMonitorProc(options);
