@@ -10,7 +10,7 @@ const getNames = async () => {
 	return globby(['*'], { cwd: await workspace.getSocketsDir() });
 };
 
-const getSocketByName = async (name) => {
+const getSocketByName = async function getSocketByName(name) {
 	const names = await getNames();
 	const socketDir = await workspace.getSocketsDir();
 	for (const iteratorName of names) {
@@ -20,7 +20,7 @@ const getSocketByName = async (name) => {
 	}
 };
 
-const getSockets = async () => {
+const getSockets = async function getSockets() {
 	const names = await getNames();
 	const socketDir = await workspace.getSocketsDir();
 	const sockets = await Promise.all(

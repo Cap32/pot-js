@@ -1,4 +1,3 @@
-
 import chokidar from 'chokidar';
 import { debounce } from 'lodash';
 import { createLogger } from 'pot-logger';
@@ -9,10 +8,12 @@ export default function watch(options = {}, handler) {
 		dirs = ['**/*'],
 		ignoreDotFiles = true,
 		ignoreNodeModulesDir = true,
-		...other,
+		...other
 	} = options;
 
-	if (!enable) { return; }
+	if (!enable) {
+		return;
+	}
 
 	const logger = createLogger('watch');
 	logger.trace('enabled');
@@ -30,10 +31,12 @@ export default function watch(options = {}, handler) {
 		ignored.push('node_modules/**/*');
 	}
 
-	chokidar.watch(dirs, {
-		...other,
-		ignored,
-		usePolling: true,
-		ignoreInitial: true,
-	}).on('all', debounce(handler, 1000));
+	chokidar
+		.watch(dirs, {
+			...other,
+			ignored,
+			usePolling: true,
+			ignoreInitial: true,
+		})
+		.on('all', debounce(handler, 1000));
 }

@@ -14,8 +14,11 @@ export async function createServer(socketPath) {
 		res.end(body);
 	});
 
-	await createLocalDomainSocket(server, socketPath);
-	const wsServer = await Server.create({ server });
+	const [wsServer] = await Promise.all([
+		Server.create({ server }),
+		createLocalDomainSocket(server, socketPath),
+	]);
+
 	wsServer.reply('close', ::wsServer.close);
 	return wsServer;
 }

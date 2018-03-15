@@ -1,4 +1,3 @@
-
 import processExists from 'process-exists';
 import { writeFile, readFile, open, remove } from 'fs-extra';
 import { join } from 'path';
@@ -12,12 +11,15 @@ import { stopServer } from './unixDomainSocket';
 import fkill from 'fkill';
 
 const getPidFile = async (name) =>
-	join(await workspace.getPidsDir(), `${name}.pid`)
-;
+	join(await workspace.getPidsDir(), `${name}.pid`);
 
 const checkIsPidFileExists = async (pidFile) => {
-	try { return !!await open(pidFile, 'r'); }
-	catch (err) { return false; }
+	try {
+		return !!await open(pidFile, 'r');
+	}
+	catch (err) {
+		return false;
+	}
 };
 
 const getPid = async (pidFile) => {
@@ -25,7 +27,9 @@ const getPid = async (pidFile) => {
 	if (isFileExists) {
 		const pid = +trim(await readFile(pidFile, 'utf-8'));
 		const isProcessExists = await processExists(pid);
-		if (!isProcessExists) { await remove(pidFile); }
+		if (!isProcessExists) {
+			await remove(pidFile);
+		}
 		return isProcessExists && pid;
 	}
 	return false;
@@ -49,7 +53,7 @@ export default class PidManager {
 		const bridge = await Bridge.getByName(name);
 
 		if (bridge) {
-			const info = await bridge.getInfo();
+			const info = await bridge.getState();
 			if (info && info.data && info.data.parentPid) {
 				return new PidManager(name, { pid: info.data.parentPid, pidFile });
 			}
@@ -79,8 +83,12 @@ export default class PidManager {
 			const { shouldLog } = options;
 
 			if (hasPidFile) {
-				try { await remove(pidFile); }
-				catch (err) { logger.debug(err); }
+				try {
+					await remove(pidFile);
+				}
+				catch (err) {
+					logger.debug(err);
+				}
 			}
 
 			if (isWin) {

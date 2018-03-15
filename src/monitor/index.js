@@ -13,6 +13,11 @@ import { stop } from '../stop';
 
 const potIPC = new StdioIPC(process);
 
+process.on('unhandledRejection', (reason, promise) => {
+	console.warn('unhandledRejection: ' + reason);
+	console.error(promise);
+});
+
 const start = async (options) => {
 	const {
 		name,

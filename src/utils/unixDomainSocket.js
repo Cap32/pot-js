@@ -19,44 +19,27 @@ export async function startServer(id) {
 
 	const server = await createServer(path);
 	server.reply(BRIDGE_CLOSE, async () => {
-		await server.close();
+		try {
+			await server.close();
+		}
+		catch (err) {
+			logger.debug('Failed to close server', err);
+		}
 	});
 	return server;
-
-	// return new Promise((resolve) => {
-	// 	Object.assign(ipc.config, {
-	// 		appspace,
-	// 		id,
-	// 		silent: true,
-	// 		stopRetrying: true,
-	// 	});
-
-	// 	ipc.serve(path, () => {
-	// 		const { server } = ipc;
-
-	// 		if (isWin) {
-	// 			writeFileSync(path);
-	// 		}
-
-	// 		server.on('error', (err) => {
-	// 			logger.error(err.message);
-	// 			logger.debug(err);
-	// 		});
-
-	// 		resolve(server);
-	// 	});
-	// 	ipc.server.start();
-	// });
 }
 
 export async function stopServer(id) {
 	const socketsDir = await workspace.getSocketsDir();
 	const path = join(socketsDir, id);
-	if (isWin) {
-		await remove(path);
+	try {
+		const client = await createClient(path);
+		await client.request(BRIDGE_CLOSE);
 	}
-	const client = await createClient(path);
-	await client.request(BRIDGE_CLOSE);
+	catch (err) {
+		logger.debug(err);
+	}
+	await remove(path);
 }
 
 export async function startClient(id) {
@@ -73,34 +56,4 @@ export async function startClient(id) {
 			logger.error('socket error', err);
 		}
 	}
-
-	// return new Promise((resolve) => {
-	// 	Object.assign(ipc.config, {
-	// 		appspace,
-	// 		id: clientId,
-	// 		silent: true,
-	// 		stopRetrying: true,
-	// 	});
-
-	// 	const path = join(socketsDir, serverId);
-
-	// 	ipc.connectTo(serverId, path, () => {
-	// 		const socket = ipc.of[serverId];
-	// 		socket.on('connect', () => {
-	// 			resolve(socket);
-	// 		});
-
-	// 		socket.on('error', async (err) => {
-	// 			if (err && ['ECONNREFUSED', 'ENOENT'].indexOf(err.code) > -1) {
-	// 				await remove(path);
-	// 			}
-	// 			else {
-	// 				logger.error('socket error', err);
-	// 			}
-	// 			resolve();
-	// 		});
-	// 	});
-	// });
 }
-
-// export const disconnect = ::ipc.disconnect;

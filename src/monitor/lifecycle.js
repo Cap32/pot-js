@@ -1,4 +1,3 @@
-
 import importFile from 'import-file';
 import { logger, setLoggers } from 'pot-logger';
 import { serialize } from '../utils/serialize';
@@ -12,11 +11,17 @@ const isProd = NODE_ENV === 'production';
 
 export default function lifecycle(monitor, options) {
 	const {
-		name, events, inject, watch: watchOptions, monitorProcessTitle,
+		name,
+		events,
+		inject,
+		watch: watchOptions,
+		monitorProcessTitle,
 	} = options;
 
 	const handle = (modulePath, ...args) => {
-		if (!modulePath) { return; }
+		if (!modulePath) {
+			return;
+		}
 
 		try {
 			const handler = importFile(modulePath, {
@@ -68,9 +73,7 @@ export default function lifecycle(monitor, options) {
 	});
 
 	monitor.on('exit', async (code, signal) => {
-		logger.debug(
-			`"${name}" exit with code "${code}", signal "${signal}"`
-		);
+		logger.debug(`"${name}" exit with code "${code}", signal "${signal}"`);
 		handle(events.exit, code, signal);
 	});
 

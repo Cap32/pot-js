@@ -1,4 +1,3 @@
-
 import yargs from 'yargs';
 import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
@@ -18,7 +17,8 @@ yargs
 				.default('entry', './index.js')
 				.options({
 					baseDir: {
-						desc: 'The base directory for resolving modules or directories. Defaults to the current working directory',
+						desc:
+							'The base directory for resolving modules or directories. Defaults to the current working directory',
 						type: 'string',
 					},
 					name: {
@@ -41,7 +41,14 @@ yargs
 						alias: 'l',
 						desc: 'Log level',
 						choices: [
-							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
+							'ALL',
+							'TRACE',
+							'DEBUG',
+							'INFO',
+							'WARN',
+							'ERROR',
+							'FATAL',
+							'OFF',
 						],
 					},
 					watch: {
@@ -82,16 +89,15 @@ yargs
 						type: 'string',
 					},
 					maxRestarts: {
-						desc: 'How many restarts are allowed within 60s. `-1` for infinite restarts. If `production` is `true`, default value is `-1`, otherwise is `0`',
+						desc:
+							'How many restarts are allowed within 60s. `-1` for infinite restarts. If `production` is `true`, default value is `-1`, otherwise is `0`',
 						type: 'number',
 					},
 					inspect: {
 						desc: 'Activate inspector. Require Node.js >= v6.3.0',
 						type: 'string',
 					},
-				})
-				.argv
-			;
+				}).argv;
 		},
 		async handler(argv) {
 			try {
@@ -119,13 +125,18 @@ yargs
 						alias: 'logLevel',
 						desc: 'Log level',
 						choices: [
-							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
+							'ALL',
+							'TRACE',
+							'DEBUG',
+							'INFO',
+							'WARN',
+							'ERROR',
+							'FATAL',
+							'OFF',
 						],
 						default: 'INFO',
 					},
-				})
-				.argv
-			;
+				}).argv;
 		},
 		handler(argv) {
 			stop(argv).catch((err) => logger.error(err.message));
@@ -146,17 +157,21 @@ yargs
 						alias: 'logLevel',
 						desc: 'Log level',
 						choices: [
-							'ALL', 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'OFF',
+							'ALL',
+							'TRACE',
+							'DEBUG',
+							'INFO',
+							'WARN',
+							'ERROR',
+							'FATAL',
+							'OFF',
 						],
 						default: 'INFO',
 					},
-				})
-				.argv
-			;
+				}).argv;
 		},
 		handler(argv) {
-			stopAll(argv).catch((err) => logger.error(err));
-			// stopAll(argv).catch((err) => logger.error(err.message));
+			stopAll(argv).catch((err) => logger.error(err.message));
 		},
 	})
 	.command({
@@ -189,9 +204,7 @@ yargs
 						type: 'number',
 						default: 200,
 					},
-				})
-				.argv
-			;
+				}).argv;
 		},
 		handler(argv) {
 			log(argv).catch((err) => logger.error(err.message));
@@ -208,6 +221,4 @@ yargs
 	.alias('h', 'help')
 	.wrap(yargs.terminalWidth())
 	.help()
-	.version(version)
-	.argv
-;
+	.version(version).argv;
