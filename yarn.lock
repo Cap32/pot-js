@@ -4525,13 +4525,13 @@ progress@^2.0.0:
   version "2.0.0"
   resolved "http://registry.npm.taobao.org/progress/download/progress-2.0.0.tgz#8a1be366bf8fc23db2bd23f10c6fe920b4389d1f"
 
-promise-ws@^0.1.0:
-  version "0.1.0"
-  resolved "http://registry.npm.taobao.org/promise-ws/download/promise-ws-0.1.0.tgz#9b65a8e9bc128dd6b3977d37912d65f901730dd6"
+promise-ws@^0.2.1:
+  version "0.2.1"
+  resolved "http://registry.npm.taobao.org/promise-ws/download/promise-ws-0.2.1.tgz#36186fab48f81bfe14f831687c35181a79c0cdb0"
   dependencies:
     delay "^2.0.0"
     pify "^3.0.0"
-    ws "^3.2.0"
+    ws "^5.0.0"
 
 promise@^7.1.1:
   version "7.3.1"
@@ -5645,10 +5645,6 @@ uid-number@^0.0.6:
   version "0.0.6"
   resolved "http://registry.npm.taobao.org/uid-number/download/uid-number-0.0.6.tgz#0ea10e8035e8eb5b8e4449f06da1c730663baa81"
 
-ultron@~1.1.0:
-  version "1.1.1"
-  resolved "http://registry.npm.taobao.org/ultron/download/ultron-1.1.1.tgz#9fe1536a10a664a65266a1e3ccf85fd36302bc9c"
-
 underscore@~1.7.0:
   version "1.7.0"
   resolved "http://registry.npm.taobao.org/underscore/download/underscore-1.7.0.tgz#6bbaf0877500d36be34ecaa584e0db9fef035209"
@@ -5849,13 +5845,11 @@ write@^0.2.1:
   dependencies:
     mkdirp "^0.5.1"
 
-ws@^3.2.0:
-  version "3.3.3"
-  resolved "http://registry.npm.taobao.org/ws/download/ws-3.3.3.tgz#f1cf84fe2d5e901ebce94efaece785f187a228f2"
+ws@^5.0.0:
+  version "5.0.0"
+  resolved "http://registry.npm.taobao.org/ws/download/ws-5.0.0.tgz#fb4ede3fddcff99b157d292a1069ace8d6e04db9"
   dependencies:
     async-limiter "~1.0.0"
-    safe-buffer "~5.1.0"
-    ultron "~1.1.0"
 
 xml-name-validator@^2.0.1:
   version "2.0.1"
