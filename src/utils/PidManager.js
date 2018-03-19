@@ -5,7 +5,6 @@ import { trim } from 'lodash';
 import { logger, setLoggers } from 'pot-logger';
 import workspace from './workspace';
 import isWin from './isWin';
-import Bridge from '../Bridge';
 import chalk from 'chalk';
 import { stopServer } from './unixDomainSocket';
 import fkill from 'fkill';
@@ -48,15 +47,6 @@ export default class PidManager {
 		if (pid) {
 			logger.trace(`pid file "${pidFile}" found`);
 			return new PidManager(name, { pid, pidFile, hasPidFile: true });
-		}
-
-		const bridge = await Bridge.getByName(name);
-
-		if (bridge) {
-			const info = await bridge.getState();
-			if (info && info.data && info.data.parentPid) {
-				return new PidManager(name, { pid: info.data.parentPid, pidFile });
-			}
 		}
 
 		return new PidManager(name, { pidFile });

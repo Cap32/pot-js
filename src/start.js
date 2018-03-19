@@ -138,8 +138,9 @@ const connectMonitor = (monitorProc, options, pidManager) => {
 					logger.info(`"${options.name}" restarted`);
 				}
 
+				await pidManager.write(pid);
+
 				if (options.daemon) {
-					await pidManager.write(pid);
 					monitorProc.disconnect();
 					monitorProc.unref();
 				}
