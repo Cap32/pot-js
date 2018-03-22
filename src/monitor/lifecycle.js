@@ -16,6 +16,7 @@ export default function lifecycle(monitor, options) {
 		inject,
 		watch: watchOptions,
 		monitorProcessTitle,
+		baseDir: cwd,
 	} = options;
 
 	const handle = (modulePath, ...args) => {
@@ -24,9 +25,7 @@ export default function lifecycle(monitor, options) {
 		}
 
 		try {
-			const handler = importFile(modulePath, {
-				cwd: options.baseDir,
-			});
+			const handler = importFile(modulePath, { cwd });
 			handler(...args);
 		}
 		catch (err) {
@@ -99,7 +98,7 @@ export default function lifecycle(monitor, options) {
 		await exit();
 	});
 
-	watch(watchOptions, (file, stat) => {
+	watch({ cwd, ...watchOptions }, (file, stat) => {
 		logger.info('restarted');
 		logger.trace('watch:restart', stat);
 

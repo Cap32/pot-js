@@ -31,6 +31,8 @@ export default function watch(options = {}, handler) {
 		ignored.push('node_modules/**/*');
 	}
 
+	logger.trace('watching', dirs.join(', '));
+
 	chokidar
 		.watch(dirs, {
 			...other,
