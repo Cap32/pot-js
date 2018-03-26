@@ -13,8 +13,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-
-	// await Kapok.killAll();
+	await Kapok.killAll();
 });
 
 describe('cli `pot start`', () => {
@@ -74,25 +73,19 @@ describe('cli `pot start` with daemon mode', async () => {
 
 	afterEach(async () => {
 		try {
-			await Kapok.start(command, ['stop', name, '-f']).doneAndKill();
+			execSync(`${command} stop ${name} -f`);
 		}
 		catch (err) {}
 	});
 
-	test.only('should `daemon` mode work', async () => {
-		await Kapok.start(command, [
-			'start',
-			'--name',
-			name,
-			'--env.PORT',
-			3010,
-			'--entry',
-			'test/fixtures/socket.js',
-			'--daemon',
-		]).doneAndKill();
-
+	test('should `daemon` mode work', async () => {
+		const port = 3010;
+		execSync(
+			`${command} start --name=${name} --env.PORT=${port}` +
+				' --entry=test/fixtures/socket.js --daemon',
+		);
 		await delay(2000);
-		await Client.connect('ws://127.0.0.1:3010', async (client) => {
+		await Client.connect(`ws://127.0.0.1:${port}`, async (client) => {
 			const text = await client.request('test', 'test');
 			expect(text).toBe('test');
 		});

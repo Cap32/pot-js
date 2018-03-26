@@ -6,9 +6,6 @@ import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
 export const stop = async function stop(options = {}) {
-
-	// require('node-notifier').notify('stop');
-
 	let { name } = options;
 	const { force, logLevel } = options;
 
