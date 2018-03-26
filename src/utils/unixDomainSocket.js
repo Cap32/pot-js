@@ -34,7 +34,7 @@ export async function stopServer(id) {
 	const path = join(socketsDir, id);
 	try {
 		const client = await createClient(path);
-		await client.request(BRIDGE_CLOSE);
+		client.request(BRIDGE_CLOSE);
 	}
 	catch (err) {
 		logger.debug(err);
