@@ -79,7 +79,7 @@ export default function lifecycle(monitor, options) {
 	const exit = async () => {
 		logger.debug('exit');
 		await stopServer(name);
-		monitor.stop(::process.exit);
+		monitor.stop(process.exit);
 	};
 
 	signals().forEach((signal) => {

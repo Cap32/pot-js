@@ -1,4 +1,3 @@
-
 import { logger, setLoggers } from 'pot-logger';
 import workspace from './utils/workspace';
 import PidManager from './utils/PidManager';
@@ -7,6 +6,9 @@ import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
 export const stop = async function stop(options = {}) {
+
+	// require('node-notifier').notify('stop');
+
 	let { name } = options;
 	const { force, logLevel } = options;
 
@@ -47,9 +49,7 @@ export const stop = async function stop(options = {}) {
 
 export const stopAll = async function stopAll(options = {}) {
 	const names = await Bridge.getNames();
-	return Promise.all(
-		names.map(async (name) => stop({ ...options, name }))
-	);
+	return Promise.all(names.map(async (name) => stop({ ...options, name })));
 };
 
 export default stop;

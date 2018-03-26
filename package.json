@@ -78,6 +78,7 @@
     "kapok-js": "^0.10.1",
     "mkdirp": "^0.5.1",
     "node-fetch": "^1.7.1",
+    "node-notifier": "^5.2.1",
     "prettier-eslint-cli": "^4.7.1",
     "qs": "^6.3.0",
     "rimraf": "^2.5.4"
