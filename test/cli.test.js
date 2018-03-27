@@ -12,10 +12,6 @@ beforeEach(async () => {
 	jest.setTimeout(15000);
 });
 
-afterEach(async () => {
-	await Kapok.killAll();
-});
-
 describe('cli `pot start`', () => {
 	test('should work', async () => {
 		return Kapok.start(command, [
@@ -128,10 +124,10 @@ describe('cli `pot stop`', () => {
 				async action() {
 					return Kapok.start(command, ['stop', '-f'])
 						.assert('INFO "pot-js" stopped')
-						.doneAndKill();
+						.done();
 				},
 			})
-			.doneAndKill();
+			.done();
 	});
 
 	test('should throw error when no process is running', async () => {
@@ -168,7 +164,7 @@ describe('cli `pot stopall`', () => {
 								return Kapok.start(command, ['stopall', '-f'])
 									.assert(/INFO "[ab]" stopped/)
 									.assert(/INFO "[ab]" stopped/)
-									.doneAndKill();
+									.done();
 							},
 						})
 						.done();
@@ -179,8 +175,14 @@ describe('cli `pot stopall`', () => {
 });
 
 describe('cli `pot ls`', () => {
+	const processes = [];
+
+	afterEach(async () => {
+		await Promise.all(processes.map(async (proc) => proc.kill()));
+	});
+
 	test('should work`', async () => {
-		const createClient = async (port, name) => {
+		const createProc = async (port, name) => {
 			return Kapok.start(
 				command,
 				['start', '--name', name, '--entry', 'test/fixtures/server.js'],
@@ -195,8 +197,8 @@ describe('cli `pot ls`', () => {
 				.done();
 		};
 
-		await createClient(3001, 'app-1');
-		await createClient(3002, 'app-2');
+		const proc1 = await createProc(3001, 'app-1');
+		const proc2 = await createProc(3002, 'app-2');
 
 		await Kapok.start(command, ['ls'])
 			.until(/^┌/)
@@ -215,6 +217,8 @@ describe('cli `pot ls`', () => {
 			.assertUntil(/app-1/)
 			.assertUntil(/app-2/)
 			.doneAndKill();
+
+		processes.push(proc1, proc2);
 	});
 });
 
