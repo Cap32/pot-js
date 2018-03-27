@@ -5,18 +5,18 @@ import { Client } from 'promise-ws';
 const entry = 'test/fixtures/socket.js';
 const PORT = 3010;
 
-let kill;
+let proc;
 
 afterEach(async () => {
-	if (typeof kill === 'function') {
-		await kill();
+	if (proc && typeof proc.kill === 'function') {
+		await proc.kill();
 		await delay(1000);
 	}
 });
 
 describe('api module `start`', () => {
 	test('should `entry` and `port` work', async () => {
-		kill = await start({ env: { PORT }, entry });
+		proc = await start({ env: { PORT }, entry });
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
 		const text = await client.request('test', '掂');
@@ -24,7 +24,7 @@ describe('api module `start`', () => {
 	});
 
 	test('should `crashes` work', async () => {
-		kill = await start({
+		proc = await start({
 			entry: 'test/fixtures/crash.js',
 			maxRestarts: 1,
 		});
@@ -36,7 +36,7 @@ describe('api module `start`', () => {
 
 	test('should `configToEnv` work', async () => {
 		const hello = 'world';
-		kill = await start({
+		proc = await start({
 			env: { PORT },
 			entry,
 			hello,
@@ -56,7 +56,7 @@ describe('api module `start`', () => {
 describe('api module `Bridge.getList()`', () => {
 	test('should `getState` work', async () => {
 		const name = 'hello';
-		kill = await start({ name, entry });
+		proc = await start({ name, entry });
 		await delay(1000);
 		const bridges = await Bridge.getList();
 		const state = await bridges[0].getState();
@@ -69,7 +69,7 @@ describe('api module `Bridge.getList()`', () => {
 
 	test('should `setState` work', async () => {
 		const name = 'hello';
-		kill = await start({ name, entry });
+		proc = await start({ name, entry });
 		await delay(1000);
 		{
 			const bridges = await Bridge.getList();

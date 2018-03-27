@@ -89,12 +89,12 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
-const execMonitorProc = ({ baseDir, daemon, env }) => {
+const startMonitorProc = ({ baseDir, daemon, env }) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
 
-	return spawn(execPath, [scriptFile], {
+	const proc = spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
 		cwd: baseDir,
@@ -103,6 +103,11 @@ const execMonitorProc = ({ baseDir, daemon, env }) => {
 			...env,
 		},
 	});
+
+	proc.originalKill = proc.kill;
+	proc.kill = async () => fkill(proc.pid);
+
+	return proc;
 };
 
 const getCommand = (options) => {
@@ -195,7 +200,7 @@ export default async function start(options = {}) {
 			}
 		}
 
-		monitorProc = execMonitorProc(options);
+		monitorProc = startMonitorProc(options);
 		await connectMonitor(monitorProc, options, pidManager);
 	}
 	catch (err) {
@@ -203,5 +208,5 @@ export default async function start(options = {}) {
 		throw err;
 	}
 
-	return kill;
+	return monitorProc;
 }
