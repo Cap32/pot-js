@@ -10,5 +10,5 @@ require('promise-ws')
 		console.log('socket server started');
 	})
 	.catch((err) => {
-		console.error(err);
+		console.error('socket server failed', err);
 	});

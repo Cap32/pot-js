@@ -1,4 +1,3 @@
-
 import delay from 'delay';
 import { start, Bridge } from '../src';
 import { Client } from 'promise-ws';
@@ -9,16 +8,18 @@ const PORT = 3010;
 let kill;
 
 afterEach(async () => {
-	if (typeof kill === 'function') { await kill(); }
+	if (typeof kill === 'function') {
+		await kill();
+		await delay(1000);
+	}
 });
 
 describe('api module `start`', () => {
-
 	test('should `entry` and `port` work', async () => {
 		kill = await start({ env: { PORT }, entry });
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
-		const text = await client.emit('test', '掂');
+		const text = await client.request('test', '掂');
 		expect(text).toBe('掂');
 	});
 
@@ -43,7 +44,7 @@ describe('api module `start`', () => {
 		});
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
-		const envString = await client.emit('env');
+		const envString = await client.request('env');
 		expect(JSON.parse(envString)).toMatchObject({
 			hello: 'world',
 			entry,
