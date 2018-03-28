@@ -1,34 +1,57 @@
 import workspace from '../utils/workspace';
 import { startClient } from '../utils/unixDomainSocket';
-import globby from 'globby';
-import { BRIDGE_STATE } from '../constants';
+import { join } from 'path';
+import { BRIDGE_STATE, BRIDGE_CLOSE } from '../constants';
 import getInfoVerbose from './getInfoVerbose';
+import { getPids, getPidFile, killPid, writePid } from './PidHelpers';
+import { removeDomainSocketFile } from './SocketsHelpers';
 
 // import { logger } from 'pot-logger';
 
-const getNames = async () => {
-	return globby(['*'], { cwd: await workspace.getSocketsDir() });
-};
+const getList = async function getList() {
+	const pidsDir = await workspace.getPidsDir();
+	const socketsDir = await workspace.getSocketsDir();
+	const pids = await getPids(pidsDir);
 
-const getSocketByName = async function getSocketByName(name) {
-	const names = await getNames();
-	const socketDir = await workspace.getSocketsDir();
-	for (const iteratorName of names) {
-		if (iteratorName === name) {
-			return startClient(name, socketDir);
-		}
-	}
-};
-
-const getSockets = async function getSockets() {
-	const names = await getNames();
-	const socketDir = await workspace.getSocketsDir();
-	const sockets = await Promise.all(
-		names.map(async (name) => {
-			return startClient(name, socketDir);
+	const list = [];
+	await Promise.all(
+		pids.map(async ({ pid, name, pidFile }) => {
+			const socketFile = join(socketsDir, name);
+			if (!pid) {
+				await removeDomainSocketFile(socketFile);
+				return;
+			}
+			const socket = await startClient(name);
+			if (socket) {
+				list.push({ name, socket, pid, pidFile });
+			}
+			else {
+				await removeDomainSocketFile(socketFile);
+			}
 		}),
 	);
-	return sockets.filter(Boolean);
+	return list;
+};
+
+const getByName = async function getByName(name) {
+	const list = await getList();
+	let res;
+	await Promise.all(
+		list.map(async (item) => {
+			if (name === item.name) {
+				res = item;
+			}
+			else {
+				await item.socket.close();
+			}
+		}),
+	);
+	return res;
+};
+
+const getNames = async function getNames() {
+	const list = await getList();
+	return list.map(({ name }) => name);
 };
 
 export default class Bridge {
@@ -43,19 +66,34 @@ export default class Bridge {
 		if (space) {
 			workspace.set(space);
 		}
-		const socket = await getSocketByName(name);
-		return socket && new Bridge(socket);
+		const item = await getByName(name);
+		return item && new Bridge(item);
 	}
 
 	static async getList(space) {
 		if (space) {
 			workspace.set(space);
 		}
-		const sockets = await getSockets();
-		return sockets.map((socket) => new Bridge(socket));
+		const list = await getList();
+		return list.map((item) => new Bridge(item));
 	}
 
-	constructor(socket) {
+	static async writePid(pidFile, pid) {
+		await writePid(pidFile, pid);
+	}
+
+	static async getPidFile(name, space) {
+		if (space) {
+			workspace.set(space);
+		}
+		const pidsDir = await workspace.getPidsDir();
+		return getPidFile(pidsDir, name);
+	}
+
+	constructor({ name, pid, pidFile, socket }) {
+		this._name = name;
+		this._pid = pid;
+		this._pidFile = pidFile;
 		this._socket = socket;
 	}
 
@@ -82,5 +120,11 @@ export default class Bridge {
 
 	async disconnect() {
 		return this._socket.close();
+	}
+
+	async kill(options) {
+		this._socket.request(BRIDGE_CLOSE);
+		this._socket.close();
+		await killPid(this._name, this._pid, this._pidFile, options);
 	}
 }

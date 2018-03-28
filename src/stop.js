@@ -1,6 +1,5 @@
 import { logger, setLoggers } from 'pot-logger';
 import workspace from './utils/workspace';
-import PidManager from './utils/PidManager';
 import Bridge from './Bridge';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
@@ -21,9 +20,9 @@ export const stop = async function stop(options = {}) {
 
 	name += ''; // prevent `name` is `Number`
 
-	const pidManager = await PidManager.find(name);
+	const bridge = await Bridge.getByName(name);
 
-	if (!pidManager.isRunning) {
+	if (!bridge) {
 		logger.error(`"${name}" NOT found`);
 		return false;
 	}
@@ -41,7 +40,7 @@ export const stop = async function stop(options = {}) {
 		}
 	}
 
-	return pidManager.kill({ shouldLog: true });
+	return bridge.kill({ shouldLog: true });
 };
 
 export const stopAll = async function stopAll(options = {}) {

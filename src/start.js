@@ -7,7 +7,7 @@ import validateSchema from './utils/validateSchema';
 import { logger, setLoggers } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
 import chalk from 'chalk';
-import PidManager from './utils/PidManager';
+import Bridge from './Bridge';
 import onExit from 'signal-exit';
 import fkill from 'fkill';
 
@@ -127,25 +127,26 @@ const getCommand = (options) => {
 	return command;
 };
 
-const connectMonitor = (monitorProc, options, pidManager) => {
+const connectMonitor = async (monitorProc, options, bridge) => {
 	const ipc = new StdioIPC(monitorProc);
 	const command = getCommand(options);
+	const { name, daemon } = options;
 	const { pid } = monitorProc;
 	logger.debug('monitor pid', chalk.magenta(pid));
-	const { pidFile } = pidManager;
+	const pidFile = await Bridge.getPidFile(name);
 
 	return new Promise((resolve, reject) => {
 		ipc
 			.on('start', async () => {
 				logger.trace('monitor started');
 
-				if (pidManager.isRunning) {
-					logger.info(`"${options.name}" restarted`);
+				if (bridge) {
+					logger.info(`"${name}" restarted`);
 				}
 
-				await pidManager.write(pid);
+				await Bridge.writePid(pidFile, pid);
 
-				if (options.daemon) {
+				if (daemon) {
 					monitorProc.disconnect();
 					monitorProc.unref();
 				}
@@ -189,11 +190,11 @@ export default async function start(options = {}) {
 
 		workspace.set(options);
 
-		const pidManager = await PidManager.find(name);
+		const bridge = await Bridge.getByName(name);
 
-		if (pidManager.isRunning) {
+		if (bridge) {
 			if (force) {
-				await pidManager.kill();
+				await bridge.kill();
 			}
 			else {
 				throw new Error(`"${name}" is running.`);
@@ -201,7 +202,7 @@ export default async function start(options = {}) {
 		}
 
 		monitorProc = startMonitorProc(options);
-		await connectMonitor(monitorProc, options, pidManager);
+		await connectMonitor(monitorProc, options, bridge);
 	}
 	catch (err) {
 		await kill();
