@@ -29,19 +29,6 @@ export async function startServer(id) {
 	return server;
 }
 
-export async function stopServer(id) {
-	const socketsDir = await workspace.getSocketsDir();
-	const path = join(socketsDir, id);
-	try {
-		const client = await createClient(path);
-		client.request(BRIDGE_CLOSE);
-	}
-	catch (err) {
-		logger.debug(err);
-	}
-	await remove(path);
-}
-
 export async function startClient(id) {
 	const socketsDir = await workspace.getSocketsDir();
 	const path = join(socketsDir, id);

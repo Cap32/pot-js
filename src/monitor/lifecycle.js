@@ -2,7 +2,9 @@ import importFile from 'import-file';
 import { logger, setLoggers } from 'pot-logger';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
-import { stopServer } from '../utils/unixDomainSocket';
+
+// import { stopServer } from '../utils/unixDomainSocket';
+import Bridge from '../Bridge';
 import { once } from 'lodash';
 import { signals } from 'signal-exit';
 
@@ -78,7 +80,10 @@ export default function lifecycle(monitor, options) {
 
 	const exit = async () => {
 		logger.debug('exit');
-		await stopServer(name);
+		const bridge = await Bridge.getByName(name);
+		if (bridge) {
+			await bridge.kill();
+		}
 		monitor.stop(process.exit);
 	};
 

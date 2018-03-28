@@ -6,8 +6,6 @@ import getInfoVerbose from './getInfoVerbose';
 import { getPids, getPidFile, killPid, writePid } from './PidHelpers';
 import { removeDomainSocketFile } from './SocketsHelpers';
 
-// import { logger } from 'pot-logger';
-
 const getList = async function getList() {
 	const pidsDir = await workspace.getPidsDir();
 	const socketsDir = await workspace.getSocketsDir();
