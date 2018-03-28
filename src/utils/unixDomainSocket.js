@@ -5,7 +5,7 @@ import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import workspace from './workspace';
 import isWin from './isWin';
-import { BRIDGE_CLOSE } from '../constants';
+import { CONNECTION_CLOSE } from '../constants';
 
 export async function startServer(id) {
 	const socketsDir = await workspace.getSocketsDir();
@@ -18,7 +18,7 @@ export async function startServer(id) {
 	}
 
 	const server = await createServer(path);
-	server.reply(BRIDGE_CLOSE, async () => {
+	server.reply(CONNECTION_CLOSE, async () => {
 		try {
 			await server.close();
 		}

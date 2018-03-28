@@ -6,9 +6,9 @@ import { setLoggers } from 'pot-logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import { startServer } from '../utils/unixDomainSocket';
-import Bridge from '../Bridge';
+import Connection from '../Connection';
 import workspace from '../utils/workspace';
-import { BRIDGE_STATE } from '../constants';
+import { CONNECTION_STATE } from '../constants';
 import { stop } from '../stop';
 
 const potIPC = new StdioIPC(process);
@@ -34,7 +34,7 @@ const start = async (options) => {
 
 	const startSocketServer = async (monitor, name) => {
 		try {
-			const names = await Bridge.getNames();
+			const names = await Connection.getNames();
 
 			if (names.indexOf(name) > -1) {
 				if (force) {
@@ -52,7 +52,7 @@ const start = async (options) => {
 
 			const socketServer = await startServer(name);
 
-			socketServer.reply(BRIDGE_STATE, async (data) => {
+			socketServer.reply(CONNECTION_STATE, async (data) => {
 				if (data) {
 					Object.assign(monitor.data, data);
 				}

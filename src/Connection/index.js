@@ -1,7 +1,7 @@
 import workspace from '../utils/workspace';
 import { startClient } from '../utils/unixDomainSocket';
 import { join } from 'path';
-import { BRIDGE_STATE, BRIDGE_CLOSE } from '../constants';
+import { CONNECTION_STATE, CONNECTION_CLOSE } from '../constants';
 import getInfoVerbose from './getInfoVerbose';
 import { getPids, getPidFile, killPid, writePid } from './PidHelpers';
 import { removeDomainSocketFile } from './SocketsHelpers';
@@ -52,7 +52,7 @@ const getNames = async function getNames() {
 	return list.map(({ name }) => name);
 };
 
-export default class Bridge {
+export default class Connection {
 	static async getNames(space) {
 		if (space) {
 			workspace.set(space);
@@ -65,7 +65,7 @@ export default class Bridge {
 			workspace.set(space);
 		}
 		const item = await getByName(name);
-		return item && new Bridge(item);
+		return item && new Connection(item);
 	}
 
 	static async getList(space) {
@@ -73,7 +73,7 @@ export default class Bridge {
 			workspace.set(space);
 		}
 		const list = await getList();
-		return list.map((item) => new Bridge(item));
+		return list.map((item) => new Connection(item));
 	}
 
 	static async writePid(pidFile, pid) {
@@ -96,13 +96,13 @@ export default class Bridge {
 	}
 
 	async setState(state) {
-		const res = await this._socket.request(BRIDGE_STATE, state);
+		const res = await this._socket.request(CONNECTION_STATE, state);
 		await this.disconnect();
 		return res;
 	}
 
 	async getState() {
-		const res = await this._socket.request(BRIDGE_STATE);
+		const res = await this._socket.request(CONNECTION_STATE);
 		await this.disconnect();
 		return res;
 	}
@@ -121,7 +121,7 @@ export default class Bridge {
 	}
 
 	async kill(options) {
-		this._socket.request(BRIDGE_CLOSE);
+		this._socket.request(CONNECTION_CLOSE);
 		this._socket.close();
 		await killPid(this._name, this._pid, this._pidFile, options);
 	}

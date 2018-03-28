@@ -2,7 +2,7 @@ import { logger } from 'pot-logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
 import { isUndefined } from 'lodash';
-import Bridge from './Bridge';
+import Connection from './Connection';
 import logUpdate from 'log-update';
 
 const list = async (options = {}) => {
@@ -29,14 +29,14 @@ const list = async (options = {}) => {
 			},
 		});
 
-		const bridges = await Bridge.getList();
+		const connections = await Connection.getList();
 
-		if (!bridges.length) {
+		if (!connections.length) {
 			return logger.warn('No process');
 		}
 
 		const infoList = await Promise.all(
-			bridges.map((bridge) => bridge.getInfoVerbose()),
+			connections.map((connection) => connection.getInfoVerbose()),
 		);
 
 		infoList.filter(Boolean).forEach((info) => {

@@ -1,5 +1,5 @@
 import delay from 'delay';
-import { start, Bridge } from '../src';
+import { start, Connection } from '../src';
 import { Client } from 'promise-ws';
 
 const entry = 'test/fixtures/socket.js';
@@ -29,8 +29,8 @@ describe('api module `start`', () => {
 			maxRestarts: 1,
 		});
 		await delay(2000);
-		const bridges = await Bridge.getList();
-		const info = await bridges[0].getInfo();
+		const connections = await Connection.getList();
+		const info = await connections[0].getInfo();
 		expect(info.crashes).toBe(2);
 	});
 
@@ -53,13 +53,13 @@ describe('api module `start`', () => {
 	});
 });
 
-describe('api module `Bridge.getList()`', () => {
+describe('api module `Connection.getList()`', () => {
 	test('should `getState` work', async () => {
 		const name = 'hello';
 		proc = await start({ name, entry });
 		await delay(1000);
-		const bridges = await Bridge.getList();
-		const state = await bridges[0].getState();
+		const connections = await Connection.getList();
+		const state = await connections[0].getState();
 		expect(typeof state.pid).toBe('number');
 		expect(state.crashes).toBe(0);
 		expect(state.status).toBe('running');
@@ -72,15 +72,15 @@ describe('api module `Bridge.getList()`', () => {
 		proc = await start({ name, entry });
 		await delay(1000);
 		{
-			const bridges = await Bridge.getList();
-			const state = await bridges[0].getState();
+			const connections = await Connection.getList();
+			const state = await connections[0].getState();
 			expect(state.data.name).toBe(name);
 			expect(state.data.hello).toBe(undefined);
 		}
 
 		{
-			const bridges = await Bridge.getList();
-			const state = await bridges[0].setState({ hello: 'world' });
+			const connections = await Connection.getList();
+			const state = await connections[0].setState({ hello: 'world' });
 			expect(state.data.hello).toBe('world');
 		}
 	});

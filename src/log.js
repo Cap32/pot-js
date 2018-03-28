@@ -1,7 +1,6 @@
-
 import { logger } from 'pot-logger';
 import { join } from 'path';
-import Bridge from './Bridge';
+import Connection from './Connection';
 import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';
@@ -16,15 +15,15 @@ const log = async (options) => {
 		value: name,
 		message: 'Please select the target app.',
 		errorMessage: 'No process is running',
-		getChoices: Bridge.getNames,
+		getChoices: Connection.getNames,
 	});
 
-	const bridge = await Bridge.getByName(appName);
-	if (!bridge) {
+	const connection = await Connection.getByName(appName);
+	if (!connection) {
 		throw new Error(`"${appName}" NOT found`);
 	}
 
-	const info = await bridge.getInfo();
+	const info = await connection.getInfo();
 	const { logsDir } = info.data;
 
 	if (!logsDir) {
@@ -39,14 +38,18 @@ const log = async (options) => {
 		getChoices: () => globby('*.log', { cwd: logsDir }),
 	});
 
-	if (!appCategory.endsWith('.log')) { appCategory += '.log'; }
+	if (!appCategory.endsWith('.log')) {
+		appCategory += '.log';
+	}
 
 	const logFile = join(logsDir, appCategory);
 	const sf = sliceFile(logFile);
 	const mode = follow ? 'follow' : 'slice';
 
 	sf.on('error', (err) => {
-		if (err.code !== 'ENOENT') { throw err; }
+		if (err.code !== 'ENOENT') {
+			throw err;
+		}
 		logger.warn('Log file NOT found');
 	});
 	sf[mode](-line).pipe(process.stdout);

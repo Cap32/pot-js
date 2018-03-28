@@ -1,6 +1,6 @@
 import { logger, setLoggers } from 'pot-logger';
 import workspace from './utils/workspace';
-import Bridge from './Bridge';
+import Connection from './Connection';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
 
@@ -15,14 +15,14 @@ export const stop = async function stop(options = {}) {
 		value: name,
 		message: 'Please select the target app.',
 		errorMessage: 'No process is running',
-		getChoices: Bridge.getNames,
+		getChoices: Connection.getNames,
 	});
 
 	name += ''; // prevent `name` is `Number`
 
-	const bridge = await Bridge.getByName(name);
+	const connection = await Connection.getByName(name);
 
-	if (!bridge) {
+	if (!connection) {
 		logger.error(`"${name}" NOT found`);
 		return false;
 	}
@@ -40,11 +40,11 @@ export const stop = async function stop(options = {}) {
 		}
 	}
 
-	return bridge.kill({ shouldLog: true });
+	return connection.kill({ shouldLog: true });
 };
 
 export const stopAll = async function stopAll(options = {}) {
-	const names = await Bridge.getNames();
+	const names = await Connection.getNames();
 	return Promise.all(names.map(async (name) => stop({ ...options, name })));
 };
 

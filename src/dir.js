@@ -1,5 +1,4 @@
-
-import Bridge from './Bridge';
+import Connection from './Connection';
 import ensureSelected from './utils/ensureSelected';
 import workspace from './utils/workspace';
 
@@ -12,16 +11,16 @@ const dir = async (options) => {
 		value: name,
 		message: 'Please select the target app.',
 		errorMessage: 'No process is running.',
-		getChoices: Bridge.getNames,
+		getChoices: Connection.getNames,
 	});
 
-	const bridge = await Bridge.getByName(appName);
+	const connection = await Connection.getByName(appName);
 
-	if (!bridge) {
+	if (!connection) {
 		throw new Error(`"${appName}" NOT found`);
 	}
 
-	const info = await bridge.getInfo();
+	const info = await connection.getInfo();
 	const { cwd, root } = info.data;
 
 	console.log(cwd || root);

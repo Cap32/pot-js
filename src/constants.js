@@ -1,8 +1,8 @@
-export const BRIDGE_STATE = 'STATE';
-export const BRIDGE_CLOSE = 'CLOSE';
+export const CONNECTION_STATE = 'STATE';
+export const CONNECTION_CLOSE = 'CLOSE';
 
 // TODO: deprecated
-export const BRIDGE_EVENT_TYPE = 'bridge';
+export const CONNECTION_EVENT_TYPE = 'bridge';
 
 // TODO: deprecated
-export const DEPRECATED_BRIDGE_EVENT_TYPE = 'getInfo';
+export const DEPRECATED_CONNECTION_EVENT_TYPE = 'getInfo';

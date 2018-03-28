@@ -4,7 +4,7 @@ import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 
 // import { stopServer } from '../utils/unixDomainSocket';
-import Bridge from '../Bridge';
+import Connection from '../Connection';
 import { once } from 'lodash';
 import { signals } from 'signal-exit';
 
@@ -80,9 +80,9 @@ export default function lifecycle(monitor, options) {
 
 	const exit = async () => {
 		logger.debug('exit');
-		const bridge = await Bridge.getByName(name);
-		if (bridge) {
-			await bridge.kill();
+		const connection = await Connection.getByName(name);
+		if (connection) {
+			await connection.kill();
 		}
 		monitor.stop(process.exit);
 	};
