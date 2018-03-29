@@ -5,10 +5,8 @@ import StdioIPC from '../utils/StdioIPC';
 import { setLoggers } from 'pot-logger';
 import lifecycle from './lifecycle';
 import logSystem from './logSystem';
-import { startServer } from '../utils/unixDomainSocket';
 import Connection from '../Connection';
 import workspace from '../utils/workspace';
-import { CONNECTION_STATE } from '../constants';
 import { stop } from '../stop';
 
 const potIPC = new StdioIPC(process);
@@ -50,16 +48,7 @@ const start = async (options) => {
 				}
 			}
 
-			const socketServer = await startServer(name);
-
-			socketServer.reply(CONNECTION_STATE, async (data) => {
-				if (data) {
-					Object.assign(monitor.data, data);
-				}
-				const monitorState = monitor.toJSON();
-				return monitorState;
-			});
-
+			await Connection.serve(monitor);
 			return true;
 		}
 		catch (err) {

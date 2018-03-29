@@ -134,17 +134,16 @@ const connectMonitor = async (monitorProc, options, connection) => {
 	const { pid } = monitorProc;
 	logger.debug('monitor pid', chalk.magenta(pid));
 	const pidFile = await Connection.getPidFile(name);
+	const socketPath = await Connection.getSocketPath(name);
 
 	return new Promise((resolve, reject) => {
 		ipc
-			.on('start', async () => {
+			.on('start', () => {
 				logger.trace('monitor started');
 
 				if (connection) {
 					logger.info(`"${name}" restarted`);
 				}
-
-				await Connection.writePid(pidFile, pid);
 
 				if (daemon) {
 					monitorProc.disconnect();
@@ -157,7 +156,13 @@ const connectMonitor = async (monitorProc, options, connection) => {
 				monitorProc.kill();
 				reject(err);
 			})
-			.send('start', { ...options, pidFile, command });
+			.send('start', {
+				...options,
+				monitorPid: pid,
+				pidFile,
+				socketPath,
+				command,
+			});
 	});
 };
 

@@ -76,7 +76,7 @@ export async function killPid(name, pid, pidFile, options = {}) {
 	}
 }
 
-export async function writePid(pidFile, pid) {
+export async function writePid({ pidFile, monitorPid }) {
 	logger.trace('pid file saved in', chalk.gray(pidFile));
-	await writeFile(pidFile, pid);
+	await writeFile(pidFile, monitorPid);
 }

@@ -1,7 +1,8 @@
 import { name as appspace } from '../../package.json';
 import nodeIpc from 'node-ipc';
 import { basename } from 'path';
-import delay from 'delay';
+
+// import delay from 'delay';
 
 export function createClient(socketPath) {
 	return new Promise((resolve, reject) => {

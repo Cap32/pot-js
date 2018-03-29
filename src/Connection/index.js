@@ -1,10 +1,14 @@
 import workspace from '../utils/workspace';
-import { startClient } from '../utils/unixDomainSocket';
 import { join } from 'path';
-import { CONNECTION_STATE, CONNECTION_CLOSE } from '../constants';
+import { STATE, CLOSE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
 import { getPids, getPidFile, killPid, writePid } from './PidHelpers';
-import { removeDomainSocketFile } from './SocketsHelpers';
+import {
+	startServer,
+	startClient,
+	getSocketPath,
+	removeDomainSocketFile,
+} from './SocketsHelpers';
 
 const getList = async function getList() {
 	const pidsDir = await workspace.getPidsDir();
@@ -19,7 +23,7 @@ const getList = async function getList() {
 				await removeDomainSocketFile(socketFile);
 				return;
 			}
-			const socket = await startClient(name);
+			const socket = await startClient(socketFile);
 			if (socket) {
 				list.push({ name, socket, pid, pidFile });
 			}
@@ -76,16 +80,25 @@ export default class Connection {
 		return list.map((item) => new Connection(item));
 	}
 
-	static async writePid(pidFile, pid) {
-		await writePid(pidFile, pid);
-	}
-
 	static async getPidFile(name, space) {
 		if (space) {
 			workspace.set(space);
 		}
 		const pidsDir = await workspace.getPidsDir();
 		return getPidFile(pidsDir, name);
+	}
+
+	static async getSocketPath(name, space) {
+		if (space) {
+			workspace.set(space);
+		}
+		const socketsDir = await workspace.getSocketsDir();
+		return getSocketPath(socketsDir, name);
+	}
+
+	static async serve(monitor) {
+		await startServer(monitor);
+		await writePid(monitor.data);
 	}
 
 	constructor({ name, pid, pidFile, socket }) {
@@ -96,13 +109,13 @@ export default class Connection {
 	}
 
 	async setState(state) {
-		const res = await this._socket.request(CONNECTION_STATE, state);
+		const res = await this._socket.request(STATE, state);
 		await this.disconnect();
 		return res;
 	}
 
 	async getState() {
-		const res = await this._socket.request(CONNECTION_STATE);
+		const res = await this._socket.request(STATE);
 		await this.disconnect();
 		return res;
 	}
@@ -121,7 +134,7 @@ export default class Connection {
 	}
 
 	async kill(options) {
-		this._socket.request(CONNECTION_CLOSE);
+		this._socket.request(CLOSE);
 		this._socket.close();
 		await killPid(this._name, this._pid, this._pidFile, options);
 	}

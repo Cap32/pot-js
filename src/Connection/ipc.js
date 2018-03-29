@@ -17,7 +17,7 @@ export async function createServer(socketPath) {
 	await createLocalDomainSocket(server, socketPath);
 	const wsServer = await Server.create({ server });
 
-	wsServer.reply('close', ::wsServer.close);
+	wsServer.reply('close', wsServer.close.bind(wsServer));
 	return wsServer;
 }
 
