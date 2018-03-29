@@ -1,12 +1,28 @@
 import { remove } from 'fs-extra';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { createServer, createClient } from './ipc';
 import { STATE, CLOSE } from './constants';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
+import globby from 'globby';
+import { noop, isObject } from 'lodash';
 
-export async function removeDomainSocketFile(file) {
-	return remove(file);
+export async function getSocketFiles(cwd) {
+	const socketFiles = await globby(['*'], {
+		absolute: true,
+		cwd,
+	});
+	return socketFiles.map((socketPath) => ({
+		socketPath,
+		name: basename(socketPath),
+	}));
+}
+
+export async function removeDomainSocketFile(socketPath) {
+	if (isObject(socketPath)) {
+		socketPath = socketPath.socketPath;
+	}
+	return remove(socketPath).catch(noop);
 }
 
 export function getSocketPath(socketPath, name) {

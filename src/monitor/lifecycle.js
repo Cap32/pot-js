@@ -2,8 +2,6 @@ import importFile from 'import-file';
 import { logger, setLoggers } from 'pot-logger';
 import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
-
-// import { stopServer } from '../utils/unixDomainSocket';
 import Connection from '../Connection';
 import { once } from 'lodash';
 import { signals } from 'signal-exit';
@@ -82,7 +80,7 @@ export default function lifecycle(monitor, options) {
 		logger.debug('exit');
 		const connection = await Connection.getByName(name);
 		if (connection) {
-			await connection.kill();
+			await connection.requestStopServer();
 		}
 		monitor.stop(process.exit);
 	};

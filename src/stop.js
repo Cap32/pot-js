@@ -40,7 +40,7 @@ export const stop = async function stop(options = {}) {
 		}
 	}
 
-	return connection.kill({ shouldLog: true });
+	return connection.requestStopServer({ shouldLog: true });
 };
 
 export const stopAll = async function stopAll(options = {}) {

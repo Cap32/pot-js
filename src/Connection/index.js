@@ -1,9 +1,11 @@
 import workspace from '../utils/workspace';
-import { join } from 'path';
 import { STATE, CLOSE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
+import { differenceWith } from 'lodash';
+import isWin from '../utils/isWin';
 import { getPids, getPidFile, killPid, writePid } from './PidHelpers';
 import {
+	getSocketFiles,
 	startServer,
 	startClient,
 	getSocketPath,
@@ -14,24 +16,30 @@ const getList = async function getList() {
 	const pidsDir = await workspace.getPidsDir();
 	const socketsDir = await workspace.getSocketsDir();
 	const pids = await getPids(pidsDir);
+	const sockets = await getSocketFiles(socketsDir);
 
 	const list = [];
 	await Promise.all(
 		pids.map(async ({ pid, name, pidFile }) => {
-			const socketFile = join(socketsDir, name);
-			if (!pid) {
-				await removeDomainSocketFile(socketFile);
-				return;
-			}
-			const socket = await startClient(socketFile);
+			const socketPath = getSocketPath(socketsDir, name);
+			const socket = await startClient(socketPath);
 			if (socket) {
-				list.push({ name, socket, pid, pidFile });
+				list.push({ name, socket, pid, pidFile, socketPath });
 			}
 			else {
-				await removeDomainSocketFile(socketFile);
+				removeDomainSocketFile(socketPath);
 			}
 		}),
 	);
+
+	// remove zombie socket files
+	if (!isWin) {
+		differenceWith(
+			sockets,
+			pids,
+			(socket, pid) => socket.name === pid.name,
+		).forEach(removeDomainSocketFile);
+	}
 	return list;
 };
 
@@ -51,17 +59,13 @@ const getByName = async function getByName(name) {
 	return res;
 };
 
-const getNames = async function getNames() {
-	const list = await getList();
-	return list.map(({ name }) => name);
-};
-
 export default class Connection {
 	static async getNames(space) {
 		if (space) {
 			workspace.set(space);
 		}
-		return getNames();
+		const list = await getList();
+		return list.map(({ name }) => name);
 	}
 
 	static async getByName(name, space) {
@@ -101,10 +105,11 @@ export default class Connection {
 		await writePid(monitor.data);
 	}
 
-	constructor({ name, pid, pidFile, socket }) {
+	constructor({ name, pid, pidFile, socketPath, socket }) {
 		this._name = name;
 		this._pid = pid;
 		this._pidFile = pidFile;
+		this._socketPath = socketPath;
 		this._socket = socket;
 	}
 
@@ -133,9 +138,10 @@ export default class Connection {
 		return this._socket.close();
 	}
 
-	async kill(options) {
+	async requestStopServer(options) {
 		this._socket.request(CLOSE);
 		this._socket.close();
+		removeDomainSocketFile(this._socketPath);
 		await killPid(this._name, this._pid, this._pidFile, options);
 	}
 }

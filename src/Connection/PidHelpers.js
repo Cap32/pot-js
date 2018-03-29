@@ -1,7 +1,7 @@
 import processExists from 'process-exists';
 import { writeFile, readFile, open, remove } from 'fs-extra';
 import { basename, join } from 'path';
-import { trim } from 'lodash';
+import { trim, noop } from 'lodash';
 import globby from 'globby';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
@@ -16,13 +16,17 @@ const checkIsPidFileExists = async (pidFile) => {
 	}
 };
 
+const removePidFile = async function removePidFile(pidFile) {
+	remove(pidFile).catch(noop);
+};
+
 const getPid = async function getPid(pidFile) {
 	const isFileExists = await checkIsPidFileExists(pidFile);
 	if (isFileExists) {
 		const pid = +trim(await readFile(pidFile, 'utf-8'));
 		const isProcessExists = await processExists(pid);
 		if (!isProcessExists) {
-			await remove(pidFile);
+			removePidFile(pidFile);
 		}
 		return isProcessExists && pid;
 	}
@@ -32,6 +36,9 @@ const getPid = async function getPid(pidFile) {
 const parsePidFile = async function parsePidFile(pidFile) {
 	const pid = await getPid(pidFile);
 	const name = basename(pidFile, '.pid');
+	if (!pid) {
+		return false;
+	}
 	return { pid, name, pidFile };
 };
 
@@ -44,27 +51,15 @@ export async function getPids(cwd) {
 		absolute: true,
 		cwd,
 	});
-	return Promise.all(pidFiles.map(parsePidFile));
+	const pids = await Promise.all(pidFiles.map(parsePidFile));
+	return pids.filter(Boolean);
 }
 
 export async function killPid(name, pid, pidFile, options = {}) {
-
-	// if (!this.isRunning) {
-	// 	throw new Error('pid is not running');
-	// }
-
 	try {
 		const { shouldLog } = options;
-
-		try {
-			await remove(pidFile);
-		}
-		catch (err) {
-			logger.debug(err);
-		}
-
+		removePidFile(pidFile);
 		await fkill(pid);
-
 		logger.trace(`killed pid ${pid}`);
 		shouldLog && logger.info(`"${name}" stopped`);
 		return true;
