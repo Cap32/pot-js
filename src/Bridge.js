@@ -1,1 +1,2 @@
-export * from './Connection';
+// DEPRECATED
+export default from './Connection';
