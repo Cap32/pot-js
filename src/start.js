@@ -1,8 +1,9 @@
 import spawn from 'cross-spawn';
-import { resolve, sep } from 'path';
-import { ensureDir, remove } from 'fs-extra';
+import { resolve } from 'path';
+import { ensureDir } from 'fs-extra';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
+import isWin from './utils/isWin';
 import validateSchema from './utils/validateSchema';
 import { logger, setLoggers } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
@@ -29,7 +30,7 @@ const ensureName = (options) => {
 		options.name = name;
 	}
 	catch (err) {
-		const sepRegExp = new RegExp(sep, 'g');
+		const sepRegExp = new RegExp(isWin ? '\\\\' : '/', 'g');
 		options.name = cwd.replace(sepRegExp, '_');
 	}
 };

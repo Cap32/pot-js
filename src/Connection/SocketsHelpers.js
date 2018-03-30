@@ -7,6 +7,7 @@ import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import globby from 'globby';
 import { noop, isObject } from 'lodash';
+import isWin from '../utils/isWin';
 
 export async function getSocketFiles(cwd) {
 	const socketFiles = await globby(['*'], {
@@ -20,6 +21,9 @@ export async function getSocketFiles(cwd) {
 }
 
 export async function removeDomainSocketFile(socketPath) {
+	if (isWin) {
+		return;
+	}
 	if (isObject(socketPath)) {
 		socketPath = socketPath.socketPath;
 	}
@@ -63,7 +67,7 @@ export async function startClient(socketFile) {
 	}
 	catch (err) {
 		if (err && ~['ECONNRESET', 'ECONNREFUSED', 'ENOENT'].indexOf(err.code)) {
-			await remove(socketFile);
+			await removeDomainSocketFile(socketFile);
 		}
 		else {
 			logger.error('socket error', err);
