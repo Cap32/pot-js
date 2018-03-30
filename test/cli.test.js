@@ -1,15 +1,16 @@
 import { resolve } from 'path';
 import { writeFile, remove } from 'fs-extra';
-import { execSync } from 'child_process';
+import spawn from 'cross-spawn';
 import { Connection } from '../src';
 import Kapok from 'kapok-js';
 import delay from 'delay';
 import { Client } from 'promise-ws';
+import fkill from 'fkill';
 
 const command = resolve('bin/pot');
 
 beforeEach(async () => {
-	jest.setTimeout(15000);
+	jest.setTimeout(30000);
 });
 
 describe('cli `pot start`', () => {
@@ -45,17 +46,20 @@ describe('cli `pot start`', () => {
 	});
 
 	test('should auto restart after killed', async () => {
+		const name = 'hello';
 		return Kapok.start(command, [
 			'start',
 			'--entry=test/fixtures/server.js',
 			'--maxRestarts=1',
+			'--name',
+			name,
 		])
 			.assertUntil(/started/)
 			.assertUntil('test server started', {
 				action: async () => {
-					const connections = await Connection.getList();
-					const { pid } = await connections[0].getInfo();
-					execSync(`kill -9 ${pid}`); // kill client process
+					const connection = await Connection.getByName(name);
+					const { pid } = await connection.getState();
+					await fkill(pid, { force: /^win/.test(process.platform) });
 				},
 			})
 			.assertUntil(/sleeped/)
@@ -69,17 +73,20 @@ describe('cli `pot start` with daemon mode', async () => {
 
 	afterEach(async () => {
 		try {
-			execSync(`${command} stop ${name} -f`);
+			spawn.sync(command, ['stop', name, '-f']);
 		}
 		catch (err) {}
 	});
 
 	test('should `daemon` mode work', async () => {
 		const port = 3010;
-		execSync(
-			`${command} start --name=${name} --env.PORT=${port}` +
-				' --entry=test/fixtures/socket.js --daemon',
-		);
+		spawn.sync(command, [
+			'start',
+			`--name=${name}`,
+			`--env.PORT=${port}`,
+			'--entry=test/fixtures/socket.js',
+			'--daemon',
+		]);
 		await delay(2000);
 		await Client.connect(`ws://127.0.0.1:${port}`, async (client) => {
 			const text = await client.request('test', 'test');
@@ -175,10 +182,15 @@ describe('cli `pot stopall`', () => {
 });
 
 describe('cli `pot ls`', () => {
-	const processes = [];
+	const names = [];
 
 	afterEach(async () => {
-		await Promise.all(processes.map(async (proc) => proc.kill()));
+		await Promise.all(
+			names.map(async (name) => {
+				const connection = await Connection.getByName(name);
+				await connection.requestStopServer();
+			}),
+		);
 	});
 
 	test('should work`', async () => {
@@ -197,8 +209,11 @@ describe('cli `pot ls`', () => {
 				.done();
 		};
 
-		const proc1 = await createProc(3001, 'app-1');
-		const proc2 = await createProc(3002, 'app-2');
+		const name1 = 'app-1';
+		const name2 = 'app-2';
+		await createProc(3001, name1);
+		await createProc(3002, name2);
+		names.push(name1, name2);
 
 		await Kapok.start(command, ['ls'])
 			.until(/^┌/)
@@ -217,8 +232,6 @@ describe('cli `pot ls`', () => {
 			.assertUntil(/app-1/)
 			.assertUntil(/app-2/)
 			.doneAndKill();
-
-		processes.push(proc1, proc2);
 	});
 });
 
