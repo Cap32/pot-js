@@ -62,7 +62,6 @@ export async function startClient(socketFile) {
 		return await createClient(socketFile);
 	}
 	catch (err) {
-		logger.error('startClient failed', err.message);
 		if (err && ~['ECONNRESET', 'ECONNREFUSED', 'ENOENT'].indexOf(err.code)) {
 			await remove(socketFile);
 		}
