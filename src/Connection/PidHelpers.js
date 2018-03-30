@@ -6,6 +6,7 @@ import globby from 'globby';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import fkill from 'fkill';
+import isWin from '../utils/isWin';
 
 const removePidFile = async function removePidFile(pidFile) {
 	return remove(pidFile).catch(noop);
@@ -50,7 +51,7 @@ export async function killPid(name, pid, pidFile, options = {}) {
 	try {
 		const { shouldLog } = options;
 		await removePidFile(pidFile);
-		await fkill(pid, { force: true });
+		await fkill(pid, { force: isWin });
 		logger.trace(`killed pid ${pid}`);
 		shouldLog && logger.info(`"${name}" stopped`);
 		return true;
