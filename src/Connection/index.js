@@ -1,101 +1,61 @@
 import workspace from '../utils/workspace';
 import { STATE, CLOSE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
-import { differenceWith } from 'lodash';
-import isWin from '../utils/isWin';
-import { getPids, getPidFile, killPid, writePid } from './PidHelpers';
+import { getPidFile, killPid, writePid } from './PidHelpers';
 import {
-	getSocketFiles,
 	startServer,
-	startClient,
 	getSocketPath,
 	removeDomainSocketFile,
 } from './SocketsHelpers';
-
-const getList = async function getList() {
-	const pidsDir = await workspace.getPidsDir();
-	const socketsDir = await workspace.getSocketsDir();
-	const pids = await getPids(pidsDir);
-	const sockets = await getSocketFiles(socketsDir);
-
-	const list = [];
-	await Promise.all(
-		pids.map(async ({ pid, name, pidFile }) => {
-			const socketPath = getSocketPath(socketsDir, name);
-			const socket = await startClient(socketPath);
-			if (socket) {
-				list.push({ name, socket, pid, pidFile, socketPath });
-			}
-			else {
-				removeDomainSocketFile(socketPath);
-			}
-		}),
-	);
-
-	// remove zombie socket files
-	if (!isWin) {
-		differenceWith(
-			sockets,
-			pids,
-			(socket, pid) => socket.name === pid.name,
-		).forEach(removeDomainSocketFile);
-	}
-	return list;
-};
-
-const getByName = async function getByName(name) {
-	const list = await getList();
-	let res;
-	await Promise.all(
-		list.map(async (item) => {
-			if (name === item.name) {
-				res = item;
-			}
-			else {
-				await item.socket.close();
-			}
-		}),
-	);
-	return res;
-};
+import { getList, getByName, ensureWorkspace } from './ConnectionUtils';
 
 export default class Connection {
-	static async getNames(space) {
-		if (space) {
-			workspace.set(space);
-		}
+	static async getNames(options) {
+		ensureWorkspace(options);
 		const list = await getList();
 		return list.map(({ name }) => name);
 	}
 
-	static async getByName(name, space) {
-		if (space) {
-			workspace.set(space);
-		}
+	static async getByName(name, options) {
+		ensureWorkspace(options);
 		const item = await getByName(name);
 		return item && new Connection(item);
 	}
 
-	static async getList(space) {
-		if (space) {
-			workspace.set(space);
+	static async requestStopServer(name, options) {
+		const connection = await Connection.getByName(name, options);
+		if (connection) {
+			return connection.requestStopServer(options);
 		}
+		else {
+			return false;
+		}
+	}
+
+	static async getState(name, options) {
+		const connection = await Connection.getByName(name, options);
+		if (connection) {
+			return connection.getState();
+		}
+		else {
+			return false;
+		}
+	}
+
+	static async getList(options) {
+		ensureWorkspace(options);
 		const list = await getList();
 		return list.map((item) => new Connection(item));
 	}
 
-	static async getPidFile(name, space) {
-		if (space) {
-			workspace.set(space);
-		}
+	static async getPidFile(name, options) {
+		ensureWorkspace(options);
 		const pidsDir = await workspace.getPidsDir();
 		return getPidFile(pidsDir, name);
 	}
 
-	static async getSocketPath(name, space) {
-		if (space) {
-			workspace.set(space);
-		}
+	static async getSocketPath(name, options) {
+		ensureWorkspace(options);
 		const socketsDir = await workspace.getSocketsDir();
 		return getSocketPath(socketsDir, name);
 	}

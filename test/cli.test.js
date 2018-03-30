@@ -57,8 +57,7 @@ describe('cli `pot start`', () => {
 			.assertUntil(/started/)
 			.assertUntil('test server started', {
 				action: async () => {
-					const connection = await Connection.getByName(name);
-					const { pid } = await connection.getState();
+					const { pid } = await Connection.getState(name);
 					await fkill(pid, { force: /^win/.test(process.platform) });
 				},
 			})
@@ -187,8 +186,7 @@ describe('cli `pot ls`', () => {
 	afterEach(async () => {
 		await Promise.all(
 			names.map(async (name) => {
-				const connection = await Connection.getByName(name);
-				await connection.requestStopServer();
+				await Connection.requestStopServer(name);
 			}),
 		);
 	});
