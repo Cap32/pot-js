@@ -7,7 +7,6 @@ import lifecycle from './lifecycle';
 import logSystem from './logSystem';
 import Connection from '../Connection';
 import workspace from '../utils/workspace';
-import { stop } from '../stop';
 
 const potIPC = new StdioIPC(process);
 
@@ -30,24 +29,8 @@ const start = async (options) => {
 		...respawnOptions
 	} = options;
 
-	const startSocketServer = async (monitor, name) => {
+	const startSocketServer = async (monitor) => {
 		try {
-			const names = await Connection.getNames();
-
-			if (names.indexOf(name) > -1) {
-				if (force) {
-					await stop(options);
-				}
-				else {
-					throw new Error(
-						`Name "${name}" has already EXISTED. ` +
-							'Please make sure if your program is NOT running, ' +
-							'or use another name.\n' +
-							`To stop "${name}", please run \`pot stop ${name}\``,
-					);
-				}
-			}
-
 			await Connection.serve(monitor);
 			return true;
 		}
@@ -78,7 +61,7 @@ const start = async (options) => {
 	});
 
 	monitor.once('start', async () => {
-		const success = await startSocketServer(monitor, name);
+		const success = await startSocketServer(monitor);
 		if (success) {
 			potIPC.send('start');
 		}

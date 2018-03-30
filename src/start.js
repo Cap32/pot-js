@@ -1,6 +1,6 @@
 import spawn from 'cross-spawn';
 import { resolve, sep } from 'path';
-import { ensureDir } from 'fs-extra';
+import { ensureDir, remove } from 'fs-extra';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
 import validateSchema from './utils/validateSchema';
@@ -89,7 +89,7 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
-const startMonitorProc = ({ baseDir, daemon, env }) => {
+const startMonitorProc = ({ baseDir, daemon, env, name }) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
@@ -105,7 +105,10 @@ const startMonitorProc = ({ baseDir, daemon, env }) => {
 	});
 
 	proc.originalKill = proc.kill;
-	proc.kill = async () => fkill(proc.pid);
+	proc.kill = async () => {
+		const connection = await Connection.getByName(name);
+		if (connection) await connection.requestStopServer();
+	};
 
 	return proc;
 };
@@ -171,7 +174,7 @@ export default async function start(options = {}) {
 
 	const kill = async () => {
 		if (monitorProc) {
-			await fkill(monitorProc.pid).catch(noop);
+			await fkill(monitorProc.pid, { tree: true }).catch(noop);
 		}
 	};
 

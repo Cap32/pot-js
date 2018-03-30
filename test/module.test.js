@@ -7,6 +7,10 @@ const PORT = 3010;
 
 let proc;
 
+beforeEach(async () => {
+	jest.setTimeout(10000);
+});
+
 afterEach(async () => {
 	if (proc && typeof proc.kill === 'function') {
 		await proc.kill();

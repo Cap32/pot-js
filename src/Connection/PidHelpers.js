@@ -1,5 +1,5 @@
 import processExists from 'process-exists';
-import { writeFile, readFile, open, remove } from 'fs-extra';
+import { writeFile, readFile, exists, remove } from 'fs-extra';
 import { basename, join } from 'path';
 import { trim, noop } from 'lodash';
 import globby from 'globby';
@@ -7,21 +7,12 @@ import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import fkill from 'fkill';
 
-const checkIsPidFileExists = async (pidFile) => {
-	try {
-		return !!await open(pidFile, 'r');
-	}
-	catch (err) {
-		return false;
-	}
-};
-
 const removePidFile = async function removePidFile(pidFile) {
-	remove(pidFile).catch(noop);
+	return remove(pidFile).catch(noop);
 };
 
 const getPid = async function getPid(pidFile) {
-	const isFileExists = await checkIsPidFileExists(pidFile);
+	const isFileExists = await exists(pidFile);
 	if (isFileExists) {
 		const pid = +trim(await readFile(pidFile, 'utf-8'));
 		const isProcessExists = await processExists(pid);
@@ -58,8 +49,8 @@ export async function getPids(cwd) {
 export async function killPid(name, pid, pidFile, options = {}) {
 	try {
 		const { shouldLog } = options;
-		removePidFile(pidFile);
-		await fkill(pid);
+		await removePidFile(pidFile);
+		await fkill(pid, { force: true });
 		logger.trace(`killed pid ${pid}`);
 		shouldLog && logger.info(`"${name}" stopped`);
 		return true;
@@ -73,5 +64,5 @@ export async function killPid(name, pid, pidFile, options = {}) {
 
 export async function writePid({ pidFile, monitorPid }) {
 	logger.trace('pid file saved in', chalk.gray(pidFile));
-	await writeFile(pidFile, monitorPid);
+	await writeFile(pidFile, monitorPid).catch((err) => logger.debug(err));
 }

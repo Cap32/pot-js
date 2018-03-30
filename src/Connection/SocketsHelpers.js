@@ -1,6 +1,7 @@
 import { remove } from 'fs-extra';
 import { basename, join } from 'path';
 import { createServer, createClient } from './ipc';
+import { ensureLocalDomainPath } from 'create-local-domain-socket';
 import { STATE, CLOSE } from './constants';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
@@ -26,7 +27,7 @@ export async function removeDomainSocketFile(socketPath) {
 }
 
 export function getSocketPath(socketPath, name) {
-	return join(socketPath, name);
+	return ensureLocalDomainPath(join(socketPath, name));
 }
 
 export async function startServer(monitor) {
@@ -61,6 +62,7 @@ export async function startClient(socketFile) {
 		return await createClient(socketFile);
 	}
 	catch (err) {
+		logger.error('startClient failed', err.message);
 		if (err && ~['ECONNRESET', 'ECONNREFUSED', 'ENOENT'].indexOf(err.code)) {
 			await remove(socketFile);
 		}
