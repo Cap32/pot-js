@@ -63,7 +63,7 @@ export async function killPid(name, pid, pidFile, options = {}) {
 	}
 }
 
-export async function writePid({ pidFile, monitorPid }) {
+export async function writePid({ pidFile, parentPid }) {
 	logger.trace('pid file saved in', chalk.gray(pidFile));
-	await writeFile(pidFile, monitorPid).catch((err) => logger.debug(err));
+	await writeFile(pidFile, parentPid).catch((err) => logger.debug(err));
 }

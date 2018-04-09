@@ -162,7 +162,7 @@ const connectMonitor = async (monitorProc, options, connection) => {
 			})
 			.send('start', {
 				...options,
-				monitorPid: pid,
+				parentPid: pid,
 				pidFile,
 				socketPath,
 				command,

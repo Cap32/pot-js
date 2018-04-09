@@ -53,10 +53,7 @@ const start = async (options) => {
 	const monitor = respawn(command, {
 		stdio: [inject ? 'ipc' : 'ignore', std, std],
 		...respawnOptions,
-		data: {
-			...options,
-			parentPid: process.pid,
-		},
+		data: options,
 		env: configToEnv ? { ...env, [configToEnv]: JSON.stringify(options) } : env,
 	});
 
