@@ -13,7 +13,10 @@ export default class Connection {
 	static async getNames(options) {
 		ensureWorkspace(options);
 		const list = await getList();
-		return list.map(({ name }) => name);
+		return list.map(async ({ name, socket }) => {
+			await socket.close();
+			return name;
+		});
 	}
 
 	static async getByName(name, options) {
@@ -90,8 +93,8 @@ export default class Connection {
 	}
 
 	async getInfoVerbose() {
-		const monitor = await this.getState();
-		return getInfoVerbose(monitor);
+		const state = await this.getState();
+		return getInfoVerbose(state);
 	}
 
 	async disconnect() {

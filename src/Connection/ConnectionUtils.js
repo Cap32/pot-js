@@ -8,6 +8,7 @@ import {
 	getSocketPath,
 	removeDomainSocketFile,
 } from './SocketsHelpers';
+import { STATE } from './constants';
 
 export function ensureWorkspace(options = {}) {
 	const { space } = options;
@@ -38,11 +39,25 @@ export async function getList() {
 
 	// remove zombie socket files
 	if (!isWin) {
-		differenceWith(
-			sockets,
-			pids,
-			(socket, pid) => socket.name === pid.name,
-		).forEach(removeDomainSocketFile);
+		await Promise.all(
+			differenceWith(
+				sockets,
+				pids,
+				(socket, pid) => socket.name === pid.name,
+			).map(async (socketRef) => {
+				const socket = await startClient(socketRef.socketPath);
+				if (socket) {
+					const state = await socket.request(STATE);
+					const { pidFile, parentPid: pid } = state.data;
+					list.push({
+						pidFile,
+						pid,
+						...socketRef,
+						socket,
+					});
+				}
+			}),
+		);
 	}
 	return list;
 }

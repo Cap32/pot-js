@@ -1,15 +1,12 @@
 import { name as appspace } from '../../package.json';
 import nodeIpc from 'node-ipc';
 import { basename } from 'path';
+import { DEPRECATED_BRIDGE, DEPRECATED_GET_INFO, CLOSE } from './constants';
 
-// import delay from 'delay';
-
-export function createClient(socketPath) {
+export async function createClient(socketPath) {
 	return new Promise((resolve, reject) => {
 		Object.assign(nodeIpc.config, {
 			appspace,
-
-			// id: 'monitor',
 			silent: true,
 			stopRetrying: true,
 		});
@@ -18,14 +15,30 @@ export function createClient(socketPath) {
 		nodeIpc.connectTo(serverId, socketPath, () => {
 			const socket = nodeIpc.of[serverId];
 			socket.on('connect', () => {
-				setTimeout(() => {
-					resolve(socket);
-				}, 500);
+				socket.request = function request(eventType) {
+					if (eventType === CLOSE) {
+						return Promise.resolve({});
+					}
+					return new Promise((resolve) => {
+						const handler = (data) => {
+							socket.off(DEPRECATED_BRIDGE, handler);
+							socket.off(DEPRECATED_GET_INFO, handler);
+							resolve(data);
+						};
+						socket.on(DEPRECATED_BRIDGE, handler);
+						socket.on(DEPRECATED_GET_INFO, handler);
+						socket.emit(DEPRECATED_BRIDGE);
+						socket.emit(DEPRECATED_GET_INFO);
+					});
+				};
+				socket.close = function close() {
+					return Promise.resolve(nodeIpc.disconnect(socket.id));
+				};
+
+				resolve(socket);
 			});
 
-			socket.on('error', async (err) => {
-				reject(err);
-			});
+			socket.on('error', reject);
 		});
 	});
 }

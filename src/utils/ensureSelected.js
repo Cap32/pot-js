@@ -1,12 +1,11 @@
-
 import inquirer from 'inquirer';
 
 export default async function ensureSelected(options) {
-	const {
-		value, message, errorMessage, getChoices,
-	} = options;
+	const { value, message, errorMessage, getChoices } = options;
 
-	if (value) { return value; }
+	if (value) {
+		return value;
+	}
 
 	const choices = await getChoices();
 

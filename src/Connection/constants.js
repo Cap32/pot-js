@@ -2,7 +2,7 @@ export const STATE = 'STATE';
 export const CLOSE = 'CLOSE';
 
 // TODO: deprecated
-export const EVENT_TYPE = 'bridge';
+export const DEPRECATED_BRIDGE = 'bridge';
 
 // TODO: deprecated
-export const DEPRECATED_EVENT_TYPE = 'getInfo';
+export const DEPRECATED_GET_INFO = 'getInfo';

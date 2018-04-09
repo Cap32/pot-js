@@ -10,11 +10,11 @@ import { noop, isObject } from 'lodash';
 import isWin from '../utils/isWin';
 
 export async function getSocketFiles(cwd) {
-	const socketFiles = await globby(['*'], {
+	const socketPaths = await globby(['*'], {
 		absolute: true,
 		cwd,
 	});
-	return socketFiles.map((socketPath) => ({
+	return socketPaths.map((socketPath) => ({
 		socketPath,
 		name: basename(socketPath),
 	}));
@@ -61,16 +61,20 @@ export async function startServer(monitor) {
 	return socketServer;
 }
 
-export async function startClient(socketFile) {
+export async function startClient(socketPath, options = {}) {
+	const { silence } = options;
+
 	try {
-		return await createClient(socketFile);
+		const clientSocket = await createClient(socketPath);
+		silence || logger.trace('start client socket', socketPath);
+		return clientSocket;
 	}
 	catch (err) {
 		if (err && ~['ECONNRESET', 'ECONNREFUSED', 'ENOENT'].indexOf(err.code)) {
-			await removeDomainSocketFile(socketFile);
+			await removeDomainSocketFile(socketPath);
 		}
 		else {
-			logger.error('socket error', err);
+			silence || logger.error('socket error', err);
 		}
 	}
 }
