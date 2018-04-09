@@ -22,15 +22,19 @@ export async function createServer(socketPath) {
 }
 
 export async function createClient(socketPath) {
+	const timeoutPromise = delay(20000);
 	const timeout = async () => {
-		await delay(10000);
+		await timeoutPromise;
 		throw new Error('TIMEOUT');
 	};
 
 	const res = await Promise.race([
+
+		// deprecatedIpcAdapter.createClient(socketPath),
+
 		Client.create(`ws+unix://${socketPath}`),
-		deprecatedIpcAdapter.createClient(socketPath),
 		timeout(),
 	]);
+	timeoutPromise.cancel();
 	return res;
 }
