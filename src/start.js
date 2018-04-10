@@ -135,8 +135,8 @@ const connectMonitor = async (monitorProc, options, connection) => {
 	const ipc = new StdioIPC(monitorProc);
 	const command = getCommand(options);
 	const { name, daemon } = options;
-	const { pid } = monitorProc;
-	logger.debug('monitor pid', chalk.magenta(pid));
+	const ppid = monitorProc.pid;
+	logger.debug('monitor pid', chalk.magenta(ppid));
 	const pidFile = await Connection.getPidFile(name);
 	const socketPath = await Connection.getSocketPath(name);
 
@@ -162,7 +162,8 @@ const connectMonitor = async (monitorProc, options, connection) => {
 			})
 			.send('start', {
 				...options,
-				parentPid: pid,
+				parentPid: ppid,
+				ppid,
 				pidFile,
 				socketPath,
 				command,
