@@ -1,4 +1,3 @@
-import workspace from '../utils/workspace';
 import { STATE, CLOSE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
 import { getPidFile, killPid, writePid } from './PidHelpers';
@@ -53,14 +52,12 @@ export default class Connection {
 
 	static async getPidFile(name, options) {
 		ensureWorkspace(options);
-		const pidsDir = await workspace.getPidsDir();
-		return getPidFile(pidsDir, name);
+		return getPidFile(name);
 	}
 
 	static async getSocketPath(name, options) {
 		ensureWorkspace(options);
-		const socketsDir = await workspace.getSocketsDir();
-		return getSocketPath(socketsDir, name);
+		return getSocketPath(name);
 	}
 
 	static async serve(monitor) {

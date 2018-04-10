@@ -18,15 +18,13 @@ export function ensureWorkspace(options = {}) {
 }
 
 export async function getList() {
-	const pidsDir = await workspace.getPidsDir();
-	const socketsDir = await workspace.getSocketsDir();
-	const pids = await getPids(pidsDir);
-	const sockets = await getSocketFiles(socketsDir);
+	const pids = await getPids();
+	const sockets = await getSocketFiles();
 
 	const list = [];
 	await Promise.all(
 		pids.map(async ({ pid, name, pidFile }) => {
-			const socketPath = getSocketPath(socketsDir, name);
+			const socketPath = await getSocketPath(name);
 			const socket = await startClient(socketPath);
 			if (socket) {
 				list.push({ name, socket, pid, pidFile, socketPath });

@@ -3,6 +3,8 @@ import createLocalDomainSocket from 'create-local-domain-socket';
 import http from 'http';
 import * as deprecatedIpcAdapter from './deprecatedIpcAdapter';
 import delay from 'delay';
+import { basename, dirname } from 'path';
+import deprecated from '../utils/deprecated';
 
 export async function createServer(socketPath) {
 	const server = http.createServer((req, res) => {
@@ -28,13 +30,16 @@ export async function createClient(socketPath) {
 		throw new Error('TIMEOUT');
 	};
 
-	const res = await Promise.race([
+	const socketBase = basename(dirname(socketPath));
+	const createClientPromise = (function () {
+		if (socketBase === 'sockets') {
+			deprecated('"$name" has been deprecated', basename(socketPath));
+			return deprecatedIpcAdapter.createClient(socketPath);
+		}
+		return Client.create(`ws+unix://${socketPath}`);
+	})();
 
-		// deprecatedIpcAdapter.createClient(socketPath),
-
-		Client.create(`ws+unix://${socketPath}`),
-		timeout(),
-	]);
+	const res = await Promise.race([createClientPromise, timeout()]);
 	timeoutPromise.cancel();
 	return res;
 }

@@ -1,5 +1,6 @@
 import processExists from 'process-exists';
 import { writeFile, readFile, exists, remove } from 'fs-extra';
+import workspace from '../utils/workspace';
 import { basename, join } from 'path';
 import { trim, noop } from 'lodash';
 import globby from 'globby';
@@ -34,15 +35,19 @@ const parsePidFile = async function parsePidFile(pidFile) {
 	return { pid, name, pidFile };
 };
 
-export function getPidFile(pidsDir, name) {
-	return join(pidsDir, `${name}.pid`);
+export async function getPidFile(name) {
+	const runDir = await workspace.getRunDir();
+	return join(runDir, `${name}.pid`);
 }
 
-export async function getPids(cwd) {
-	const pidFiles = await globby(['*'], {
-		absolute: true,
-		cwd,
-	});
+export async function getPids() {
+	const runDir = await workspace.getRunDir();
+
+	// DEPRECATED: workspace.DEPRECATED_getPidsDir()
+	const deprecatedPidsDir = await workspace.DEPRECATED_getPidsDir();
+
+	const patterns = [`${runDir}/*.pid`, `${deprecatedPidsDir}/*.pid`];
+	const pidFiles = await globby(patterns, { absolute: true });
 	const pids = await Promise.all(pidFiles.map(parsePidFile));
 	return pids.filter(Boolean);
 }

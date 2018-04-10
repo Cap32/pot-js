@@ -1,5 +1,6 @@
 import { remove } from 'fs-extra';
 import { basename, join } from 'path';
+import workspace from '../utils/workspace';
 import { createServer, createClient } from './ipc';
 import { ensureLocalDomainPath } from 'create-local-domain-socket';
 import { STATE, CLOSE } from './constants';
@@ -9,11 +10,14 @@ import globby from 'globby';
 import { noop, isObject } from 'lodash';
 import isWin from '../utils/isWin';
 
-export async function getSocketFiles(cwd) {
-	const socketPaths = await globby(['*'], {
-		absolute: true,
-		cwd,
-	});
+export async function getSocketFiles() {
+	const runDir = await workspace.getRunDir();
+
+	// DEPRECATED: workspace.DEPRECATED_getSocketsDir()
+	const deprecatedSocketsDir = await workspace.DEPRECATED_getSocketsDir();
+
+	const patterns = [`${runDir}/**/!(*.*)`, `${deprecatedSocketsDir}/**/!(*.*)`];
+	const socketPaths = await globby(patterns, { absolute: true });
 	return socketPaths.map((socketPath) => ({
 		socketPath,
 		name: basename(socketPath),
@@ -30,8 +34,9 @@ export async function removeDomainSocketFile(socketPath) {
 	return remove(socketPath).catch(noop);
 }
 
-export function getSocketPath(socketPath, name) {
-	return ensureLocalDomainPath(join(socketPath, name));
+export async function getSocketPath(name) {
+	const runDir = await workspace.getRunDir();
+	return ensureLocalDomainPath(join(runDir, name));
 }
 
 export async function startServer(monitor) {
