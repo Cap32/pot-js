@@ -4,7 +4,7 @@ import { serialize } from '../utils/serialize';
 import watch from '../utils/watch';
 import Connection from '../Connection';
 import { once } from 'lodash';
-import { signals } from 'signal-exit';
+import onSignalExit from '../utils/onSignalExit';
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
@@ -85,11 +85,9 @@ export default function lifecycle(monitor, options) {
 		monitor.stop(process.exit);
 	};
 
-	signals().forEach((signal) => {
-		process.on(signal, async () => {
-			setLoggers('logLevel', 'OFF');
-			await exit();
-		});
+	onSignalExit(async () => {
+		setLoggers('logLevel', 'OFF');
+		await exit();
 	});
 
 	process.title = monitorProcessTitle;
