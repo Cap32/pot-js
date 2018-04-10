@@ -1,6 +1,7 @@
 import { STATE, CLOSE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
 import { getPidFile, killPid, writePid } from './PidHelpers';
+import { logger } from 'pot-logger';
 import {
 	startServer,
 	getSocketPath,
@@ -21,7 +22,7 @@ export default class Connection {
 	static async getByName(name, options) {
 		ensureWorkspace(options);
 		const item = await getByName(name);
-		return item && new Connection(item);
+		return item && new Connection(item, options);
 	}
 
 	static async requestStopServer(name, options) {
@@ -47,7 +48,7 @@ export default class Connection {
 	static async getList(options) {
 		ensureWorkspace(options);
 		const list = await getList();
-		return list.map((item) => new Connection(item));
+		return list.map((item) => new Connection(item, options));
 	}
 
 	static async getPidFile(name, options) {
@@ -65,7 +66,8 @@ export default class Connection {
 		await writePid(monitor.data);
 	}
 
-	constructor({ name, pid, pidFile, socketPath, socket }) {
+	constructor({ name, pid, pidFile, socketPath, socket }, options = {}) {
+		this._keepAlive = options.keepAlive;
 		this._name = name;
 		this._pid = pid;
 		this._pidFile = pidFile;
@@ -73,16 +75,31 @@ export default class Connection {
 		this._socket = socket;
 	}
 
+	async _export(promise, options = {}) {
+		try {
+			const res = await promise;
+			if (!this._keepAlive) {
+				this.disconnect();
+			}
+			return res;
+		}
+		catch (err) {
+			if (options.onError) {
+				return options.onError(err);
+			}
+			if (!options.silence) {
+				logger.debug(err);
+			}
+			await this.disconnect();
+		}
+	}
+
 	async setState(state) {
-		const res = await this._socket.request(STATE, state);
-		await this.disconnect();
-		return res;
+		return this._export(this._socket.request(STATE, state));
 	}
 
 	async getState() {
-		const res = await this._socket.request(STATE);
-		await this.disconnect();
-		return res;
+		return this._export(this._socket.request(STATE));
 	}
 
 	async getInfo() {
@@ -95,7 +112,12 @@ export default class Connection {
 	}
 
 	async disconnect() {
-		return this._socket.close();
+		try {
+			await this._socket.close();
+		}
+		catch (err) {
+			logger.debug(err);
+		}
 	}
 
 	async requestStopServer(options) {

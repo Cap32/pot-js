@@ -1,4 +1,4 @@
-import { logger } from 'pot-logger';
+import { logger, setLoggers } from 'pot-logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
 import { isUndefined, padEnd } from 'lodash';
@@ -32,7 +32,14 @@ const list = async (options = {}) => {
 			state.startedLocal,
 			state.data.parentPid,
 		],
+		logLevel,
 	} = options;
+
+	if (logLevel) {
+		setLoggers('logLevel', logLevel);
+	}
+
+	const connections = await Connection.getList({ keepAlive: true });
 
 	const loop = async () => {
 		const table = new Table({
@@ -42,17 +49,18 @@ const list = async (options = {}) => {
 			},
 		});
 
-		const connections = await Connection.getList();
-
-		if (!connections.length) {
-			return logger.warn('No process');
-		}
-
-		const stateList = await Promise.all(
+		let stateList = await Promise.all(
 			connections.map((connection) => connection.getInfoVerbose()),
 		);
 
-		stateList.filter(Boolean).forEach((state) => {
+		stateList = stateList.filter(Boolean);
+
+		if (!stateList.length) {
+			logUpdate.clear();
+			return logger.warn('No process');
+		}
+
+		stateList.forEach((state) => {
 			table.push(setTable(state).map((val) => (isUndefined(val) ? '-' : val)));
 		});
 
