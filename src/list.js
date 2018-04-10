@@ -10,14 +10,14 @@ const list = async (options = {}) => {
 
 	const {
 		head = ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid'],
-		setTable = (info) => [
-			info.data.name,
-			info.styledStatus,
-			info.crashes,
-			info.memoryUsage.formattedString,
-			info.cpuUsage.percent,
-			info.startedLocal,
-			info.data.parentPid,
+		setTable = (state) => [
+			state.data.name,
+			state.styledStatus,
+			state.crashes,
+			state.data.memoryUsage.formattedString,
+			state.data.cpuUsage.percent,
+			state.startedLocal,
+			state.data.parentPid,
 		],
 	} = options;
 
@@ -35,12 +35,12 @@ const list = async (options = {}) => {
 			return logger.warn('No process');
 		}
 
-		const infoList = await Promise.all(
+		const stateList = await Promise.all(
 			connections.map((connection) => connection.getInfoVerbose()),
 		);
 
-		infoList.filter(Boolean).forEach((info) => {
-			table.push(setTable(info).map((val) => (isUndefined(val) ? '-' : val)));
+		stateList.filter(Boolean).forEach((state) => {
+			table.push(setTable(state).map((val) => (isUndefined(val) ? '-' : val)));
 		});
 
 		logUpdate(table.toString());

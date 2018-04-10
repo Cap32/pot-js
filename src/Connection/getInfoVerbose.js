@@ -1,4 +1,3 @@
-
 import pidUsage from 'pidusage';
 import { logger } from 'pot-logger';
 import formatBytes from '../utils/formatBytes';
@@ -7,54 +6,43 @@ import { totalmem } from 'os';
 
 const { assign } = Object;
 
-const parseMemoryUsage = (info) => {
-	const {
-		memoryUsage: {
-			heapUsed, heapTotal, rss, total: totalMemory,
-		},
-		memoryUsage,
-	} = info;
-
-	// DEPRECATED: `heapTotal` is wrong value
-	const total = totalMemory || heapTotal;
-	const used = rss || heapUsed;
+const parseMemoryUsage = (state) => {
+	const { memoryUsage } = state.data;
+	const { used, total } = memoryUsage;
 
 	if (isNaN(used) || isNaN(total)) {
 		assign(memoryUsage, {
 			percent: '-',
-			formattedHeapUsed: '-', // DEPRECATED
+			formattedTotal: '-',
 			formattedUsed: '-',
+			formattedString: '-',
 		});
 	}
 	else {
 		const formattedUsed = formatBytes(used);
+		const formattedTotal = formatBytes(total);
+		const percent = `${(used / total * 100).toFixed(2)}%`;
 		assign(memoryUsage, {
-			percent: `${(used / total * 100).toFixed(2)}%`,
-			formattedHeapUsed: formattedUsed, // DEPRECATED
+			percent,
+			formattedTotal,
 			formattedUsed,
+			formattedString: `${formattedUsed} (${percent})`,
 		});
 	}
-
-	memoryUsage.formattedString =
-		`${memoryUsage.formattedHeapUsed} (${memoryUsage.percent})`;
-	return info;
+	return state;
 };
 
-const parseCpuUsage = (info) => {
-	const { cpuUsage, data } = info;
-	const total = (function () {
-		try { return data.cpuUsage.total; }
-		catch (err) { return NaN; }
-	}());
-	const val = cpuUsage.user / total;
-	cpuUsage.percent = isNaN(val) ? '-' : `${(val / 100).toFixed(2)}%`;
+const parseCpuUsage = (state) => {
+	const { cpuUsage } = state.data;
+	const { value } = cpuUsage;
+	cpuUsage.percent = isNaN(value) ? '-' : `${value}%`;
 	cpuUsage.formattedString = cpuUsage.percent;
-	return info;
+	return state;
 };
 
-const styleStatus = (info) => {
-	const { status } = info;
-	info.styledStatus = (function () {
+const styleStatus = (state) => {
+	const { status } = state;
+	state.styledStatus = (function () {
 		switch (status) {
 			case 'running':
 				return chalk.green(status);
@@ -66,68 +54,57 @@ const styleStatus = (info) => {
 			default:
 				return status;
 		}
-	}());
-	return info;
+	})();
+	return state;
 };
 
-const startedLocal = (info) => {
-	info.startedLocal = new Date(info.started).toLocaleString();
-	return info;
+const startedLocal = (state) => {
+	state.startedLocal = new Date(state.started).toLocaleString();
+	return state;
 };
 
-export default function handleInfoVerbose(state) {
-	return new Promise((resolve) => {
-		const callback = (rest = {}) => {
-			const info = {
+export default async function handleInfoVerbose(state) {
+	const exportState = function exportState(usages = {}) {
+		Object.assign(
+			state.data,
+			{
 				memoryUsage: {
-					heapUsed: NaN,
-					heapTotal: NaN,
-					rss: NaN,
+					used: NaN,
 					total: NaN,
 				},
 				cpuUsage: {
-					user: NaN,
-					system: NaN,
+					value: NaN,
 				},
-				...state,
-				...rest,
-			};
+			},
+			usages,
+		);
+		parseMemoryUsage(state);
+		parseCpuUsage(state);
+		styleStatus(state);
+		startedLocal(state);
+		return state;
+	};
 
-			parseMemoryUsage(info);
-			parseCpuUsage(info);
-			styleStatus(info);
-			startedLocal(info);
+	const { pid } = state;
+	if (!pid) {
+		return exportState();
+	}
 
-			resolve(info);
-		};
-
-		const { pid } = state;
-		if (pid) {
-			pidUsage.stat(pid, (err, pidState = {}) => {
-				let resp = null;
-				if (err) {
-					logger.error(err.message);
-					logger.debug(err);
-				}
-				else {
-					const { memory, cpu } = pidState;
-					const total = totalmem();
-					resp = {
-						memoryUsage: {
-							heapUsed: memory, // DEPRECATED: it's wrong value here
-							heapTotal: total, // DEPRECATED: it's wrong value here
-							rss: memory,
-							total,
-						},
-						cpuUsage: { user: cpu },
-					};
-				}
-				callback(resp);
-			});
-			pidUsage.unmonitor(pid);
-		}
-		else {
-			callback();
-		}
-	});
-};
+	try {
+		const pidState = await pidUsage(pid);
+		const { memory, cpu } = pidState;
+		const total = totalmem();
+		return exportState({
+			memoryUsage: {
+				used: memory,
+				total,
+			},
+			cpuUsage: { value: cpu },
+		});
+	}
+	catch (err) {
+		logger.error(err.message);
+		logger.debug(err);
+		return exportState();
+	}
+}
