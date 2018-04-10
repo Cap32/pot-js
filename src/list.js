@@ -1,15 +1,28 @@
 import { logger } from 'pot-logger';
 import workspace from './utils/workspace';
 import Table from 'cli-table';
-import { isUndefined } from 'lodash';
+import { isUndefined, padEnd } from 'lodash';
 import Connection from './Connection';
 import logUpdate from 'log-update';
+
+const formatHead = function formatHead(head) {
+	switch (head) {
+		case 'Memory':
+			return padEnd(head, 18, ' ');
+		case 'CPU':
+			return padEnd(head, 6, ' ');
+		default:
+			return head;
+	}
+};
+
+const heads = ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid'];
 
 const list = async (options = {}) => {
 	workspace.set(options);
 
 	const {
-		head = ['Name', 'Status', 'Crashes', 'Memory', 'CPU', 'Started', 'Pid'],
+		head = heads.map(formatHead),
 		setTable = (state) => [
 			state.data.name,
 			state.styledStatus,
