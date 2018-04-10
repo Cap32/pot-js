@@ -11,6 +11,9 @@ import chalk from 'chalk';
 import Connection from './Connection';
 import onExit from 'signal-exit';
 import fkill from 'fkill';
+import { version } from '../package.json';
+
+const potjs = { version };
 
 const ensureName = (options) => {
 	if (options.name) {
@@ -167,6 +170,7 @@ const connectMonitor = async (monitorProc, options, connection) => {
 				pidFile,
 				socketPath,
 				command,
+				potjs,
 			});
 	});
 };
