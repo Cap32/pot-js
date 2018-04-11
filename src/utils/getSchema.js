@@ -1,4 +1,3 @@
-
 export default function getSchema(production = true) {
 	return {
 		$schema: 'http://json-schema.org/draft-06/schema#',
@@ -25,6 +24,12 @@ export default function getSchema(production = true) {
 			env: {
 				type: 'object',
 				default: {},
+			},
+			events: {
+				type: 'object',
+				additionalProperties: {
+					type: 'string',
+				},
 			},
 			execArgs: {
 				anyOf: [
@@ -143,4 +148,4 @@ export default function getSchema(production = true) {
 			},
 		},
 	};
-};
+}

@@ -1,5 +1,4 @@
-import importFile from 'import-file';
-import { logger, setLoggers } from 'pot-logger';
+import { ensureLogger, logger, setLoggers } from 'pot-logger';
 import respawn from './utils/respawn';
 import StdioIPC from './utils/StdioIPC';
 import Connection from './Connection';
@@ -7,7 +6,9 @@ import workspace from './utils/workspace';
 import { serialize } from './utils/serialize';
 import watch from './utils/watch';
 import onSignalExit from './utils/onSignalExit';
+import createScriptRunner from './utils/createScriptRunner';
 import { once } from 'lodash';
+import chalk from 'chalk';
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
@@ -66,23 +67,19 @@ const start = async function start(options) {
 		env: configToEnv ? { ...env, [configToEnv]: JSON.stringify(options) } : env,
 	});
 
-	const runScript = (modulePath, ...args) => {
-		if (!modulePath) {
-			return;
-		}
-
-		try {
-			const run = importFile(modulePath, { cwd });
-			run(...args);
-		}
-		catch (err) {
-			logger.error(err.message);
-			logger.debug(err);
+	const eventsLogger = ensureLogger('events', 'gray');
+	const runScript = createScriptRunner({ cwd, logger: eventsLogger });
+	const runEvent = (event, ...args) => {
+		const command = events[event];
+		if (command) {
+			const prefix = [event]
+				.concat(args)
+				.filter(Boolean)
+				.join(' ');
+			eventsLogger.info(chalk.gray(`${prefix} - ${command}`));
+			runScript(event, ...args);
 		}
 	};
-
-	const logStart = () => logger.info(`"${name}" started`);
-	const logStartOnce = once(logStart);
 
 	const exit = async () => {
 		logger.debug('exit');
@@ -95,13 +92,13 @@ const start = async function start(options) {
 	};
 
 	process.on('uncaughtException', async (err) => {
-		runScript(events.uncaughtException, err);
-		logger.debug('uncaughtException');
+		runEvent('uncaughtException', err);
 		logger.error(err);
 		await exit();
 	});
 
 	monitor.once('start', async () => {
+		logger.info(`"${name}" started`);
 		const success = await startSocketServer(monitor);
 		if (success) {
 			potIPC.send('start');
@@ -109,27 +106,26 @@ const start = async function start(options) {
 	});
 
 	monitor.on('start', () => {
-		(isProd ? logStart : logStartOnce)();
-		runScript(events.start);
+		runEvent('start');
 	});
 
 	monitor.on('stop', () => {
 		isProd && logger.warn(`"${name}" stopped`);
-		runScript(events.stop);
+		runEvent('stop');
 	});
 
 	monitor.on('crash', () => {
 		logger.fatal(`"${name}" crashed`);
-		runScript(events.crash);
+		runEvent('crash');
 	});
 
 	monitor.on('sleep', () => {
 		logger.warn(`"${name}" sleeped`);
-		runScript(events.sleep);
+		runEvent('sleep');
 	});
 
 	monitor.on('spawn', (child) => {
-		runScript(events.spawn, child);
+		runEvent('spawn');
 
 		if (inject) {
 			logger.trace('child.connected', child.connected);
@@ -142,18 +138,21 @@ const start = async function start(options) {
 
 	monitor.on('exit', async (code, signal) => {
 		logger.debug(`"${name}" exit with code "${code}", signal "${signal}"`);
-		runScript(events.exit, code, signal);
+		runEvent('exit', code, signal);
 	});
 
 	monitor.on('stdout', (data) => {
+		runEvent('stdout');
 		logger.info(data.toString());
 	});
 
 	monitor.on('stderr', (data) => {
+		runEvent('stderr');
 		logger.error(data.toString());
 	});
 
 	monitor.on('warn', (data) => {
+		runEvent('warn');
 		logger.warn(data.toString());
 	});
 
@@ -167,7 +166,7 @@ const start = async function start(options) {
 		logger.trace('watch:restart', stat);
 
 		process.emit('watch:restart', { file, stat });
-		runScript(events.restart);
+		runEvent('restart');
 
 		await monitor.stop();
 		monitor.start();
