@@ -1,3 +1,6 @@
+import { EventTypes } from './respawn';
+import { reduce } from 'lodash';
+
 export default function getSchema(production = true) {
 	return {
 		$schema: 'http://json-schema.org/draft-06/schema#',
@@ -27,9 +30,14 @@ export default function getSchema(production = true) {
 			},
 			events: {
 				type: 'object',
-				additionalProperties: {
-					type: 'string',
-				},
+				properties: reduce(
+					EventTypes,
+					(acc, key) => {
+						acc[key] = { type: 'string' };
+						return acc;
+					},
+					{},
+				),
 			},
 			execArgs: {
 				anyOf: [

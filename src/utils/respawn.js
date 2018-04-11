@@ -22,10 +22,10 @@ const kill = async function kill(pid) {
 
 const EventTypes = {
 	SPAWN: 'spawn',
-	EXIT: 'exit',
-	SLEEP: 'sleep',
 	START: 'start',
+	SLEEP: 'sleep',
 	CRASH: 'crash',
+	EXIT: 'exit',
 	STOP: 'stop',
 	STDOUT: 'stdout',
 	STDERR: 'stderr',

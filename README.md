@@ -6,23 +6,27 @@ Script runner
 
 ## Table of Contents
 
-<!-- MarkdownTOC -->
+<!-- TOC -->
 
-* [Features](#features)
-* [Installing](#installing)
-* [CLI Reference](#cli-reference)
-* [Node.js module API Reference](#nodejs-module-api-reference)
-  * [start\(\[options\]\)](#startoptions)
-  * [stop\(\[options\]\)](#stopoptions)
-  * [stopall\(\[options\]\)](#stopalloptions)
-  * [list\(\[options\]\)](#listoptions)
-  * [log\(\[options\]\)](#logoptions)
-  * [dir\(\[options\]\)](#diroptions)
-* [License](#license)
+* [pot-js](#pot-js)
+  * [Table of Contents](#table-of-contents)
+  * [Features](#features)
+  * [Installing](#installing)
+  * [CLI Reference](#cli-reference)
+  * [Node.js module API Reference](#nodejs-module-api-reference)
+    * [start([options])](#startoptions)
+      * [Options](#options)
+    * [stop([options])](#stopoptions)
+      * [Options](#options-1)
+    * [stopall([options])](#stopalloptions)
+      * [Options](#options-2)
+    * [list([options])](#listoptions)
+      * [Options](#options-3)
+    * [log([options])](#logoptions)
+    * [dir([options])](#diroptions)
+  * [License](#license)
 
-<!-- /MarkdownTOC -->
-
-<a name="features"></a>
+<!-- /TOC -->
 
 ## Features
 
@@ -31,8 +35,6 @@ Script runner
 * Easy to run as a daemon on unix based systems
 * Provides both CLI and Node.js module API
 * Built-in powerful logger system
-
-<a name="installing"></a>
 
 ## Installing
 
@@ -45,8 +47,6 @@ For global CLI command, please add `-g` option
 ```bash
 $ npm install -g pot-js
 ```
-
-<a name="cli-reference"></a>
 
 ## CLI Reference
 
@@ -66,11 +66,7 @@ Options:
   -h, --help  Show help                            [boolean]
 ```
 
-<a name="nodejs-module-api-reference"></a>
-
 ## Node.js module API Reference
-
-<a name="startoptions"></a>
 
 #### start([options])
 
@@ -82,6 +78,16 @@ Spawn a process
 * `name` (String): Process monitor name. Defaults to the basename of `baseDir`.
 * `workspace` (String): Workspace.
 * `entry` (String): Defining the source script. Defaults to `./index.js`.
+* `events` (Object): Defining scripts by event hooks. Like `scripts` in `package.json`. Here are available event hooks:
+  * `spawn`: New child process has been spawned
+  * `start`: The monitor has started
+  * `stop`: The monitor has fully stopped and the process is killed
+  * `crash`: The monitor has crashed (too many restarts or spawn error)
+  * `sleep`: monitor is sleeping
+  * `exit`: Child process has exited
+  * `stdout`: Child process stdout has emitted data
+  * `stderr`: Child process stderr has emitted data
+  * `warn`: Child process has emitted an error
 * `execArgs` (String|[String]): Executing arguments. Defaults to `[]`.
 * `execCommand` (String): Executing command. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
 * `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Defaults to `false`.
@@ -110,8 +116,6 @@ Spawn a process
 
 ---
 
-<a name="stopoptions"></a>
-
 #### stop([options])
 
 Stop a process
@@ -124,8 +128,6 @@ Stop a process
 
 ---
 
-<a name="stopalloptions"></a>
-
 #### stopall([options])
 
 Stop all processes
@@ -137,8 +139,6 @@ Stop all processes
 
 ---
 
-<a name="listoptions"></a>
-
 #### list([options])
 
 List running processes
@@ -148,8 +148,6 @@ List running processes
 * `workspace` (String): Workspace.
 
 ---
-
-<a name="logoptions"></a>
 
 #### log([options])
 
@@ -162,8 +160,6 @@ Displaying the last part of a process log files
 
 ---
 
-<a name="diroptions"></a>
-
 #### dir([options])
 
 Displaying the directory of a pot process project.
@@ -172,8 +168,6 @@ Displaying the directory of a pot process project.
 * `workspace` (String): Workspace.
 
 ---
-
-<a name="license"></a>
 
 ## License
 
