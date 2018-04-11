@@ -75,7 +75,7 @@ export default class Connection {
 		this._socket = socket;
 	}
 
-	async _export(...args) {
+	async _getState(...args) {
 		try {
 			const state = await this._socket.request(STATE, ...args);
 
@@ -99,11 +99,11 @@ export default class Connection {
 	}
 
 	async setState(state) {
-		return this._export(this._socket.request(STATE, state));
+		return this._getState(state);
 	}
 
 	async getState() {
-		return this._export(this._socket.request(STATE));
+		return this._getState();
 	}
 
 	async getInfo() {
