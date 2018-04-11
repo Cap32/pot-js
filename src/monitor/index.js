@@ -1,6 +1,4 @@
-// import respawn from 'respawn';
-import respawn from './respawn';
-
+import respawn from '../utils/respawn';
 import StdioIPC from '../utils/StdioIPC';
 import { setLoggers } from 'pot-logger';
 import lifecycle from './lifecycle';
