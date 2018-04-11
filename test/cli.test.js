@@ -180,59 +180,6 @@ describe('cli `pot stopall`', () => {
 	});
 });
 
-describe('cli `pot ls`', () => {
-	const names = [];
-
-	afterEach(async () => {
-		await Promise.all(
-			names.map(async (name) => {
-				await Connection.requestStopServer(name);
-			}),
-		);
-	});
-
-	test('should work`', async () => {
-		const createProc = async (port, name) => {
-			return Kapok.start(
-				command,
-				['start', '--name', name, '--entry', 'test/fixtures/server.js'],
-				{
-					env: {
-						...process.env,
-						PORT: port,
-					},
-				},
-			)
-				.until(/started/)
-				.done();
-		};
-
-		const name1 = 'app-1';
-		const name2 = 'app-2';
-		await createProc(3001, name1);
-		await createProc(3002, name2);
-		names.push(name1, name2);
-
-		await Kapok.start(command, ['ls'])
-			.until(/^┌/)
-			.joinUntil(/┤/)
-			.assert((message) => {
-				return [
-					'Name',
-					'Status',
-					'Crashes',
-					'Memory',
-					'CPU',
-					'Started',
-					'Pid',
-				].every((key) => message.includes(key));
-			})
-			.assertUntil(/app-1/)
-			.assertUntil(/app-2/)
-			.doneAndKill();
-	});
-});
-
 describe('cli `pot dir`', () => {
 	test('should work', async () => {
 		return Kapok.start(
