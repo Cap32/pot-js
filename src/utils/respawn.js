@@ -20,6 +20,18 @@ const kill = async function kill(pid) {
 	return fkill(pid, { force: isWin }).catch(noop);
 };
 
+const EventTypes = {
+	SPAWN: 'spawn',
+	EXIT: 'exit',
+	SLEEP: 'sleep',
+	START: 'start',
+	CRASH: 'crash',
+	STOP: 'stop',
+	STDOUT: 'stdout',
+	STDERR: 'stderr',
+	WARN: 'warn',
+};
+
 class Monitor extends EventEmitter {
 	constructor(command, opts) {
 		super();
@@ -111,13 +123,13 @@ class Monitor extends EventEmitter {
 			this.status = 'running';
 			this.child = child;
 			this.pid = child.pid;
-			this.emit('spawn', child);
+			this.emit(EventTypes.SPAWN, child);
 
 			child.setMaxListeners(0);
 
 			if (child.stdout) {
 				child.stdout.on('data', (data) => {
-					this.emit('stdout', data);
+					this.emit(EventTypes.STDOUT, data);
 				});
 
 				if (this.stdout) {
@@ -127,7 +139,7 @@ class Monitor extends EventEmitter {
 
 			if (child.stderr) {
 				child.stderr.on('data', (data) => {
-					this.emit('stderr', data);
+					this.emit(EventTypes.STDERR, data);
 				});
 
 				if (this.stderr) {
@@ -147,7 +159,7 @@ class Monitor extends EventEmitter {
 			};
 
 			child.on('error', (err) => {
-				this.emit('warn', err); // too opionated? maybe just forward err
+				this.emit(EventTypes.WARN, err); // too opionated? maybe just forward err
 				if (!clear()) return;
 				if (this.status === 'stopping') return this._stopped();
 				this.crashes++;
@@ -155,7 +167,7 @@ class Monitor extends EventEmitter {
 			});
 
 			child.on('exit', (code, signal) => {
-				this.emit('exit', code, signal);
+				this.emit(EventTypes.EXIT, code, signal);
 				if (!clear()) return;
 				if (this.status === 'stopping') return this._stopped();
 
@@ -173,7 +185,7 @@ class Monitor extends EventEmitter {
 				}
 
 				this.status = 'sleeping';
-				this.emit('sleep');
+				this.emit(EventTypes.SLEEP);
 
 				const restartTimeout = this.sleep(restarts);
 				this.timeout = setTimeout(loop, restartTimeout);
@@ -183,7 +195,7 @@ class Monitor extends EventEmitter {
 		clearTimeout(this.timeout);
 		loop();
 
-		if (this.status === 'running') this.emit('start');
+		if (this.status === 'running') this.emit(EventTypes.START);
 	}
 
 	toJSON() {
@@ -212,7 +224,7 @@ class Monitor extends EventEmitter {
 	_crash() {
 		if (this.status !== 'running') return;
 		this.status = 'crashed';
-		this.emit('crash');
+		this.emit(EventTypes.CRASH);
 		if (this.status === 'crashed') this._stopped();
 	}
 
@@ -220,7 +232,7 @@ class Monitor extends EventEmitter {
 		if (this.status === 'stopped') return;
 		if (this.status !== 'crashed') this.status = 'stopped';
 		this.started = null;
-		this.emit('stop');
+		this.emit(EventTypes.STOP);
 	}
 }
 
@@ -230,3 +242,5 @@ export default function respawn(command, opts) {
 	}
 	return new Monitor(command, opts || {});
 }
+
+export { EventTypes };

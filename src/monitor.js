@@ -1,5 +1,5 @@
 import { ensureLogger, logger, setLoggers } from 'pot-logger';
-import respawn from './utils/respawn';
+import respawn, { EventTypes } from './utils/respawn';
 import StdioIPC from './utils/StdioIPC';
 import Connection from './Connection';
 import workspace from './utils/workspace';
@@ -7,7 +7,6 @@ import { serialize } from './utils/serialize';
 import watch from './utils/watch';
 import onSignalExit from './utils/onSignalExit';
 import createScriptRunner from './utils/createScriptRunner';
-import { once } from 'lodash';
 import chalk from 'chalk';
 
 const { NODE_ENV } = process.env;
@@ -91,13 +90,7 @@ const start = async function start(options) {
 		process.exit();
 	};
 
-	process.on('uncaughtException', async (err) => {
-		runEvent('uncaughtException', err);
-		logger.error(err);
-		await exit();
-	});
-
-	monitor.once('start', async () => {
+	monitor.once(EventTypes.START, async () => {
 		logger.info(`"${name}" started`);
 		const success = await startSocketServer(monitor);
 		if (success) {
@@ -105,27 +98,27 @@ const start = async function start(options) {
 		}
 	});
 
-	monitor.on('start', () => {
-		runEvent('start');
+	monitor.on(EventTypes.START, () => {
+		runEvent(EventTypes.START);
 	});
 
-	monitor.on('stop', () => {
+	monitor.on(EventTypes.STOP, () => {
 		isProd && logger.warn(`"${name}" stopped`);
-		runEvent('stop');
+		runEvent(EventTypes.STOP);
 	});
 
-	monitor.on('crash', () => {
+	monitor.on(EventTypes.CRASH, () => {
 		logger.fatal(`"${name}" crashed`);
-		runEvent('crash');
+		runEvent(EventTypes.CRASH);
 	});
 
-	monitor.on('sleep', () => {
+	monitor.on(EventTypes.SLEEP, () => {
 		logger.warn(`"${name}" sleeped`);
-		runEvent('sleep');
+		runEvent(EventTypes.SLEEP);
 	});
 
-	monitor.on('spawn', (child) => {
-		runEvent('spawn');
+	monitor.on(EventTypes.SPAWN, (child) => {
+		runEvent(EventTypes.SPAWN);
 
 		if (inject) {
 			logger.trace('child.connected', child.connected);
@@ -136,24 +129,29 @@ const start = async function start(options) {
 		}
 	});
 
-	monitor.on('exit', async (code, signal) => {
+	monitor.on(EventTypes.EXIT, async (code, signal) => {
 		logger.debug(`"${name}" exit with code "${code}", signal "${signal}"`);
-		runEvent('exit', code, signal);
+		runEvent(EventTypes.EXIT, code, signal);
 	});
 
-	monitor.on('stdout', (data) => {
-		runEvent('stdout');
+	monitor.on(EventTypes.STDOUT, (data) => {
+		runEvent(EventTypes.STDOUT);
 		logger.info(data.toString());
 	});
 
-	monitor.on('stderr', (data) => {
-		runEvent('stderr');
+	monitor.on(EventTypes.STDERR, (data) => {
+		runEvent(EventTypes.STDERR);
 		logger.error(data.toString());
 	});
 
-	monitor.on('warn', (data) => {
-		runEvent('warn');
+	monitor.on(EventTypes.WARN, (data) => {
+		runEvent(EventTypes.WARN);
 		logger.warn(data.toString());
+	});
+
+	process.on('uncaughtException', async (err) => {
+		logger.fatal(err);
+		await exit();
 	});
 
 	onSignalExit(async () => {
@@ -166,7 +164,7 @@ const start = async function start(options) {
 		logger.trace('watch:restart', stat);
 
 		process.emit('watch:restart', { file, stat });
-		runEvent('restart');
+		runEvent(EventTypes.RESTART);
 
 		await monitor.stop();
 		monitor.start();
