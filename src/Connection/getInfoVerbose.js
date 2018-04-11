@@ -1,65 +1,44 @@
 import pidUsage from 'pidusage';
 import { logger } from 'pot-logger';
 import formatBytes from '../utils/formatBytes';
-import chalk from 'chalk';
 import { totalmem } from 'os';
 
 const { assign } = Object;
 
 const parseMemoryUsage = (state) => {
-	const { memoryUsage } = state.data;
+	const { memoryUsage } = state;
 	const { used, total } = memoryUsage;
 
 	if (isNaN(used) || isNaN(total)) {
 		assign(memoryUsage, {
+			value: '-',
 			percent: '-',
-			formattedTotal: '-',
-			formattedUsed: '-',
-			formattedString: '-',
+			styled: '-',
 		});
 	}
 	else {
-		const formattedUsed = formatBytes(used);
-		const formattedTotal = formatBytes(total);
-		const percent = `${(used / total * 100).toFixed(2)}%`;
+		const styledUsed = formatBytes(used);
+		const value = used / total * 100;
+		const percent = `${value.toFixed(2)}%`;
 		assign(memoryUsage, {
+			value,
 			percent,
-			formattedTotal,
-			formattedUsed,
-			formattedString: `${formattedUsed} (${percent})`,
+			styled: `${styledUsed} (${percent})`,
 		});
 	}
 	return state;
 };
 
 const parseCpuUsage = (state) => {
-	const { cpuUsage } = state.data;
+	const { cpuUsage } = state;
 	const { value } = cpuUsage;
 	cpuUsage.percent = isNaN(value) ? '-' : `${value}%`;
-	cpuUsage.formattedString = cpuUsage.percent;
-	return state;
-};
-
-const styleStatus = (state) => {
-	const { status } = state;
-	state.styledStatus = (function () {
-		switch (status) {
-			case 'running':
-				return chalk.green(status);
-			case 'stopped':
-			case 'crashed':
-				return chalk.red(status);
-			case 'sleeping':
-				return chalk.magenta(status);
-			default:
-				return status;
-		}
-	})();
+	cpuUsage.styled = cpuUsage.percent;
 	return state;
 };
 
 const startedLocal = (state) => {
-	state.startedLocal = new Date(state.started).toLocaleString();
+	state.monitor.startedLocal = new Date(state.monitor.started).toLocaleString();
 	return state;
 };
 
@@ -70,7 +49,7 @@ export default async function handleInfoVerbose(state) {
 
 	const exportState = function exportState(usages = {}) {
 		Object.assign(
-			state.data,
+			state,
 			{
 				memoryUsage: {
 					used: NaN,
@@ -84,7 +63,6 @@ export default async function handleInfoVerbose(state) {
 		);
 		parseMemoryUsage(state);
 		parseCpuUsage(state);
-		styleStatus(state);
 		startedLocal(state);
 		return state;
 	};

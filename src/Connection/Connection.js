@@ -75,21 +75,25 @@ export default class Connection {
 		this._socket = socket;
 	}
 
-	async _export(promise, options = {}) {
+	async _export(...args) {
 		try {
-			const res = await promise;
+			const state = await this._socket.request(STATE, ...args);
+
+			// DEPRECATED: adapt to old version state
+			if (state && state.data) {
+				const { data } = state;
+				delete state.data;
+				state.monitor = state;
+				Object.assign(state, data);
+			}
+
 			if (!this._keepAlive) {
 				this.disconnect();
 			}
-			return res;
+			return state;
 		}
 		catch (err) {
-			if (options.onError) {
-				return options.onError(err);
-			}
-			if (!options.silence) {
-				logger.debug(err);
-			}
+			logger.debug(err);
 			await this.disconnect();
 		}
 	}

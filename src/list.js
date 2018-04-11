@@ -35,17 +35,50 @@ const tableOptions = {
 };
 
 const defaultCells = [
-	{ title: 'Name', width: 10, get: (state) => state.data.name },
-	{ title: 'Status', width: 8, get: (state) => state.styledStatus },
-	{ title: 'Crashes', width: 8, get: (state) => state.crashes },
+	{ title: 'Name', width: 10, get: (state) => state.name },
+	{
+		title: 'Status',
+		width: 8,
+		get: (state, chalk) => {
+			const { status } = state.monitor;
+			switch (status) {
+				case 'running':
+					return chalk.green(status);
+				case 'stopped':
+				case 'crashed':
+					return chalk.red(status);
+				case 'sleeping':
+					return chalk.yellow(status);
+				default:
+					return status;
+			}
+		},
+	},
+	{
+		title: 'Crashes',
+		width: 8,
+		get: (state) => state.monitor.crashes,
+	},
 	{
 		title: 'Memory',
 		width: 18,
-		get: (state) => state.data.memoryUsage.formattedString,
+		get: (state) => {
+			const { styled, value } = state.memoryUsage;
+			const color = value < 20 ? 'reset' : value < 50 ? 'yellow' : 'red';
+			return chalk[color](styled);
+		},
 	},
-	{ title: 'CPU', width: 6, get: (state) => state.data.cpuUsage.percent },
-	{ title: 'Started', width: 20, get: (state) => state.startedLocal },
-	{ title: 'PPID', width: 6, get: (state) => state.data.parentPid },
+	{
+		title: 'CPU',
+		width: 6,
+		get: (state) => {
+			const { styled, value } = state.cpuUsage;
+			const color = value < 40 ? 'reset' : value < 80 ? 'yellow' : 'red';
+			return chalk[color](styled);
+		},
+	},
+	{ title: 'Started', width: 20, get: (state) => state.monitor.startedLocal },
+	{ title: 'PPID', width: 6, get: (state) => state.ppid },
 	{ title: 'PID', width: 6, get: (state) => state.pid },
 ];
 
@@ -89,7 +122,7 @@ const list = async (options = {}) => {
 			table.push(
 				cells.map(({ get }) => {
 					if (!get) return '';
-					const val = get(state);
+					const val = get(state, chalk);
 					return isUndefined(val) ? '-' : val;
 				}),
 			);

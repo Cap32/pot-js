@@ -20,10 +20,9 @@ const dir = async (options) => {
 		throw new Error(`"${appName}" NOT found`);
 	}
 
-	const info = await connection.getInfo();
-	const { cwd, root } = info.data;
-
-	console.log(cwd || root);
+	const state = await connection.getState();
+	const { cwd } = state;
+	console.log(cwd);
 };
 
 export default dir;

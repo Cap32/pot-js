@@ -47,6 +47,7 @@ class Monitor extends EventEmitter {
 		this.uid = opts.uid;
 		this.gid = opts.gid;
 		this.pid = 0;
+		this.ppid = opts.ppid;
 		this.crashes = 0;
 		this.stdio = opts.stdio;
 		this.stdout = opts.stdout;
@@ -199,26 +200,22 @@ class Monitor extends EventEmitter {
 	}
 
 	toJSON() {
-		const doc = {
-			id: this.id,
-			name: this.name,
-			status: this.status,
-			started: this.started,
+		return {
+			...this.data,
 			pid: this.pid,
-			crashes: this.crashes,
-			command: this.command,
-			cwd: this.cwd,
-			env: this.env,
-			data: this.data,
+			ppid: this.ppid,
+			monitor: {
+				id: this.id,
+				name: this.name,
+				status: this.status,
+				started: this.started,
+				pid: this.ppid,
+				crashes: this.crashes,
+				command: this.command,
+				cwd: this.cwd,
+				env: this.env,
+			},
 		};
-
-		if (!doc.id) delete doc.id;
-		if (!doc.pid) delete doc.pid;
-		if (!doc.name) delete doc.name;
-		if (!doc.data) delete doc.data;
-		if (!doc.started) delete doc.started;
-
-		return doc;
 	}
 
 	_crash() {

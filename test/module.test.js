@@ -34,8 +34,8 @@ describe('api module `start`', () => {
 		});
 		await delay(2000);
 		const connections = await Connection.getList();
-		const info = await connections[0].getInfo();
-		expect(info.crashes).toBe(2);
+		const state = await connections[0].getState();
+		expect(state.monitor.crashes).toBe(2);
 	});
 
 	test('should `configToEnv` work', async () => {
@@ -65,10 +65,10 @@ describe('api module `Connection.getList()`', () => {
 		const connections = await Connection.getList();
 		const state = await connections[0].getState();
 		expect(typeof state.pid).toBe('number');
-		expect(state.crashes).toBe(0);
-		expect(state.status).toBe('running');
-		expect(state.data.name).toBe(name);
-		expect(state.data.entry).toBe(entry);
+		expect(state.monitor.crashes).toBe(0);
+		expect(state.monitor.status).toBe('running');
+		expect(state.name).toBe(name);
+		expect(state.entry).toBe(entry);
 	});
 
 	test('should `setState` work', async () => {
@@ -78,14 +78,14 @@ describe('api module `Connection.getList()`', () => {
 		{
 			const connections = await Connection.getList();
 			const state = await connections[0].getState();
-			expect(state.data.name).toBe(name);
-			expect(state.data.hello).toBe(undefined);
+			expect(state.name).toBe(name);
+			expect(state.hello).toBe(undefined);
 		}
 
 		{
 			const connections = await Connection.getList();
 			const state = await connections[0].setState({ hello: 'world' });
-			expect(state.data.hello).toBe('world');
+			expect(state.hello).toBe('world');
 		}
 	});
 });
