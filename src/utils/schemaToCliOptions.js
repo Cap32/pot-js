@@ -1,27 +1,32 @@
 import { reduce, isObject } from 'lodash';
 
-const noDefault = function noDefault(prop) {
-	const getDefaultDescription = function getDefaultDescription(defaults) {
-		if (Array.isArray(defaults)) {
-			return `[${defaults.join()}]`;
+const getDefaultDescription = function getDefaultDescription(defaults) {
+	if (Array.isArray(defaults)) {
+		return `[${defaults.join()}]`;
+	}
+	else if (isObject(defaults)) {
+		try {
+			return JSON.stringify(defaults);
 		}
-		else if (isObject(defaults)) {
-			try {
-				return JSON.stringify(defaults);
-			}
-			catch (err) {
-				return defaults.toString();
-			}
+		catch (err) {
+			return defaults.toString();
 		}
-		return defaults;
-	};
+	}
+	return defaults;
+};
+
+// skip validation and default assigment, because it will do it at `start()`
+const skip = function skip(prop) {
 	const defaults = prop.default;
+	prop.skipValidation = true;
 	if (defaults !== undefined) {
-		if (prop.type && prop.type.startsWith('bool')) {
-			delete prop.type;
-		}
 		prop.defaultDescription = getDefaultDescription(defaults);
-		delete prop.default;
+		if (prop.type && prop.type.startsWith('bool')) {
+			prop.default = undefined;
+		}
+		else {
+			delete prop.default;
+		}
 	}
 };
 
@@ -30,17 +35,9 @@ export default function schemaToCliOptions(schema) {
 		schema.properties,
 		(acc, spec, key) => {
 			const prop = (acc[key] = { ...spec });
-
-			if (spec.anyOf) {
-				Object.assign(prop, spec.anyOf[0]);
-			}
-
-			noDefault(prop);
-
-			if (spec.enum) {
-				prop.choices = spec.enum;
-			}
-			prop.skipValidation = true;
+			if (spec.anyOf) Object.assign(prop, spec.anyOf[0]);
+			if (spec.enum) prop.choices = spec.enum;
+			skip(prop);
 			return acc;
 		},
 		{},
