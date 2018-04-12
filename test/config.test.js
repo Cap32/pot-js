@@ -1,4 +1,3 @@
-
 import validateSchema from '../src/utils/validateSchema';
 
 describe('default config', () => {
@@ -6,7 +5,7 @@ describe('default config', () => {
 		const config = validateSchema({ production: true });
 		expect(config).toMatchObject({
 			production: true,
-			cwd: expect.stringMatching(/.+/),
+			cwd: expect.stringContaining('pot-js'),
 			daemon: false,
 			entry: './index.js',
 			env: {},
@@ -26,7 +25,7 @@ describe('default config', () => {
 		const config = validateSchema({ production: false });
 		expect(config).toMatchObject({
 			production: false,
-			cwd: expect.stringMatching(/.+/),
+			cwd: expect.stringContaining('pot-js'),
 			daemon: false,
 			entry: './index.js',
 			env: {},
@@ -38,7 +37,7 @@ describe('default config', () => {
 			maxRestarts: 0,
 			monitorProcessTitle: 'node',
 			watch: false,
-			workspace: 'defaults'
+			workspace: 'defaults',
 		});
 	});
 });
