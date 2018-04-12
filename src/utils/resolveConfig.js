@@ -2,16 +2,16 @@ import { merge } from 'lodash';
 import importFile from 'import-file';
 import { isAbsolute } from 'path';
 
-export default function resolveConfig(options = {}) {
-	const { config, configWalk } = options;
-	const useFindUp = configWalk && !isAbsolute(config);
+export default function resolveConfig(cliOptions = {}) {
+	const { config: configFile, configWalk } = cliOptions;
+	const useFindUp = configWalk && !isAbsolute(configFile);
 
-	if (config) {
+	if (configFile) {
 		try {
-			const configJSON = importFile(config, { useFindUp });
-			return merge(options, configJSON);
+			const config = importFile(configFile, { useFindUp });
+			return merge(config, cliOptions);
 		}
 		catch (err) {}
 	}
-	return options;
+	return cliOptions;
 }
