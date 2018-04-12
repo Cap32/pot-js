@@ -1,10 +1,10 @@
 import yargs from 'yargs';
-import { name, version } from '../../package.json';
+import { name, version } from '../package.json';
 import { upperCase } from 'lodash';
 import { logger, setLoggers } from 'pot-logger';
-import resolveConfig from '../utils/resolveConfig';
-import * as Schemas from '../schemas/cli';
-import { start, stop, stopAll, list, log, dir } from '../';
+import resolveConfig from './utils/resolveConfig';
+import * as Schemas from './schemas/cli';
+import { start, stop, stopAll, list, log, dir } from './';
 
 // eslint-disable-next-line
 yargs

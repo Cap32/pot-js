@@ -8,7 +8,7 @@ const getForce = function getForce(description) {
 	return {
 		alias: 'f',
 		description,
-		type: 'bool',
+		type: 'boolean',
 	};
 };
 
@@ -25,7 +25,7 @@ export const start = {
 		configWalk: {
 			description: 'Walk to resolve config file',
 			default: true,
-			type: 'bool',
+			type: 'boolean',
 		},
 	},
 };
@@ -56,7 +56,7 @@ export const log = {
 		follow: {
 			alias: 'f',
 			description: 'Follow mode. Just like `tail -f`',
-			type: 'bool',
+			type: 'boolean',
 		},
 		line: {
 			alias: 'n',

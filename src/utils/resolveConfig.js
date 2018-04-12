@@ -1,4 +1,3 @@
-
 import { merge } from 'lodash';
 import importFile from 'import-file';
 import { isAbsolute } from 'path';
@@ -14,6 +13,5 @@ export default function resolveConfig(options = {}) {
 		}
 		catch (err) {}
 	}
-
 	return options;
 }

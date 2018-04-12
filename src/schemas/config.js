@@ -46,6 +46,7 @@ export default {
 				},
 				{},
 			),
+			default: {},
 		},
 		execArgs: {
 			description: 'Exec args',
