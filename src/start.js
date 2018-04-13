@@ -4,7 +4,8 @@ import { ensureDir } from 'fs-extra';
 import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
 import isWin from './utils/isWin';
-import validateSchema from './utils/validateSchema';
+import validateBySchema from './utils/validateBySchema';
+import schema from './schemas/config';
 import { logger, setLoggers } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
 import chalk from 'chalk';
@@ -56,7 +57,7 @@ const ensureWatch = (options) => {
 };
 
 const ensureOptions = (options = {}) => {
-	validateSchema(options);
+	options = validateBySchema(schema, options);
 
 	options.cwd = resolve(options.cwd);
 

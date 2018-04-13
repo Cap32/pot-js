@@ -3,34 +3,39 @@
 import { logger, setLoggers } from 'pot-logger';
 import resolveConfig from './resolveConfig';
 import getCliOptionsBySchema from './getCliOptionsBySchema';
-import { isFunction, isObject, omit } from 'lodash';
+import validateBySchema from './validateBySchema';
+import { isFunction, isObject, forEach, flatten } from 'lodash';
 
 const builder = function builder(yargs) {
-	const potStore = this.middlewares[0] || {};
-	const { schema, configFile, getBuilder, workspace } = potStore;
-	let options = getCliOptionsBySchema(schema, ['config']);
+	const { middlewares, optional, demanded, original } = this;
+	const potStore = middlewares[0] || {};
+	const { schema, getBuilder, configFile } = potStore;
+	const spec = getCliOptionsBySchema(schema, [configFile]);
 
-	if (options) {
-		if (configFile) {
-			const { value: configValue, defaultValue } = configFile;
-			if (configValue) {
-				if (options.config) options.config.hidden = true;
-			}
-			else if (defaultValue !== undefined) {
-				if (options.config) options.config.default = defaultValue;
-			}
-		}
-
-		if (workspace) {
-			options = omit(options, ['workspace']);
-		}
+	if (schema && schema.properties && schema.properties[configFile]) {
+		delete schema.properties[configFile];
 	}
 
 	if (isFunction(getBuilder)) {
-		return getBuilder.call(this, yargs, options);
+		return getBuilder.call(this, yargs, spec);
 	}
-	else if (isObject(options)) {
-		return yargs.usage(`$0 ${this.original}`).options(options).argv;
+	else if (isObject(spec)) {
+		const argv = yargs.usage(`$0 ${original}`);
+		const positions = flatten([
+			...demanded.map(({ cmd }) => cmd),
+			...optional.map(({ cmd }) => cmd),
+		]);
+		const options = {};
+		forEach(spec, (val, key) => {
+			if (~positions.indexOf(key)) {
+				argv.positional(key, val);
+			}
+			else {
+				options[key] = val;
+			}
+		});
+		argv.options(options);
+		return argv.argv;
 	}
 
 	return yargs.argv;
@@ -39,19 +44,14 @@ const builder = function builder(yargs) {
 const handler = async function handler(argv) {
 	try {
 		const potStore = this.middlewares[0] || {};
-		const { operator, configFile, workspace } = potStore;
+		const { operator, configFile, schema, validate } = potStore;
 
 		if (isFunction(operator)) {
-			if (workspace) {
-				argv.workspace = workspace;
-			}
-
 			if (configFile) {
-				const { value: configValue } = configFile;
-				if (configValue) {
-					argv.config = configValue;
-				}
-				argv = await resolveConfig(argv, argv.config);
+				argv = await resolveConfig(argv, configFile);
+			}
+			if (validate !== false && schema) {
+				validateBySchema(schema, argv);
 			}
 			await operator(argv);
 		}
@@ -69,7 +69,7 @@ export default function createCommand(options = {}) {
 		schema,
 		getBuilder,
 		configFile,
-		workspace,
+		validate,
 		middlewares = [],
 		...other
 	} = options;
@@ -83,7 +83,7 @@ export default function createCommand(options = {}) {
 		schema,
 		getBuilder,
 		configFile,
-		workspace,
+		validate,
 	});
 	middlewares.unshift(potStoreMiddleware);
 

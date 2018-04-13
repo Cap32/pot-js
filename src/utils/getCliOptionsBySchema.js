@@ -40,6 +40,7 @@ export default function getCliOptionsBySchema(schema, blacklist = []) {
 
 	if (cache.has(schema)) return cache.get(schema);
 
+	blacklist = blacklist.filter(Boolean);
 	const res = reduce(
 		properties,
 		(acc, spec, key) => {

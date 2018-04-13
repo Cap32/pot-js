@@ -1,8 +1,9 @@
-import validateSchema from '../src/utils/validateSchema';
+import schema from '../src/schemas/config';
+import validateBySchema from '../src/utils/validateBySchema';
 
 describe('default config', () => {
 	test('production config', async () => {
-		const config = validateSchema({ production: true });
+		const config = validateBySchema(schema, { production: true });
 		expect(config).toMatchObject({
 			production: true,
 			cwd: expect.stringContaining('pot-js'),
@@ -11,7 +12,6 @@ describe('default config', () => {
 			env: {},
 			execArgs: [],
 			execCommand: expect.stringContaining('node'),
-			inspect: false,
 			logLevel: 'INFO',
 			logsDir: false,
 			maxRestarts: -1,
@@ -22,7 +22,7 @@ describe('default config', () => {
 	});
 
 	test('development config', async () => {
-		const config = validateSchema({ production: false });
+		const config = validateBySchema(schema, { production: false });
 		expect(config).toMatchObject({
 			production: false,
 			cwd: expect.stringContaining('pot-js'),
@@ -31,7 +31,6 @@ describe('default config', () => {
 			env: {},
 			execArgs: [],
 			execCommand: expect.stringContaining('node'),
-			inspect: false,
 			logLevel: 'DEBUG',
 			logsDir: false,
 			maxRestarts: 0,

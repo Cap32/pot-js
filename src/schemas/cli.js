@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 const { properties } = start;
 const logLevel = cloneDeep(properties.logLevel);
 const workspace = cloneDeep(properties.workspace);
+const name = cloneDeep(properties.name);
 
 export { start };
 
@@ -15,6 +16,7 @@ export const stop = {
 			type: 'boolean',
 		},
 		logLevel,
+		name,
 		workspace,
 	},
 };
@@ -26,7 +28,13 @@ export const list = {
 	},
 };
 
-export const dir = list;
+export const dir = {
+	properties: {
+		logLevel,
+		name,
+		workspace,
+	},
+};
 
 export const log = {
 	properties: {
@@ -47,6 +55,7 @@ export const log = {
 			default: 200,
 		},
 		logLevel,
+		name,
 		workspace,
 	},
 };

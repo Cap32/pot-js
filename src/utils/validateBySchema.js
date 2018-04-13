@@ -1,5 +1,4 @@
 import Ajv from 'ajv';
-import configSchema from '../schemas/config';
 
 const ajv = new Ajv({
 	useDefaults: true,
@@ -8,8 +7,8 @@ const ajv = new Ajv({
 	coerceTypes: true,
 });
 
-export default function validateSchema(config = {}) {
-	const valid = ajv.validate(configSchema, config);
+export default function validateBySchema(schema, config = {}) {
+	const valid = ajv.validate(schema, config);
 	if (!valid) {
 		const error = new Error(
 			ajv.errorsText(ajv.errors, {
@@ -19,6 +18,5 @@ export default function validateSchema(config = {}) {
 		error.errors = ajv.errors;
 		throw error;
 	}
-	if (config.inspect === 'false') config.inspect = false;
 	return config;
 }
