@@ -9,6 +9,12 @@ export default {
 			type: 'string',
 			default: '.',
 		},
+		config: {
+			alias: 'c',
+			description: 'Path to the config file',
+			default: '.potrc',
+			type: 'string',
+		},
 		configToEnv: {
 			description: 'Convert configuration to environment variable',
 			type: 'string',
@@ -19,10 +25,10 @@ export default {
 			default: process.cwd(),
 		},
 		daemon: {
+			alias: 'd',
 			description: 'Run as a daemon',
 			type: 'boolean',
 			default: false,
-			alias: 'd',
 		},
 		entry: {
 			description: 'Entry script path',
@@ -67,6 +73,11 @@ export default {
 			description: 'Exec command',
 			type: 'string',
 			default: process.execPath,
+		},
+		force: {
+			alias: 'f',
+			description: 'Force restart even if the process is exists',
+			type: 'boolean',
 		},
 		inspect: {
 			description: 'Activate inspector. Require Node.js >= v6.3.0',

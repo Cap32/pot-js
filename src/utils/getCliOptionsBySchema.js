@@ -34,7 +34,7 @@ const skip = function skip(prop) {
 
 const cache = new WeakMap();
 
-export default function getCliOptionsBySchema(schema) {
+export default function getCliOptionsBySchema(schema, blacklist = []) {
 	const { properties } = schema || {};
 	if (!properties) return;
 
@@ -44,9 +44,10 @@ export default function getCliOptionsBySchema(schema) {
 		properties,
 		(acc, spec, key) => {
 			const prop = (acc[key] = { ...spec });
-			if (spec.anyOf) Object.assign(prop, spec.anyOf[0]);
 			if (spec.enum) prop.choices = spec.enum;
-			skip(prop);
+			if (!blacklist.length || !~blacklist.indexOf(key)) {
+				skip(prop);
+			}
 			return acc;
 		},
 		{},

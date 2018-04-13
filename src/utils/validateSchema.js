@@ -1,5 +1,5 @@
 import Ajv from 'ajv';
-import schema from '../schemas/config';
+import configSchema from '../schemas/config';
 
 const ajv = new Ajv({
 	useDefaults: true,
@@ -9,7 +9,7 @@ const ajv = new Ajv({
 });
 
 export default function validateSchema(config = {}) {
-	const valid = ajv.validate(schema, config);
+	const valid = ajv.validate(configSchema, config);
 	if (!valid) {
 		const error = new Error(
 			ajv.errorsText(ajv.errors, {

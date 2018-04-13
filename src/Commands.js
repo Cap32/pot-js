@@ -4,7 +4,7 @@ import * as Operators from './';
 export const start = {
 	command: 'start [entry] [options]',
 	description: 'Spawn and monitor a process',
-	getBuild(yargs, { entry, ...options }) {
+	getBuilder(yargs, { entry, ...options }) {
 		return yargs
 			.usage('$0 start [entry] [options]')
 			.positional('entry', entry)
@@ -12,11 +12,7 @@ export const start = {
 	},
 	schema: Schemas.start,
 	operator: Operators.start,
-	middlewares: [
-		function potTrick(argv) {
-			return argv;
-		},
-	],
+	configFile: true,
 };
 
 export const stop = {

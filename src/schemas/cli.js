@@ -1,44 +1,28 @@
-import base from './config';
+import start from './config';
+import { cloneDeep } from 'lodash';
 
-const { properties } = base;
-const { logLevel } = properties;
+const { properties } = start;
+const logLevel = cloneDeep(properties.logLevel);
+const workspace = cloneDeep(properties.workspace);
 
-const getForce = function getForce(description) {
-	return {
-		alias: 'f',
-		description,
-		type: 'boolean',
-	};
-};
-
-export const start = {
-	properties: {
-		...properties,
-		force: getForce('Force restart even if the process is exists'),
-		config: {
-			alias: 'c',
-			description: 'Path to the config file',
-			default: '.potrc',
-			type: 'string',
-		},
-		configWalk: {
-			description: 'Walk to resolve config file',
-			default: true,
-			type: 'boolean',
-		},
-	},
-};
+export { start };
 
 export const stop = {
 	properties: {
-		force: getForce('Stop without confirming'),
+		force: {
+			alias: 'f',
+			description: 'Stop without confirming',
+			type: 'boolean',
+		},
 		logLevel,
+		workspace,
 	},
 };
 
 export const list = {
 	properties: {
 		logLevel,
+		workspace,
 	},
 };
 
@@ -46,7 +30,6 @@ export const dir = list;
 
 export const log = {
 	properties: {
-		logLevel,
 		category: {
 			alias: 'c',
 			description: 'Log category',
@@ -63,5 +46,7 @@ export const log = {
 			type: 'number',
 			default: 200,
 		},
+		logLevel,
+		workspace,
 	},
 };
