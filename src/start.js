@@ -94,7 +94,7 @@ const ensureOptions = (options = {}) => {
 	return options;
 };
 
-const startMonitorProc = ({ baseDir, daemon, env, name }) => {
+const startMonitorProc = ({ cwd, daemon, env, name }) => {
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
@@ -102,7 +102,7 @@ const startMonitorProc = ({ baseDir, daemon, env, name }) => {
 	const proc = spawn(execPath, [scriptFile], {
 		detached: daemon,
 		stdio: ['ipc', stdio, stdio],
-		cwd: baseDir,
+		cwd,
 		env: {
 			...process.env,
 			...env,
