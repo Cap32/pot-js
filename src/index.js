@@ -7,7 +7,6 @@ export Bridge from './Bridge';
 export Connection from './Connection';
 export * as Commands from './Commands';
 export workspace from './utils/workspace';
-export schemaToCliOptions from './utils/schemaToCliOptions';
-export resolveConfig from './utils/resolveConfig';
+export createCli from './utils/createCli';
 export configSchema from './schemas/config';
 export * as cliSchema from './schemas/cli';

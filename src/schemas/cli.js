@@ -1,7 +1,6 @@
 import base from './config';
-import schemaToCliOptions from '../utils/schemaToCliOptions';
 
-const properties = schemaToCliOptions(base);
+const { properties } = base;
 const { logLevel } = properties;
 
 const getForce = function getForce(description) {

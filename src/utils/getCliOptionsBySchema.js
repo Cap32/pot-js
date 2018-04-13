@@ -20,7 +20,9 @@ const skip = function skip(prop) {
 	const defaults = prop.default;
 	prop.skipValidation = true;
 	if (defaults !== undefined) {
-		prop.defaultDescription = getDefaultDescription(defaults);
+		if (prop.defaultDescription === undefined) {
+			prop.defaultDescription = getDefaultDescription(defaults);
+		}
 		if (prop.type && prop.type.startsWith('bool')) {
 			prop.default = undefined;
 		}
@@ -30,9 +32,16 @@ const skip = function skip(prop) {
 	}
 };
 
-export default function schemaToCliOptions(schema) {
-	return reduce(
-		schema.properties,
+const cache = new WeakMap();
+
+export default function getCliOptionsBySchema(schema) {
+	const { properties } = schema || {};
+	if (!properties) return;
+
+	if (cache.has(schema)) return cache.get(schema);
+
+	const res = reduce(
+		properties,
 		(acc, spec, key) => {
 			const prop = (acc[key] = { ...spec });
 			if (spec.anyOf) Object.assign(prop, spec.anyOf[0]);
@@ -42,4 +51,7 @@ export default function schemaToCliOptions(schema) {
 		},
 		{},
 	);
+
+	cache.set(schema, res);
+	return res;
 }
