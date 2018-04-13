@@ -5,7 +5,7 @@ import * as Handlers from './';
 
 export const start = {
 	command: 'start [entry]',
-	description: 'Start process',
+	description: 'Spawn and monitor a process',
 	builder: (yargs) => {
 		const { entry, ...options } = Schemas.start.properties;
 		return yargs
@@ -15,7 +15,8 @@ export const start = {
 	},
 	async handler(argv) {
 		try {
-			await Handlers.start(await resolveConfig(argv));
+			const config = await resolveConfig(argv);
+			await Handlers.start(config);
 		}
 		catch (err) {
 			setLoggers('logLevel', argv.logLevel);
@@ -27,7 +28,7 @@ export const start = {
 
 export const stop = {
 	command: 'stop [name]',
-	description: 'Stop process',
+	description: 'Stop a process',
 	builder: (yargs) => yargs.options(Schemas.stop.properties).argv,
 	handler(argv) {
 		Handlers.stop(argv).catch((err) => logger.error(err.message));

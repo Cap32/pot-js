@@ -1,6 +1,5 @@
 import yargs from 'yargs';
-import { name, version } from '../package.json';
-import { upperCase } from 'lodash';
+import { version } from '../package.json';
 import * as Commands from './Commands';
 
 // eslint-disable-next-line
@@ -13,8 +12,10 @@ yargs
 	.command(Commands.list)
 	.command(Commands.log)
 	.command(Commands.dir)
-	.env(upperCase(name))
 	.alias('h', 'help')
-	.wrap(yargs.terminalWidth())
 	.help()
-	.version(version).argv;
+	.version(version)
+	.env('POT')
+	.locale('en')
+	.recommendCommands()
+	.wrap(70).argv;

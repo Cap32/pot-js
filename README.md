@@ -8,23 +8,22 @@ Script runner
 
 <!-- TOC -->
 
-* [pot-js](#pot-js)
-  * [Table of Contents](#table-of-contents)
-  * [Features](#features)
-  * [Installing](#installing)
-  * [CLI Reference](#cli-reference)
-  * [Node.js module API Reference](#nodejs-module-api-reference)
-    * [start([options])](#startoptions)
-      * [Options](#options)
-    * [stop([options])](#stopoptions)
-      * [Options](#options-1)
-    * [stopall([options])](#stopalloptions)
-      * [Options](#options-2)
-    * [list([options])](#listoptions)
-      * [Options](#options-3)
-    * [log([options])](#logoptions)
-    * [dir([options])](#diroptions)
-  * [License](#license)
+* [Table of Contents](#table-of-contents)
+* [Features](#features)
+* [Installing](#installing)
+* [CLI Reference](#cli-reference)
+* [Node.js module API Reference](#nodejs-module-api-reference)
+  * [start([options])](#startoptions)
+    * [Options](#options)
+  * [stop([options])](#stopoptions)
+    * [Options](#options-1)
+  * [stopall([options])](#stopalloptions)
+    * [Options](#options-2)
+  * [list([options])](#listoptions)
+    * [Options](#options-3)
+  * [log([options])](#logoptions)
+  * [dir([options])](#diroptions)
+* [License](#license)
 
 <!-- /TOC -->
 
@@ -32,9 +31,10 @@ Script runner
 
 * Automatically restart process if it crashes
 * Supports workspace
-* Easy to run as a daemon on unix based systems
+* Easy to run as a daemon on UNIX based systems
 * Provides both CLI and Node.js module API
 * Built-in powerful logger system
+* Interactive CLI
 
 ## Installing
 
@@ -51,33 +51,35 @@ $ npm install -g pot-js
 ## CLI Reference
 
 ```bash
-pot <command> [args]
+pot <command> [options]
 
 Commands:
-  start [entry]  Start process
-  stop [name]    Stop process
-  stopall        Stop all processes
-  list           List processes                [aliases: ls]
-  log [name]     Show log
-  dir [name]     Show dir
+  pot start [entry]  Spawn and monitor a process
+  pot stop [name]    Stop a process
+  pot stopall        Stop all processes
+  pot list           List processes                      [aliases: ls]
+  pot log [name]     Show log
+  pot dir [name]     Show dir
 
 Options:
-  --version   Show version number                  [boolean]
-  -h, --help  Show help                            [boolean]
+  --version   Show version number                            [boolean]
+  -h, --help  Show help                                      [boolean]
 ```
 
 ## Node.js module API Reference
 
 #### start([options])
 
-Spawn a process
+Spawn and monitor a process.
 
 ###### Options
 
-* `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`
-* `name` (String): Process monitor name. Defaults to the basename of `baseDir`.
-* `workspace` (String): Workspace.
+* `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`.
+* `configToEnv` (String): Setting an env name and pass the config json string to child process `env`.
+* `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
+* `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `pot stop ${name}`. Defaults to `false`.
 * `entry` (String): Defining the source script. Defaults to `./index.js`.
+* `env` (Object): Defining custom environments. Defaults to `process.env`.
 * `events` (Object): Defining scripts by event hooks. Like `scripts` in `package.json`. Here are available event hooks:
   * `spawn`: New child process has been spawned
   * `start`: The monitor has started
@@ -103,22 +105,20 @@ Spawn a process
 * `logsDir` (String): Defining log files directory. If `daemon` mode actived, log messages will write to some `.log` files. Defaults to `.logs`.
 * `maxRestarts` (Number): Defining max restarts if crashed. Defaults to `-1` (`-1` equals to `Infinity`) in `production` mode, `0` in `development` mode.
 * `monitorProcessTitle` (String): Monitor process title. Defaults to "node".
-* `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `pot stop ${name}`. Defaults to `false`.
+* `name` (String): Process monitor name. Defaults to the basename of `baseDir`.
 * `production` (Boolean): Enable `production` mode. Defaults to `true`.
-* `env` (Object): Defining custom environments. Defaults to `process.env`.
-* `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
 * `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
   * `enable` (Boolean): Enable `watch`. Defaults to `true`.
   * `dirs` (String|[String]): Defining watching directories.
   * `ignoreDotFiles` (Boolean): Ignore watching `.*` files. Defaults to `true`.
   * `ignoreNodeModulesDir` (Boolean): Ignore watching `node_modules` directory. Defaults to `true`.
-* `configToEnv` (String): Setting an env name and pass the config json string to child process `env`.
+* `workspace` (String): Workspace.
 
 ---
 
 #### stop([options])
 
-Stop a process
+Stop a process.
 
 ###### Options
 
@@ -130,7 +130,7 @@ Stop a process
 
 #### stopall([options])
 
-Stop all processes
+Stop all processes.
 
 ###### Options
 
@@ -141,7 +141,7 @@ Stop all processes
 
 #### list([options])
 
-List running processes
+List processes.
 
 ###### Options
 
@@ -151,7 +151,7 @@ List running processes
 
 #### log([options])
 
-Displaying the last part of a process log files
+Displaying the last part of a process log files.
 
 * `name` (String): Target process name.
 * `workspace` (String): Workspace.
