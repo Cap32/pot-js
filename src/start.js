@@ -208,9 +208,10 @@ export default async function start(options = {}) {
 
 		if (connection) {
 			if (force) {
-				await connection.kill();
+				await connection.requestStopServer();
 			}
 			else {
+				await connection.disconnect();
 				throw new Error(`"${name}" is running.`);
 			}
 		}
