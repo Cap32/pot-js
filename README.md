@@ -8,22 +8,23 @@ Script runner
 
 <!-- TOC -->
 
-* [Table of Contents](#table-of-contents)
-* [Features](#features)
-* [Installing](#installing)
-* [CLI Reference](#cli-reference)
-* [Node.js module API Reference](#nodejs-module-api-reference)
-  * [start([options])](#startoptions)
-    * [Options](#options)
-  * [stop([options])](#stopoptions)
-    * [Options](#options-1)
-  * [stopall([options])](#stopalloptions)
-    * [Options](#options-2)
-  * [list([options])](#listoptions)
-    * [Options](#options-3)
-  * [log([options])](#logoptions)
-  * [dir([options])](#diroptions)
-* [License](#license)
+* [pot-js](#pot-js)
+  * [Table of Contents](#table-of-contents)
+  * [Features](#features)
+  * [Installing](#installing)
+  * [CLI Reference](#cli-reference)
+  * [Node.js module API Reference](#nodejs-module-api-reference)
+    * [start([options])](#startoptions)
+      * [Options](#options)
+    * [stop([options])](#stopoptions)
+      * [Options](#options-1)
+    * [stopall([options])](#stopalloptions)
+      * [Options](#options-2)
+    * [list([options])](#listoptions)
+      * [Options](#options-3)
+    * [log([options])](#logoptions)
+    * [dir([options])](#diroptions)
+  * [License](#license)
 
 <!-- /TOC -->
 
@@ -75,6 +76,7 @@ Spawn and monitor a process.
 ###### Options
 
 * `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`.
+* `config` (String): Path to the config file Defaults to `.potrc`.
 * `configToEnv` (String): Setting an env name and pass the config json string to child process `env`.
 * `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
 * `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `pot stop ${name}`. Defaults to `false`.
