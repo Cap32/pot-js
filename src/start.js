@@ -1,7 +1,6 @@
-import spawn from 'cross-spawn';
+import { fork } from 'child_process';
 import { resolve } from 'path';
 import { ensureDir } from 'fs-extra';
-import StdioIPC from './utils/StdioIPC';
 import workspace from './utils/workspace';
 import isWin from './utils/isWin';
 import validateBySchema from './utils/validateBySchema';
@@ -95,12 +94,9 @@ const ensureOptions = (options = {}) => {
 };
 
 const startMonitorProc = ({ cwd, daemon, env, name }) => {
-	const stdio = daemon ? 'ignore' : 'inherit';
-	const { execPath } = process;
 	const scriptFile = resolve(__dirname, '../bin/monitor');
-
-	const proc = spawn(execPath, [scriptFile], {
-		detached: daemon,
+	const stdio = daemon ? 'ignore' : 'inherit';
+	const proc = fork(scriptFile, [], {
 		stdio: ['ipc', stdio, stdio],
 		cwd,
 		env: {
@@ -136,7 +132,8 @@ const getCommand = (options) => {
 };
 
 const connectMonitor = async (monitorProc, options, connection) => {
-	const ipc = new StdioIPC(monitorProc);
+
+	// const ipc = new StdioIPC(monitorProc);
 	const command = getCommand(options);
 	const { name, daemon } = options;
 	const ppid = monitorProc.pid;
@@ -145,26 +142,42 @@ const connectMonitor = async (monitorProc, options, connection) => {
 	const socketPath = await Connection.getSocketPath(name);
 
 	return new Promise((resolve, reject) => {
-		ipc
-			.on('start', () => {
+		const handleMonitorProcMessage = function handleMonitorProcMessage(msg) {
+			if (!isObject(msg)) return;
+
+			const { type, payload } = msg;
+
+			if (type === 'start') {
 				logger.trace('monitor started');
 
 				if (connection) {
 					logger.info(`"${name}" restarted`);
 				}
 
+				monitorProc.disconnect();
+				monitorProc.removeListener('message', handleMonitorProcMessage);
+
 				if (daemon) {
-					monitorProc.disconnect();
 					monitorProc.unref();
 				}
 
 				resolve();
-			})
-			.on('error', (err) => {
+			}
+			else if (type === 'error') {
 				monitorProc.kill();
-				reject(err);
-			})
-			.send('start', {
+				reject(payload);
+			}
+		};
+		monitorProc.on('message', handleMonitorProcMessage);
+
+		monitorProc.once('error', (err) => {
+			monitorProc.kill();
+			reject(err);
+		});
+
+		monitorProc.send({
+			type: 'start',
+			payload: {
 				...options,
 				parentPid: ppid,
 				ppid,
@@ -172,7 +185,8 @@ const connectMonitor = async (monitorProc, options, connection) => {
 				socketPath,
 				command,
 				potjs,
-			});
+			},
+		});
 	});
 };
 

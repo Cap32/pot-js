@@ -1,6 +1,5 @@
 import { ensureLogger, logger, setLoggers } from 'pot-logger';
 import respawn, { EventTypes } from './utils/respawn';
-import StdioIPC from './utils/StdioIPC';
 import Connection from './Connection';
 import workspace from './utils/workspace';
 import { serialize } from './utils/serialize';
@@ -11,7 +10,6 @@ import chalk from 'chalk';
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
-const potIPC = new StdioIPC(process);
 
 if (!isProd) {
 	process.on('unhandledRejection', (reason, promise) => {
@@ -26,7 +24,7 @@ const startSocketServer = async function startSocketServer(monitor) {
 		return true;
 	}
 	catch (err) {
-		potIPC.send('error', err);
+		process.send({ type: 'error', payload: err });
 		return false;
 	}
 };
@@ -94,7 +92,7 @@ const start = async function start(options) {
 		logger.info(`"${name}" started`);
 		const success = await startSocketServer(monitor);
 		if (success) {
-			potIPC.send('start');
+			process.send({ type: 'start' });
 		}
 	});
 
@@ -173,4 +171,8 @@ const start = async function start(options) {
 	monitor.start();
 };
 
-potIPC.on('start', start);
+process.on('message', (message) => {
+	if (message.type === 'start') {
+		start(message.payload);
+	}
+});
