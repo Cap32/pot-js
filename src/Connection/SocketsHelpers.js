@@ -31,6 +31,7 @@ export async function removeDomainSocketFile(socketPath) {
 	if (isObject(socketPath)) {
 		socketPath = socketPath.socketPath;
 	}
+	logger.trace('remove socket file', socketPath);
 	return remove(socketPath).catch(noop);
 }
 
@@ -41,14 +42,15 @@ export async function getSocketPath(name) {
 
 export async function startServer(monitor) {
 	const { data } = monitor;
-	const path = data.socketPath;
+	const { socketPath } = data;
 
-	logger.trace('unix domain socket path', chalk.gray(path));
+	logger.trace('unix domain socket path', chalk.gray(socketPath));
 
-	const socketServer = await createServer(path);
+	const socketServer = await createServer(socketPath);
 	socketServer.reply(CLOSE, async () => {
 		try {
 			await socketServer.close();
+			await removeDomainSocketFile(socketPath);
 		}
 		catch (err) {
 			logger.debug('Failed to close socketServer', err);

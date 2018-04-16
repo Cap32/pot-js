@@ -10,6 +10,7 @@ import fkill from 'fkill';
 import isWin from '../utils/isWin';
 
 const removePidFile = async function removePidFile(pidFile) {
+	logger.trace('remove pid file', pidFile);
 	return remove(pidFile).catch(noop);
 };
 
@@ -35,6 +36,8 @@ const parsePidFile = async function parsePidFile(pidFile) {
 	return { pid, name, pidFile };
 };
 
+export { removePidFile };
+
 export async function getPidFile(name) {
 	const runDir = await workspace.getRunDir();
 	return join(runDir, `${name}.pid`);
@@ -52,17 +55,16 @@ export async function getPids() {
 	return pids.filter(Boolean);
 }
 
-export async function killPid(name, pid, pidFile, options = {}) {
+export async function killPid(name, pid, options = {}) {
 	try {
 		const { shouldLog } = options;
-		await removePidFile(pidFile);
 		await fkill(pid, { force: isWin });
 		logger.trace(`killed pid ${pid}`);
 		shouldLog && logger.info(`"${name}" stopped`);
 		return true;
 	}
 	catch (err) {
-		logger.info(`Stop "${name}" failed.`);
+		logger.error(`Stop "${name}" failed.`);
 		logger.debug(err);
 		return false;
 	}

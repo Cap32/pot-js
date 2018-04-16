@@ -1,6 +1,6 @@
 import { STATE, CLOSE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
-import { getPidFile, killPid, writePid } from './PidHelpers';
+import { getPidFile, killPid, writePid, removePidFile } from './PidHelpers';
 import { logger } from 'pot-logger';
 import {
 	startServer,
@@ -66,7 +66,7 @@ export default class Connection {
 		await writePid(monitor.data);
 	}
 
-	constructor({ name, pid, pidFile, socketPath, socket }, options = {}) {
+	constructor({ name, pid, pidFile, socket, socketPath }, options = {}) {
 		this._keepAlive = options.keepAlive;
 		this._name = name;
 		this._pid = pid;
@@ -125,9 +125,17 @@ export default class Connection {
 	}
 
 	async requestStopServer(options) {
-		this._socket.request(CLOSE);
-		this._socket.close();
-		removeDomainSocketFile(this._socketPath);
-		await killPid(this._name, this._pid, this._pidFile, options);
+		await Promise.all([
+			new Promise((resolve) => {
+				this._socket.once('close', resolve);
+				this._socket.request(CLOSE);
+			}),
+			killPid(this._name, this._pid, options),
+		]);
+
+		await Promise.all([
+			removeDomainSocketFile(this._socketPath),
+			removePidFile(this._pidFile),
+		]);
 	}
 }
