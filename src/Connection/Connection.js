@@ -1,4 +1,4 @@
-import { STATE, CLOSE } from './constants';
+import { STATE, CLOSE, RESTART } from './constants';
 import getInfoVerbose from './getInfoVerbose';
 import { getPidFile, killPid, writePid, removePidFile } from './PidHelpers';
 import { logger } from 'pot-logger';
@@ -13,10 +13,12 @@ export default class Connection {
 	static async getNames(options) {
 		ensureWorkspace(options);
 		const list = await getList();
-		return list.map(async ({ name, socket }) => {
-			await socket.close();
-			return name;
-		});
+		return Promise.all(
+			list.map(async ({ name, socket }) => {
+				await socket.close();
+				return name;
+			}),
+		);
 	}
 
 	static async getByName(name, options) {
@@ -75,6 +77,13 @@ export default class Connection {
 		this._socket = socket;
 	}
 
+	async _response(res) {
+		let response;
+		if (res) response = await res;
+		if (!this._keepAlive) this.disconnect();
+		return response;
+	}
+
 	async _getState(...args) {
 		try {
 			const state = await this._socket.request(STATE, ...args);
@@ -87,10 +96,7 @@ export default class Connection {
 				Object.assign(state, data);
 			}
 
-			if (!this._keepAlive) {
-				this.disconnect();
-			}
-			return state;
+			return this._response(state);
 		}
 		catch (err) {
 			logger.debug(err);
@@ -113,6 +119,10 @@ export default class Connection {
 	async getInfoVerbose() {
 		const state = await this.getState();
 		return getInfoVerbose(state);
+	}
+
+	async restart() {
+		return this._response(this._socket.request(RESTART));
 	}
 
 	async disconnect() {

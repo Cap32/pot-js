@@ -1,5 +1,6 @@
 export const STATE = 'STATE';
 export const CLOSE = 'CLOSE';
+export const RESTART = 'RESTART';
 
 // TODO: deprecated
 export const DEPRECATED_BRIDGE = 'bridge';

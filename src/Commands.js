@@ -10,6 +10,20 @@ export const start = {
 	validate: false,
 };
 
+export const restart = {
+	command: 'restart [name]',
+	description: 'Restart a process',
+	schema: Schemas.restart,
+	operator: Operators.restart,
+};
+
+export const restartAll = {
+	command: 'restartall',
+	description: 'Restart all processes',
+	schema: Schemas.restart,
+	operator: Operators.restartAll,
+};
+
 export const stop = {
 	command: 'stop [name]',
 	description: 'Stop a process',

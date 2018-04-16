@@ -21,6 +21,8 @@ export const stop = {
 	},
 };
 
+export const restart = stop;
+
 export const list = {
 	properties: {
 		logLevel,

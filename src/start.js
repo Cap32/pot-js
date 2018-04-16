@@ -131,9 +131,7 @@ const getCommand = (options) => {
 	return command;
 };
 
-const connectMonitor = async (monitorProc, options, connection) => {
-
-	// const ipc = new StdioIPC(monitorProc);
+const connectMonitor = async (monitorProc, options) => {
 	const command = getCommand(options);
 	const { name, daemon } = options;
 	const ppid = monitorProc.pid;
@@ -149,11 +147,6 @@ const connectMonitor = async (monitorProc, options, connection) => {
 
 			if (type === 'start') {
 				logger.trace('monitor started');
-
-				if (connection) {
-					logger.info(`"${name}" restarted`);
-				}
-
 				monitorProc.disconnect();
 				monitorProc.removeListener('message', handleMonitorProcMessage);
 
@@ -232,7 +225,7 @@ export default async function start(options = {}) {
 		}
 
 		monitorProc = startMonitorProc(options);
-		await connectMonitor(monitorProc, options, connection);
+		await connectMonitor(monitorProc, options);
 	}
 	catch (err) {
 		await kill();

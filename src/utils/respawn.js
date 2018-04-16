@@ -23,6 +23,7 @@ const kill = async function kill(pid) {
 const EventTypes = {
 	SPAWN: 'spawn',
 	START: 'start',
+	RESTART: 'restart',
 	SLEEP: 'sleep',
 	CRASH: 'crash',
 	EXIT: 'exit',
@@ -101,8 +102,16 @@ class Monitor extends EventEmitter {
 		]);
 	}
 
-	start() {
-		if (this.status === 'running') return;
+	async start(options = {}) {
+		let { restart } = options;
+
+		if (this.status === 'running') {
+			if (!restart) return false;
+			await this.stop();
+		}
+		else {
+			restart = false;
+		}
 
 		let restarts = 0;
 		let clock = 60000;
@@ -196,7 +205,15 @@ class Monitor extends EventEmitter {
 		clearTimeout(this.timeout);
 		loop();
 
-		if (this.status === 'running') this.emit(EventTypes.START);
+		if (this.status === 'running') {
+			this.emit(restart ? EventTypes.RESTART : EventTypes.START);
+			return true;
+		}
+		return false;
+	}
+
+	async restart() {
+		return this.start({ restart: true });
 	}
 
 	toJSON() {

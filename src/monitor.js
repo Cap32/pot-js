@@ -42,6 +42,7 @@ const start = async function start(options) {
 		watch: watchOptions,
 		monitorProcessTitle,
 		baseDir: cwd,
+		production,
 		...respawnOptions
 	} = options;
 
@@ -58,8 +59,18 @@ const start = async function start(options) {
 	const monitor = respawn(command, {
 		stdio: ['ignore', std, std],
 		...respawnOptions,
+		fork: false,
 		data: options,
-		env: configToEnv ? { ...env, [configToEnv]: JSON.stringify(options) } : env,
+		env: (function () {
+			const res = { ...env };
+			if (!res.NODE_ENV) {
+				res.NODE_ENV = production ? 'production' : 'development';
+			}
+			if (configToEnv) {
+				res[configToEnv] = JSON.stringify(options);
+			}
+			return res;
+		})(),
 	});
 
 	const eventsLogger = ensureLogger('events', 'gray');
@@ -86,20 +97,22 @@ const start = async function start(options) {
 		process.exit();
 	};
 
-	monitor.once(EventTypes.START, async () => {
-		logger.info(`"${name}" started`);
+	monitor.on(EventTypes.START, async () => {
 		const success = await startSocketServer(monitor);
 		if (success) {
 			process.send({ type: 'start' });
 		}
-	});
-
-	monitor.on(EventTypes.START, () => {
+		logger.info(`"${name}" started`);
 		runEvent(EventTypes.START);
 	});
 
+	monitor.on(EventTypes.RESTART, () => {
+		logger.info(`"${name}" restarted`);
+		runEvent(EventTypes.RESTART);
+	});
+
 	monitor.on(EventTypes.STOP, () => {
-		isProd && logger.warn(`"${name}" stopped`);
+		logger.warn(`"${name}" stopped`);
 		runEvent(EventTypes.STOP);
 	});
 
@@ -148,14 +161,9 @@ const start = async function start(options) {
 	});
 
 	watch({ cwd, ...watchOptions }, async (file, stat) => {
-		logger.info('restarted');
 		logger.trace('watch:restart', stat);
-
 		process.emit('watch:restart', { file, stat });
-		runEvent(EventTypes.RESTART);
-
-		await monitor.stop();
-		monitor.start();
+		await monitor.restart();
 	});
 
 	monitor.start();
