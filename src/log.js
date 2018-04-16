@@ -23,8 +23,8 @@ const log = async (options) => {
 		throw new Error(`"${appName}" NOT found`);
 	}
 
-	const info = await connection.getInfo();
-	const { logsDir } = info.data;
+	const state = await connection.getState();
+	const { logsDir } = state;
 
 	if (!logsDir) {
 		logger.warn('Logger is disabled');
