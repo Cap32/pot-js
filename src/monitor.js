@@ -2,7 +2,6 @@ import { ensureLogger, logger, setLoggers } from 'pot-logger';
 import respawn, { EventTypes } from './utils/respawn';
 import Connection from './Connection';
 import workspace from './utils/workspace';
-import { serialize } from './utils/serialize';
 import watch from './utils/watch';
 import onSignalExit from './utils/onSignalExit';
 import createScriptRunner from './utils/createScriptRunner';
@@ -36,7 +35,6 @@ const start = async function start(options) {
 		logsDir,
 		command,
 		daemon,
-		inject,
 		force,
 		env,
 		configToEnv,
@@ -58,7 +56,7 @@ const start = async function start(options) {
 
 	const std = daemon ? 'pipe' : 'inherit';
 	const monitor = respawn(command, {
-		stdio: [inject ? 'ipc' : 'ignore', std, std],
+		stdio: ['ignore', std, std],
 		...respawnOptions,
 		data: options,
 		env: configToEnv ? { ...env, [configToEnv]: JSON.stringify(options) } : env,
@@ -115,16 +113,8 @@ const start = async function start(options) {
 		runEvent(EventTypes.SLEEP);
 	});
 
-	monitor.on(EventTypes.SPAWN, (child) => {
+	monitor.on(EventTypes.SPAWN, () => {
 		runEvent(EventTypes.SPAWN);
-
-		if (inject) {
-			logger.trace('child.connected', child.connected);
-			if (child.connected) {
-				child.send(serialize(options));
-				child.disconnect();
-			}
-		}
 	});
 
 	monitor.on(EventTypes.EXIT, async (code, signal) => {
