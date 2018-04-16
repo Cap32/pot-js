@@ -2,8 +2,12 @@ import { logger, setLoggers } from 'pot-logger';
 import Connection from './Connection';
 import ensureSelected from './utils/ensureSelected';
 import workspace from './utils/workspace';
+import validateBySchema from './utils/validateBySchema';
+import { restart as schema } from './schemas/cli';
 
-export const restart = async function restart(options) {
+export const restart = async function restart(options = {}) {
+	validateBySchema(schema, options);
+
 	workspace.set(options);
 	setLoggers('logLevel', options.logLevel);
 

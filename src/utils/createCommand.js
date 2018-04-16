@@ -50,7 +50,7 @@ const handler = async function handler(argv) {
 			if (configFile) {
 				argv = await resolveConfig(argv, configFile);
 			}
-			if (validate !== false && schema) {
+			if (validate && schema) {
 				validateBySchema(schema, argv);
 			}
 			await operator(argv);

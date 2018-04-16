@@ -1,8 +1,11 @@
 import Connection from './Connection';
 import ensureSelected from './utils/ensureSelected';
 import workspace from './utils/workspace';
+import validateBySchema from './utils/validateBySchema';
+import { restart as schema } from './schemas/cli';
 
-const dir = async (options) => {
+export default async function dir(options = {}) {
+	validateBySchema(schema, options);
 	workspace.set(options);
 
 	const { name } = options;
@@ -23,6 +26,4 @@ const dir = async (options) => {
 	const state = await connection.getState();
 	const { cwd } = state;
 	console.log(cwd);
-};
-
-export default dir;
+}

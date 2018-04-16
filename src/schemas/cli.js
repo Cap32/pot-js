@@ -1,5 +1,5 @@
 import start from './config';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, omit } from 'lodash';
 
 const { properties } = start;
 const logLevel = cloneDeep(properties.logLevel);
@@ -21,7 +21,21 @@ export const stop = {
 	},
 };
 
-export const restart = stop;
+export const stopAll = {
+	properties: omit(stop.properties, ['name']),
+};
+
+export const restart = {
+	properties: {
+		logLevel,
+		name,
+		workspace,
+	},
+};
+
+export const restartAll = {
+	properties: omit(restart.properties, ['name']),
+};
 
 export const list = {
 	properties: {
@@ -30,13 +44,7 @@ export const list = {
 	},
 };
 
-export const dir = {
-	properties: {
-		logLevel,
-		name,
-		workspace,
-	},
-};
+export const dir = restart;
 
 export const log = {
 	properties: {

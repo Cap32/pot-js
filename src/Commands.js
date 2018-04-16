@@ -7,7 +7,6 @@ export const start = {
 	schema: Schemas.start,
 	operator: Operators.start,
 	configFile: 'config',
-	validate: false,
 };
 
 export const restart = {
@@ -20,7 +19,7 @@ export const restart = {
 export const restartAll = {
 	command: 'restartall',
 	description: 'Restart all processes',
-	schema: Schemas.restart,
+	schema: Schemas.restartAll,
 	operator: Operators.restartAll,
 };
 
@@ -34,7 +33,7 @@ export const stop = {
 export const stopall = {
 	command: 'stopall',
 	description: 'Stop all processes',
-	schema: Schemas.stop,
+	schema: Schemas.stopAll,
 	operator: Operators.stopAll,
 };
 

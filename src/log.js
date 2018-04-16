@@ -5,8 +5,11 @@ import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';
 import workspace from './utils/workspace';
+import validateBySchema from './utils/validateBySchema';
+import { log as schema } from './schemas/cli';
 
-const log = async (options) => {
+export default async function log(options = {}) {
+	validateBySchema(schema, options);
 	workspace.set(options);
 
 	const { name, line, category, follow } = options;
@@ -53,6 +56,4 @@ const log = async (options) => {
 		logger.warn('Log file NOT found');
 	});
 	sf[mode](-line).pipe(process.stdout);
-};
-
-export default log;
+}

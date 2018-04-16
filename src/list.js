@@ -5,6 +5,8 @@ import { isUndefined, isFunction } from 'lodash';
 import Connection from './Connection';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
+import validateBySchema from './utils/validateBySchema';
+import { list as schema } from './schemas/cli';
 
 const paddingSpaces = '    ';
 const tableOptions = {
@@ -82,7 +84,8 @@ const defaultCells = [
 	{ title: 'PID', width: 6, get: (state) => state.pid },
 ];
 
-const list = async (options = {}) => {
+export default async function list(options = {}) {
+	validateBySchema(schema, options);
 	workspace.set(options);
 
 	const { cells: getCells = defaultCells, logLevel } = options;
@@ -135,6 +138,4 @@ const list = async (options = {}) => {
 	};
 
 	await loop();
-};
-
-export default list;
+}

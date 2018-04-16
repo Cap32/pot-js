@@ -3,8 +3,12 @@ import workspace from './utils/workspace';
 import Connection from './Connection';
 import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
+import validateBySchema from './utils/validateBySchema';
+import { stop as schema } from './schemas/cli';
 
 export const stop = async function stop(options = {}) {
+	validateBySchema(schema, options);
+
 	let { name } = options;
 	const { force, logLevel } = options;
 
