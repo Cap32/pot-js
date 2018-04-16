@@ -36,6 +36,7 @@ export const stop = async function stop(options = {}) {
 		});
 
 		if (!confirmed.yes) {
+			await connection.disconnect();
 			return false;
 		}
 	}
@@ -45,7 +46,14 @@ export const stop = async function stop(options = {}) {
 
 export const stopAll = async function stopAll(options = {}) {
 	const names = await Connection.getNames();
-	return Promise.all(names.map(async (name) => stop({ ...options, name })));
+	if (options.force) {
+		await Promise.all(names.map(async (name) => stop({ ...options, name })));
+	}
+	else {
+		for (const name of names) {
+			await stop({ ...options, name });
+		}
+	}
 };
 
 export default stop;
