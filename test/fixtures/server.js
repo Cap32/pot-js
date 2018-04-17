@@ -5,7 +5,7 @@ require('http')
 		console.log('[HTTP]', req.url);
 		res.end(RESPONSE_DATA || '掂');
 	})
-	.listen(PORT, () => {
+	.listen(PORT, function () {
 		console.log('test server started');
 
 		var desiredLoadFactor = 0.5;

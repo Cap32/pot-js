@@ -4,8 +4,8 @@
 
 import spawn from 'cross-spawn';
 import { EventEmitter } from 'events';
-import { fork } from 'child_process';
 import fkill from 'fkill';
+import cluster from 'cluster';
 import { noop } from 'lodash';
 import isWin from './isWin';
 
@@ -42,6 +42,7 @@ class Monitor extends EventEmitter {
 		this.status = 'stopped';
 		this.command = command;
 		this.name = opts.name;
+		this.instances = opts.instances;
 		this.cwd = opts.cwd || '.';
 		this.env = opts.env || {};
 		this.data = opts.data || {};
@@ -56,7 +57,6 @@ class Monitor extends EventEmitter {
 		this.silent = opts.silent;
 		this.windowsVerbatimArguments = opts.windowsVerbatimArguments;
 		this.windowsHide = opts.windowsHide !== false;
-		this.spawnFn = opts.fork ? fork : spawn;
 
 		this.crashed = false;
 		this.sleep =
@@ -64,6 +64,7 @@ class Monitor extends EventEmitter {
 		this.maxRestarts = opts.maxRestarts === 0 ? 0 : opts.maxRestarts || -1;
 		this.kill = opts.kill === false ? false : opts.kill || 30000;
 		this.child = null;
+		this.worker = null;
 		this.started = null;
 		this.timeout = null;
 	}
@@ -118,11 +119,29 @@ class Monitor extends EventEmitter {
 		let clock = 60000;
 
 		const loop = () => {
+			const env = Object.assign(process.env, this.env);
+
 			const cmd =
 				typeof this.command === 'function' ? this.command() : this.command;
-			const child = this.spawnFn(cmd[0], cmd.slice(1), {
+
+			// cluster.setupMaster({
+			// 	execPath: this.command[0],
+			// 	execArgv: this.command.slice(1),
+			// 	cwd: this.cwd,
+			// 	uid: this.uid,
+			// 	gid: this.gid,
+			// 	silent: this.silent,
+			// 	windowsVerbatimArguments: this.windowsVerbatimArguments,
+			// 	windowsHide: this.windowsHide,
+			// });
+
+			// this.worker = cluster.fork(env);
+
+			// const child = this.worker.process;
+
+			const child = spawn(cmd[0], cmd.slice(1), {
 				cwd: this.cwd,
-				env: Object.assign(process.env, this.env),
+				env,
 				uid: this.uid,
 				gid: this.gid,
 				stdio: this.stdio,
@@ -252,11 +271,9 @@ class Monitor extends EventEmitter {
 	}
 }
 
-export default function respawn(command, opts) {
-	if (typeof command !== 'function' && !Array.isArray(command)) {
-		return respawn(command.command, command);
-	}
-	return new Monitor(command, opts || {});
+export default function respawn(command, opts = {}) {
+	const { instances = 1, ...options } = opts;
+	return new Array(instances).fill().map(() => new Monitor(command, options));
 }
 
 export { EventTypes };

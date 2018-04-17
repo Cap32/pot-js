@@ -102,6 +102,12 @@ export default {
 			],
 			default: false,
 		},
+		instances: {
+			alias: 'i',
+			description: 'Cluster instances',
+			default: 1,
+			type: 'number',
+		},
 		logLevel: {
 			alias: 'l',
 			description: 'Log level',
