@@ -8,23 +8,22 @@ Script runner
 
 <!-- TOC -->
 
-* [pot-js](#pot-js)
-  * [Table of Contents](#table-of-contents)
-  * [Features](#features)
-  * [Installing](#installing)
-  * [CLI Reference](#cli-reference)
-  * [Node.js module API Reference](#nodejs-module-api-reference)
-    * [start([options])](#startoptions)
-      * [Options](#options)
-    * [stop([options])](#stopoptions)
-      * [Options](#options-1)
-    * [stopall([options])](#stopalloptions)
-      * [Options](#options-2)
-    * [list([options])](#listoptions)
-      * [Options](#options-3)
-    * [log([options])](#logoptions)
-    * [dir([options])](#diroptions)
-  * [License](#license)
+* [Table of Contents](#table-of-contents)
+* [Features](#features)
+* [Installing](#installing)
+* [CLI Reference](#cli-reference)
+* [Node.js module API Reference](#nodejs-module-api-reference)
+  * [start([options])](#startoptions)
+    * [Options](#options)
+  * [stop([options])](#stopoptions)
+    * [Options](#options-1)
+  * [stopall([options])](#stopalloptions)
+    * [Options](#options-2)
+  * [list([options])](#listoptions)
+    * [Options](#options-3)
+  * [log([options])](#logoptions)
+  * [dir([options])](#diroptions)
+* [License](#license)
 
 <!-- /TOC -->
 
@@ -56,6 +55,8 @@ pot <command> [options]
 
 Commands:
   pot start [entry]  Spawn and monitor a process
+  pot restart [name]  Restart a process
+  pot restartall      Restart all processes
   pot stop [name]    Stop a process
   pot stopall        Stop all processes
   pot list           List processes                      [aliases: ls]
