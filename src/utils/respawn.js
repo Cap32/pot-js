@@ -55,6 +55,7 @@ class Monitor extends EventEmitter {
 		this.stderr = opts.stderr;
 		this.silent = opts.silent;
 		this.windowsVerbatimArguments = opts.windowsVerbatimArguments;
+		this.windowsHide = opts.windowsHide !== false;
 		this.spawnFn = opts.fork ? fork : spawn;
 
 		this.crashed = false;
@@ -127,6 +128,7 @@ class Monitor extends EventEmitter {
 				stdio: this.stdio,
 				silent: this.silent,
 				windowsVerbatimArguments: this.windowsVerbatimArguments,
+				windowsHide: this.windowsHide,
 			});
 
 			this.started = new Date();

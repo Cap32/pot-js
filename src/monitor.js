@@ -6,6 +6,7 @@ import watch from './utils/watch';
 import onSignalExit from './utils/onSignalExit';
 import createScriptRunner from './utils/createScriptRunner';
 import chalk from 'chalk';
+import { resolve } from 'path';
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
@@ -55,9 +56,8 @@ const start = async function start(options) {
 	workspace.set(space);
 	process.title = monitorProcessTitle;
 
-	const std = daemon ? 'pipe' : 'inherit';
 	const monitor = respawn(command, {
-		stdio: ['ignore', std, std],
+		stdio: ['ignore', 'pipe', 'pipe'],
 		...respawnOptions,
 		fork: false,
 		data: options,
@@ -76,13 +76,13 @@ const start = async function start(options) {
 	const eventsLogger = ensureLogger('events', 'gray');
 	const runScript = createScriptRunner({ cwd, logger: eventsLogger });
 	const runEvent = (event, ...args) => {
-		const command = events[event];
-		if (command) {
+		const hook = events[event];
+		if (hook) {
 			const prefix = [event]
 				.concat(args)
 				.filter(Boolean)
 				.join(' ');
-			eventsLogger.info(chalk.gray(`${prefix} - ${command}`));
+			eventsLogger.info(chalk.gray(`${prefix} - ${hook}`));
 			runScript(event, ...args);
 		}
 	};
@@ -137,17 +137,17 @@ const start = async function start(options) {
 
 	monitor.on(EventTypes.STDOUT, (data) => {
 		runEvent(EventTypes.STDOUT);
-		logger.info(data.toString());
+		logger.info(data.toString().trim());
 	});
 
 	monitor.on(EventTypes.STDERR, (data) => {
 		runEvent(EventTypes.STDERR);
-		logger.error(data.toString());
+		logger.error(data.toString().trim());
 	});
 
 	monitor.on(EventTypes.WARN, (data) => {
 		runEvent(EventTypes.WARN);
-		logger.warn(data.toString());
+		logger.warn(data.toString().trim());
 	});
 
 	process.on('uncaughtException', async (err) => {
