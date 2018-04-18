@@ -37,7 +37,7 @@ class Monitor extends EventEmitter {
 	constructor(command, opts) {
 		super();
 
-		this.id = null; // for respawn-group
+		this.id = null;
 
 		this.status = 'stopped';
 		this.command = command;
@@ -45,7 +45,7 @@ class Monitor extends EventEmitter {
 		this.instances = opts.instances;
 		this.cwd = opts.cwd || '.';
 		this.env = opts.env || {};
-		this.data = opts.data || {};
+		this.data = { ...opts.data };
 		this.uid = opts.uid;
 		this.gid = opts.gid;
 		this.pid = 0;
@@ -121,34 +121,35 @@ class Monitor extends EventEmitter {
 		const loop = () => {
 			const env = Object.assign(process.env, this.env);
 
-			const cmd =
-				typeof this.command === 'function' ? this.command() : this.command;
+			// const cmd =
+			// 	typeof this.command === 'function' ? this.command() : this.command;
 
-			// cluster.setupMaster({
-			// 	execPath: this.command[0],
-			// 	execArgv: this.command.slice(1),
-			// 	cwd: this.cwd,
-			// 	uid: this.uid,
-			// 	gid: this.gid,
-			// 	silent: this.silent,
-			// 	windowsVerbatimArguments: this.windowsVerbatimArguments,
-			// 	windowsHide: this.windowsHide,
-			// });
-
-			// this.worker = cluster.fork(env);
-
-			// const child = this.worker.process;
-
-			const child = spawn(cmd[0], cmd.slice(1), {
+			cluster.setupMaster({
+				execPath: this.command[0],
+				execArgv: this.command.slice(1),
 				cwd: this.cwd,
-				env,
 				uid: this.uid,
 				gid: this.gid,
-				stdio: this.stdio,
 				silent: this.silent,
 				windowsVerbatimArguments: this.windowsVerbatimArguments,
 				windowsHide: this.windowsHide,
 			});
+
+			this.worker = cluster.fork(env);
+			this.id = this.worker.id;
+
+			const child = this.worker.process;
+
+			// const child = spawn(cmd[0], cmd.slice(1), {
+			// 	cwd: this.cwd,
+			// 	env,
+			// 	uid: this.uid,
+			// 	gid: this.gid,
+			// 	stdio: this.stdio,
+			// 	silent: this.silent,
+			// 	windowsVerbatimArguments: this.windowsVerbatimArguments,
+			// 	windowsHide: this.windowsHide,
+			// });
 
 			this.started = new Date();
 			this.status = 'running';

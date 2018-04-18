@@ -9,6 +9,7 @@ import chalk from 'chalk';
 import globby from 'globby';
 import { noop, isObject } from 'lodash';
 import isWin from '../utils/isWin';
+import getKey from './getKey';
 
 export async function getSocketFiles() {
 	const runDir = await workspace.getRunDir();
@@ -20,7 +21,7 @@ export async function getSocketFiles() {
 	const socketPaths = await globby(patterns, { absolute: true });
 	return socketPaths.map((socketPath) => ({
 		socketPath,
-		name: basename(socketPath),
+		key: basename(socketPath, '.sock'),
 	}));
 }
 
@@ -35,22 +36,22 @@ export async function removeDomainSocketFile(socketPath) {
 	return remove(socketPath).catch(noop);
 }
 
-export async function getSocketPath(name) {
+export async function getSocketPath(keyOrMonitor) {
 	const runDir = await workspace.getRunDir();
-	return ensureLocalDomainPath(join(runDir, name));
+	const key = getKey(keyOrMonitor);
+	return ensureLocalDomainPath(join(runDir, key));
 }
 
 export async function startServer(monitor) {
-	const { data } = monitor;
-	const { socketPath } = data;
+	const { socketPath } = monitor.data;
 
 	logger.trace('unix domain socket path', chalk.gray(socketPath));
-
 	const socketServer = await createServer(socketPath);
+
 	socketServer.reply(CLOSE, async () => {
 		try {
 			await socketServer.close();
-			await removeDomainSocketFile(socketPath);
+			await removeDomainSocketFile(monitor.data.socketPath);
 		}
 		catch (err) {
 			logger.debug('Failed to close socketServer', err);
@@ -59,10 +60,9 @@ export async function startServer(monitor) {
 
 	socketServer.reply(STATE, async (state) => {
 		if (state) {
-			Object.assign(data, state);
+			Object.assign(monitor.data, state);
 		}
-		const monitorState = monitor.toJSON();
-		return monitorState;
+		return monitor.toJSON();
 	});
 
 	socketServer.reply(RESTART, async () => {

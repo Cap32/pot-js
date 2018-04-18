@@ -133,11 +133,9 @@ const getCommand = (options) => {
 
 const connectMonitor = async (monitorProc, options) => {
 	const command = getCommand(options);
-	const { name, daemon } = options;
+	const { daemon } = options;
 	const ppid = monitorProc.pid;
 	logger.debug('monitor pid', chalk.magenta(ppid));
-	const pidFile = await Connection.getPidFile(name);
-	const socketPath = await Connection.getSocketPath(name);
 
 	return new Promise((resolve, reject) => {
 		const handleMonitorProcMessage = function handleMonitorProcMessage(msg) {
@@ -174,8 +172,6 @@ const connectMonitor = async (monitorProc, options) => {
 				...options,
 				parentPid: ppid,
 				ppid,
-				pidFile,
-				socketPath,
 				command,
 				potjs,
 			},

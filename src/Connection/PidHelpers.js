@@ -1,5 +1,5 @@
 import processExists from 'process-exists';
-import { writeFile, readFile, exists, remove } from 'fs-extra';
+import { writeFile, readFile, remove } from 'fs-extra';
 import workspace from '../utils/workspace';
 import { basename, join } from 'path';
 import { trim, noop } from 'lodash';
@@ -8,6 +8,7 @@ import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import fkill from 'fkill';
 import isWin from '../utils/isWin';
+import getKey from './getKey';
 
 const removePidFile = async function removePidFile(pidFile) {
 	logger.trace('remove pid file', pidFile);
@@ -15,8 +16,7 @@ const removePidFile = async function removePidFile(pidFile) {
 };
 
 const getPid = async function getPid(pidFile) {
-	const isFileExists = await exists(pidFile);
-	if (isFileExists) {
+	try {
 		const pid = +trim(await readFile(pidFile, 'utf-8'));
 		const isProcessExists = await processExists(pid);
 		if (!isProcessExists) {
@@ -24,23 +24,26 @@ const getPid = async function getPid(pidFile) {
 		}
 		return isProcessExists && pid;
 	}
-	return false;
+	catch (err) {
+		return false;
+	}
 };
 
 const parsePidFile = async function parsePidFile(pidFile) {
 	const pid = await getPid(pidFile);
-	const name = basename(pidFile, '.pid');
+	const key = basename(pidFile, '.pid');
 	if (!pid) {
 		return false;
 	}
-	return { pid, name, pidFile };
+	return { pid, key, pidFile };
 };
 
 export { removePidFile };
 
-export async function getPidFile(name) {
+export async function getPidFile(keyOrMonitor) {
+	const key = getKey(keyOrMonitor);
 	const runDir = await workspace.getRunDir();
-	return join(runDir, `${name}.pid`);
+	return join(runDir, `${key}.pid`);
 }
 
 export async function getPids() {
@@ -55,16 +58,16 @@ export async function getPids() {
 	return pids.filter(Boolean);
 }
 
-export async function killPid(name, pid, options = {}) {
+export async function killPid(key, pid, options = {}) {
 	try {
 		const { shouldLog } = options;
 		await fkill(pid, { force: isWin });
 		logger.trace(`killed pid ${pid}`);
-		shouldLog && logger.info(`"${name}" stopped`);
+		shouldLog && logger.info(`"${key}" stopped`);
 		return true;
 	}
 	catch (err) {
-		logger.error(`Stop "${name}" failed.`);
+		logger.error(`Stop "${key}" failed.`);
 		logger.debug(err);
 		return false;
 	}

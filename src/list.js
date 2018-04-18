@@ -38,6 +38,7 @@ const tableOptions = {
 
 const defaultCells = [
 	{ title: 'Name', width: 10, get: (state) => state.name },
+	{ title: 'Id', width: 4, get: (state) => state.monitor.id },
 	{
 		title: 'Status',
 		width: 8,
@@ -99,7 +100,7 @@ export default async function list(options = {}) {
 		cells.push();
 	}
 
-	const connections = await Connection.getList({ keepAlive: true });
+	const instances = await Connection.getAllInstances({ keepAlive: true });
 
 	const loop = async () => {
 		const table = new Table({
@@ -109,7 +110,7 @@ export default async function list(options = {}) {
 		});
 
 		let stateList = await Promise.all(
-			connections.map((connection) => connection.getInfoVerbose()),
+			instances.map((instance) => instance.getInfoVerbose()),
 		);
 
 		stateList = stateList.filter(Boolean);

@@ -1,151 +1,84 @@
-import { STATE, CLOSE, RESTART } from './constants';
-import getInfoVerbose from './getInfoVerbose';
-import { getPidFile, killPid, writePid, removePidFile } from './PidHelpers';
+import { getPidFile, writePid } from './PidHelpers';
+import { uniq } from 'lodash';
+import { startServer, getSocketPath } from './SocketsHelpers';
+import { ensureWorkspace } from './ConnectionUtils';
 import { logger } from 'pot-logger';
-import {
-	startServer,
-	getSocketPath,
-	removeDomainSocketFile,
-} from './SocketsHelpers';
-import { getList, getByName, ensureWorkspace } from './ConnectionUtils';
+import getKey from './getKey';
+import Instance from './Instance';
 
 export default class Connection {
 	static async getNames(options) {
-		ensureWorkspace(options);
-		const list = await getList();
-		return Promise.all(
-			list.map(async ({ name, socket }) => {
-				await socket.close();
+		const instances = await Instance.getAllInstances(options);
+		const names = await Promise.all(
+			instances.map(async (instance) => {
+				const { name } = await instance.getState();
 				return name;
 			}),
 		);
+		return uniq(names);
 	}
 
 	static async getByName(name, options) {
-		ensureWorkspace(options);
-		const item = await getByName(name);
-		return item && new Connection(item, options);
+		const instances = await Instance.getInstancesByName(name, options);
+		return instances.length ? new Connection(name, instances) : null;
 	}
 
-	static async requestStopServer(name, options) {
+	static async getState(name, options = {}) {
 		const connection = await Connection.getByName(name, options);
-		if (connection) {
-			return connection.requestStopServer(options);
-		}
-		else {
-			return false;
-		}
+		if (!connection) return {};
+		return connection.getState(options.instanceIndex);
 	}
 
-	static async getState(name, options) {
-		const connection = await Connection.getByName(name, options);
-		if (connection) {
-			return connection.getState();
-		}
-		else {
-			return false;
-		}
-	}
+	static getAllInstances = Instance.getAllInstances;
 
-	static async getList(options) {
-		ensureWorkspace(options);
-		const list = await getList();
-		return list.map((item) => new Connection(item, options));
-	}
-
-	static async getPidFile(name, options) {
-		ensureWorkspace(options);
-		return getPidFile(name);
-	}
-
-	static async getSocketPath(name, options) {
-		ensureWorkspace(options);
-		return getSocketPath(name);
-	}
+	static getList = Connection.getAllInstances;
 
 	static async serve(monitor) {
+		const { data: options, worker = {} } = monitor;
+		ensureWorkspace(options);
+
+		const key = getKey(monitor);
+		const pidFile = await getPidFile(key);
+		const socketPath = await getSocketPath(key);
+
+		options.workerId = worker.id || 0;
+		options.key = key;
+		options.pidFile = pidFile;
+		options.socketPath = socketPath;
+
 		await startServer(monitor);
-		await writePid(monitor.data);
+		await writePid(options);
 	}
 
-	constructor({ name, pid, pidFile, socket, socketPath }, options = {}) {
-		this._keepAlive = options.keepAlive;
+	constructor(name, instances = []) {
 		this._name = name;
-		this._pid = pid;
-		this._pidFile = pidFile;
-		this._socketPath = socketPath;
-		this._socket = socket;
+		this.instances = instances;
 	}
 
-	async _response(res) {
-		let response;
-		if (res) response = await res;
-		if (!this._keepAlive) this.disconnect();
-		return response;
+	async getState(instanceIndex = 0) {
+		const instance = this.instances[instanceIndex];
+		if (!instance) return {};
+		const state = await instance.getState();
+		await this.disconnect();
+		return state;
 	}
 
-	async _getState(...args) {
-		try {
-			const state = await this._socket.request(STATE, ...args);
-
-			// DEPRECATED: adapt to old version state
-			if (state && state.data) {
-				const { data } = state;
-				delete state.data;
-				state.monitor = state;
-				Object.assign(state, data);
-			}
-
-			return this._response(state);
-		}
-		catch (err) {
-			logger.debug(err);
-			await this.disconnect();
-		}
-	}
-
-	async setState(state) {
-		return this._getState(state);
-	}
-
-	async getState() {
-		return this._getState();
-	}
-
-	async getInfo() {
-		return this.getState();
-	}
-
-	async getInfoVerbose() {
-		const state = await this.getState();
-		return getInfoVerbose(state);
+	async _each(method, ...args) {
+		return Promise.all(
+			this.instances.map((instance) => instance[method](...args)),
+		);
 	}
 
 	async restart() {
-		return this._response(this._socket.request(RESTART));
+		return this._each('restart');
 	}
 
 	async disconnect() {
-		try {
-			await this._socket.close();
-		}
-		catch (err) {
-			logger.debug(err);
-		}
+		return this._each('disconnect');
 	}
 
-	async requestStopServer(options) {
-		await Promise.all([
-			new Promise((resolve) => {
-				this._socket.once('close', resolve);
-				this._socket.request(CLOSE);
-			}),
-			killPid(this._name, this._pid, options),
-		]);
-
-		await Promise.all([
-			removeDomainSocketFile(this._socketPath),
-			removePidFile(this._pidFile),
-		]);
+	async requestStopServer(options = {}) {
+		options.shouldLog && logger.info(`"${this._name}" stopped`);
+		return this._each('requestStopServer');
 	}
 }

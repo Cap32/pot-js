@@ -22,7 +22,7 @@ describe('cli `pot start`', () => {
 			'--logLevel=DEBUG',
 		])
 			.assertUntil(/started/)
-			.assertUntil('INFO test server started')
+			.assertUntil('test server started')
 			.doneAndKill();
 	});
 
@@ -55,14 +55,14 @@ describe('cli `pot start`', () => {
 			name,
 		])
 			.assertUntil(/started/)
-			.assertUntil('INFO test server started', {
+			.assertUntil('test server started', {
 				action: async () => {
 					const { pid } = await Connection.getState(name);
 					await fkill(pid, { force: /^win/.test(process.platform) });
 				},
 			})
 			.assertUntil(/sleeped/)
-			.assertUntil('INFO test server started') // restarted
+			.assertUntil('test server started') // restarted
 			.doneAndKill();
 	});
 });
@@ -111,14 +111,14 @@ describe('cli `pot start` with config file', async () => {
 			'module.exports = { entry: \'fixtures/server.js\' }',
 		);
 		return Kapok.start(command, ['start'], { cwd: __dirname })
-			.assertUntil('INFO test server started')
+			.assertUntil('test server started')
 			.doneAndKill();
 	});
 
 	test('should read `.potrc.json` config file', async () => {
 		await writeConfig('.potrc.json', '{ "entry": "fixtures/server.js" }');
 		return Kapok.start(command, ['start'], { cwd: __dirname })
-			.assertUntil('INFO test server started')
+			.assertUntil('test server started')
 			.doneAndKill();
 	});
 });
@@ -126,7 +126,7 @@ describe('cli `pot start` with config file', async () => {
 describe('cli `pot stop`', () => {
 	test('should `pot stop` work', async () => {
 		await Kapok.start(command, ['start', '--entry', 'test/fixtures/server.js'])
-			.until('INFO test server started', {
+			.until('test server started', {
 				async action() {
 					return Kapok.start(command, ['stop', '-f'])
 						.assert('INFO "pot-js" stopped')
@@ -154,7 +154,7 @@ describe('cli `pot stopall`', () => {
 			'--entry',
 			'test/fixtures/socket.js',
 		])
-			.until('INFO socket server started', {
+			.until('socket server started', {
 				async action() {
 					return Kapok.start(command, [
 						'start',
@@ -165,7 +165,7 @@ describe('cli `pot stopall`', () => {
 						'--entry',
 						'test/fixtures/socket.js',
 					])
-						.until('INFO socket server started', {
+						.until('socket server started', {
 							async action() {
 								return Kapok.start(command, ['stopall', '-f'])
 									.assert(/INFO "[ab]" stopped/)
@@ -187,7 +187,7 @@ describe('cli `pot dir`', () => {
 			['start', '--entry', 'test/fixtures/server.js', '--name', 'app'],
 			{ env: { ...process.env, PORT: 3001 } },
 		)
-			.until('INFO test server started', {
+			.until('test server started', {
 				async assert() {
 					return Kapok.start(command, ['dir'])
 						.assertUntil(process.cwd())

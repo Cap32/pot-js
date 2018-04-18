@@ -56,7 +56,8 @@ const start = async function start(options) {
 	process.title = monitorProcessTitle;
 
 	const monitors = respawn(command, {
-		stdio: ['ignore', 'pipe', 'pipe'],
+
+		// stdio: ['ignore', 'pipe', 'pipe'],
 		...respawnOptions,
 		data: options,
 		env: (function () {
