@@ -115,7 +115,8 @@ const start = async function start(options) {
 			runEvent(EventTypes.START);
 		});
 
-		monitor.on(EventTypes.RESTART, () => {
+		monitor.on(EventTypes.RESTART, async () => {
+			await Connection.writePid(monitor);
 			logger.info(`"${name}" restarted`);
 			runEvent(EventTypes.RESTART);
 		});

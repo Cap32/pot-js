@@ -50,6 +50,11 @@ export default class Connection {
 		await writePid(options);
 	}
 
+	static async writePid(monitor) {
+		logger.info(monitor.data.pid);
+		await writePid(monitor.data);
+	}
+
 	constructor(name, instances = []) {
 		this._name = name;
 		this.instances = instances;
