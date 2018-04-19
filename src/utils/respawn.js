@@ -155,6 +155,8 @@ class Monitor extends EventEmitter {
 			this.status = 'running';
 			this.child = child;
 			this.pid = child.pid;
+			this.data.pid = this.pid;
+			this.data.ppid = this.ppid;
 			this.emit(EventTypes.SPAWN, child);
 
 			child.setMaxListeners(0);

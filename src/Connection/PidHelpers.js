@@ -32,10 +32,8 @@ const getPid = async function getPid(pidFile) {
 const parsePidFile = async function parsePidFile(pidFile) {
 	const pid = await getPid(pidFile);
 	const key = basename(pidFile, '.pid');
-	if (!pid) {
-		return false;
-	}
-	return { pid, key, pidFile };
+	if (!pid) return false;
+	return { key, pidFile };
 };
 
 export { removePidFile };
@@ -58,11 +56,11 @@ export async function getPids() {
 	return pids.filter(Boolean);
 }
 
-export async function killPid(key, pid, options = {}) {
+export async function killPid(key, ppid, options = {}) {
 	try {
 		const { shouldLog } = options;
-		await fkill(pid, { force: isWin });
-		logger.trace(`killed pid ${pid}`);
+		await fkill(ppid, { force: isWin });
+		logger.trace(`killed pid ${ppid}`);
 		shouldLog && logger.info(`"${key}" stopped`);
 		return true;
 	}
@@ -73,7 +71,7 @@ export async function killPid(key, pid, options = {}) {
 	}
 }
 
-export async function writePid({ pidFile, parentPid }) {
+export async function writePid({ pidFile, pid }) {
 	logger.trace('pid file saved in', chalk.gray(pidFile));
-	await writeFile(pidFile, parentPid).catch((err) => logger.debug(err));
+	await writeFile(pidFile, pid).catch((err) => logger.debug(err));
 }

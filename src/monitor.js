@@ -89,11 +89,16 @@ const start = async function start(options) {
 	monitors.forEach((monitor) => {
 		const exit = async () => {
 			logger.debug('exit');
-			const connection = await Connection.getByName(name);
-			if (connection) {
-				await connection.requestStopServer();
+			try {
+				const connection = await Connection.getByName(name);
+				if (connection) {
+					await connection.requestStopServer();
+				}
+				await monitor.stop();
 			}
-			await monitor.stop();
+			catch (err) {
+				logger.debug(err);
+			}
 			process.exit();
 		};
 

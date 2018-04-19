@@ -41,7 +41,7 @@ const getAll = async function getAll() {
 				const socket = await startClient(socketRef.socketPath);
 				if (socket) {
 					const state = await getState(socket);
-					const { pidFile, parentPid: pid } = state;
+					const { pidFile, pid } = state;
 					refsList.push({
 						pidFile,
 						pid,
@@ -110,12 +110,8 @@ export default class Instance {
 		return refs.map((ref) => new Instance(ref, options));
 	}
 
-	constructor({ key, pid, pidFile, socket, socketPath }, options = {}) {
+	constructor({ socket }, options = {}) {
 		this._keepAlive = options.keepAlive;
-		this._key = key;
-		this._pid = pid;
-		this._pidFile = pidFile;
-		this._socketPath = socketPath;
 		this._socket = socket;
 	}
 
@@ -168,16 +164,19 @@ export default class Instance {
 	}
 
 	async requestStopServer(options) {
+		const socket = this._socket;
+		const state = await getState(socket);
+		const { key, ppid, socketPath, pidFile } = state;
 		await Promise.all([
 			new Promise((resolve) => {
-				this._socket.once('close', resolve);
-				this._socket.request(CLOSE).catch(logger.debug);
+				socket.once('close', resolve);
+				socket.request(CLOSE).catch(logger.debug);
 			}),
-			killPid(this._key, this._pid, options),
+			killPid(key, ppid, options),
 		]);
 		await Promise.all([
-			removeDomainSocketFile(this._socketPath),
-			removePidFile(this._pidFile),
+			removeDomainSocketFile(socketPath),
+			removePidFile(pidFile),
 		]);
 	}
 }
