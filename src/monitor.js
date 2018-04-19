@@ -28,6 +28,8 @@ const startSocketServer = async function startSocketServer(monitor) {
 	}
 };
 
+const globalState = { instancesCount: 0 };
+
 const start = async function start(options) {
 	const {
 		name,
@@ -60,6 +62,7 @@ const start = async function start(options) {
 		// stdio: ['ignore', 'pipe', 'pipe'],
 		...respawnOptions,
 		data: options,
+		globalState,
 		env: (function () {
 			const res = { ...env };
 			if (!res.NODE_ENV) {
@@ -103,6 +106,7 @@ const start = async function start(options) {
 		};
 
 		monitor.on(EventTypes.START, async () => {
+			monitor.id = ++globalState.instancesCount;
 			const success = await startSocketServer(monitor);
 			if (success) {
 				process.send({ type: 'start' });

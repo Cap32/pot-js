@@ -34,14 +34,14 @@ export default class Connection {
 	static getList = Connection.getAllInstances;
 
 	static async serve(monitor) {
-		const { data: options, worker = {} } = monitor;
+		const { data: options, id } = monitor;
 		ensureWorkspace(options);
 
 		const key = getKey(monitor);
 		const pidFile = await getPidFile(key);
 		const socketPath = await getSocketPath(key);
 
-		options.workerId = worker.id || 0;
+		options.instanceId = id;
 		options.key = key;
 		options.pidFile = pidFile;
 		options.socketPath = socketPath;

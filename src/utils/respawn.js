@@ -37,15 +37,14 @@ class Monitor extends EventEmitter {
 	constructor(command, opts) {
 		super();
 
-		this.id = null;
-
+		this.id = 0;
 		this.status = 'stopped';
 		this.command = command;
 		this.name = opts.name;
-		this.instances = opts.instances;
 		this.cwd = opts.cwd || '.';
 		this.env = opts.env || {};
 		this.data = { ...opts.data };
+		this.globalState = opts.globalState;
 		this.uid = opts.uid;
 		this.gid = opts.gid;
 		this.pid = 0;
@@ -136,8 +135,6 @@ class Monitor extends EventEmitter {
 			});
 
 			this.worker = cluster.fork(env);
-			this.id = this.worker.id;
-
 			const child = this.worker.process;
 
 			// const child = spawn(cmd[0], cmd.slice(1), {
@@ -245,6 +242,7 @@ class Monitor extends EventEmitter {
 			...this.data,
 			pid: this.pid,
 			ppid: this.ppid,
+			globalState: this.globalState,
 			monitor: {
 				id: this.id,
 				name: this.name,
