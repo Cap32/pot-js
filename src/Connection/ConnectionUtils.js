@@ -15,6 +15,7 @@ export async function getState(socket, ...args) {
 		delete state.data;
 		state.monitor = state;
 		Object.assign(state, data);
+		if (state.parentPid && !state.ppid) state.ppid = state.parentPid;
 	}
 
 	return state;

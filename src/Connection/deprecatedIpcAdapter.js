@@ -38,6 +38,8 @@ export async function createClient(socketPath) {
 				resolve(socket);
 			});
 
+			socket.once = socket.on.bind(socket);
+
 			socket.on('error', reject);
 		});
 	});

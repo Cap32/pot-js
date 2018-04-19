@@ -170,7 +170,6 @@ const connectMonitor = async (monitorProc, options) => {
 			type: 'start',
 			payload: {
 				...options,
-				parentPid: ppid,
 				ppid,
 				command,
 				potjs,
