@@ -38,7 +38,7 @@ const tableOptions = {
 
 const defaultCells = [
 	{ title: 'Name', width: 10, get: (state) => state.name },
-	{ title: 'Id', width: 4, get: (state) => state.monitor.id },
+	{ title: 'Instance', width: 10, get: (state) => state.monitor.id },
 	{
 		title: 'Status',
 		width: 8,
