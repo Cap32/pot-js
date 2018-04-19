@@ -244,7 +244,7 @@ class Monitor extends EventEmitter {
 			ppid: this.ppid,
 			globalState: this.globalState,
 			monitor: {
-				id: this.id,
+				instanceId: this.id,
 				name: this.name,
 				status: this.status,
 				started: this.started,
