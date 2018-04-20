@@ -78,7 +78,6 @@ Spawn and monitor a process.
 
 * `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`.
 * `config` (String): Path to the config file Defaults to `.potrc`.
-* `configToEnv` (String): Setting an env name and pass the config json string to child process `env`.
 * `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
 * `daemon` (Boolean): Enable `daemon` mode. Notice: to kill `daemon` process, please run `pot stop ${name}`. Defaults to `false`.
 * `entry` (String): Defining the source script. Defaults to `./index.js`.
@@ -96,6 +95,7 @@ Spawn and monitor a process.
 * `execArgs` (String|[String]): Executing arguments. Defaults to `[]`.
 * `execCommand` (String): Executing command. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
 * `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Defaults to `false`.
+* `instances` (Number): Cluster instances. Defaults to `1`.
 * `logLevel` (String|Object): Defining log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
   * ALL
   * TRACE
