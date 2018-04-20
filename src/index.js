@@ -1,6 +1,7 @@
 export start from './start';
 export { stop, stopAll } from './stop';
 export { restart, restartAll } from './restart';
+export { reload, reloadAll } from './reload';
 export list from './list';
 export log from './log';
 export dir from './dir';

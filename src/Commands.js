@@ -23,6 +23,20 @@ export const restartAll = {
 	operator: Operators.restartAll,
 };
 
+export const reload = {
+	command: 'reload [name]',
+	description: 'Reload a process',
+	schema: Schemas.reload,
+	operator: Operators.reload,
+};
+
+export const reloadAll = {
+	command: 'reloadall',
+	description: 'Reload all processes',
+	schema: Schemas.reloadAll,
+	operator: Operators.reloadAll,
+};
+
 export const stop = {
 	command: 'stop [name]',
 	description: 'Stop a process',

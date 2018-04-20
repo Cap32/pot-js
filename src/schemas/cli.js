@@ -37,6 +37,21 @@ export const restartAll = {
 	properties: omit(restart.properties, ['name']),
 };
 
+export const reload = {
+	properties: {
+		...restart.properties,
+		delay: {
+			description: 'Reload delay',
+			type: 'number',
+			default: 5000,
+		},
+	},
+};
+
+export const reloadAll = {
+	properties: omit(reload.properties, ['name']),
+};
+
 export const list = {
 	properties: {
 		logLevel,

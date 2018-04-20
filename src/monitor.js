@@ -1,5 +1,6 @@
 import { ensureLogger, logger, setLoggers } from 'pot-logger';
 import chalk from 'chalk';
+import delay from 'delay';
 import Connection from './Connection';
 import respawn, { EventTypes } from './utils/respawn';
 import workspace from './utils/workspace';
@@ -84,23 +85,44 @@ const start = async function start(options) {
 		}
 	};
 
+	const exit = async () => {
+		logger.debug('exit');
+		try {
+			const connection = await Connection.getByName(name);
+			if (connection) {
+				await connection.requestStopServer();
+			}
+			await Promise.all(monitors.map(async (monitor) => monitor.stop()));
+		}
+		catch (err) {
+			logger.debug(err);
+		}
+		process.exit();
+	};
+
+	process.on('uncaughtException', async (err) => {
+		logger.fatal(err);
+		await exit();
+	});
+
+	onSignalExit(async () => {
+		setLoggers('logLevel', 'OFF');
+		await exit();
+	});
+
+	watch({ cwd, ...watchOptions }, async () => {
+		logger.trace('watch:restart');
+		process.emit('watch:restart');
+		const { length } = monitors;
+		const reloadDelay = length > 1 ? 2000 / length : 0;
+		for (const monitor of monitors) {
+			await monitor.restart();
+			await delay(reloadDelay);
+		}
+	});
+
 	const bootstraps = monitors.map((monitor) => {
 		let displayName = monitor.data.name;
-
-		const exit = async () => {
-			logger.debug('exit');
-			try {
-				const connection = await Connection.getByName(name);
-				if (connection) {
-					await connection.requestStopServer();
-				}
-				await monitor.stop();
-			}
-			catch (err) {
-				logger.debug(err);
-			}
-			process.exit();
-		};
 
 		monitor.on(EventTypes.STOP, () => {
 			logger.warn(`"${displayName}" stopped`);
@@ -141,22 +163,6 @@ const start = async function start(options) {
 		monitor.on(EventTypes.WARN, (data) => {
 			runEvent(EventTypes.WARN);
 			logger.warn(data.toString().trim());
-		});
-
-		process.on('uncaughtException', async (err) => {
-			logger.fatal(err);
-			await exit();
-		});
-
-		onSignalExit(async () => {
-			setLoggers('logLevel', 'OFF');
-			await exit();
-		});
-
-		watch({ cwd, ...watchOptions }, async (file, stat) => {
-			logger.trace('watch:restart', stat);
-			process.emit('watch:restart', { file, stat });
-			await monitor.restart();
 		});
 
 		monitor.on(EventTypes.RESTART, async () => {
