@@ -24,7 +24,7 @@ export async function createServer(socketPath) {
 }
 
 export async function createClient(socketPath) {
-	const timeoutPromise = delay(20000);
+	const timeoutPromise = delay(40000);
 	const timeout = async () => {
 		await timeoutPromise;
 		throw new Error('TIMEOUT');
@@ -39,7 +39,13 @@ export async function createClient(socketPath) {
 		return Client.create(`ws+unix://${socketPath}`);
 	})();
 
-	const res = await Promise.race([createClientPromise, timeout()]);
-	timeoutPromise.cancel();
-	return res;
+	try {
+		const res = await Promise.race([createClientPromise, timeout()]);
+		timeoutPromise.cancel();
+		return res;
+	}
+	catch (err) {
+		timeoutPromise.cancel();
+		throw err;
+	}
 }

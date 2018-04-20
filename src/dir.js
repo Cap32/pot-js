@@ -19,11 +19,16 @@ export default async function dir(options = {}) {
 
 	const connection = await Connection.getByName(appName);
 
-	if (!connection) {
+	const throwError = function throwError() {
 		throw new Error(`"${appName}" NOT found`);
-	}
+	};
+
+	if (!connection) throwError();
 
 	const state = await connection.getState();
+
+	if (!state) throwError();
+
 	const { cwd } = state;
 	console.log(cwd);
 }

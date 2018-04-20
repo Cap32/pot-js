@@ -21,12 +21,17 @@ export default async function log(options = {}) {
 		getChoices: Connection.getNames,
 	});
 
-	const connection = await Connection.getByName(appName);
-	if (!connection) {
+	const throwError = function throwError() {
 		throw new Error(`"${appName}" NOT found`);
-	}
+	};
+
+	const connection = await Connection.getByName(appName);
+
+	if (!connection) throwError();
 
 	const state = await connection.getState();
+	if (!state) throwError();
+
 	const { logsDir } = state;
 
 	if (!logsDir) {

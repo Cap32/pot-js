@@ -11,11 +11,11 @@ export default class Connection {
 		const instances = await Instance.getAllInstances(options);
 		const names = await Promise.all(
 			instances.map(async (instance) => {
-				const { name } = await instance.getState();
-				return name;
+				const state = await instance.getState();
+				return state && state.name;
 			}),
 		);
-		return uniq(names);
+		return uniq(names).filter(Boolean);
 	}
 
 	static async getByName(name, options) {

@@ -54,7 +54,7 @@ export async function startServer(monitor) {
 			await removeDomainSocketFile(monitor.data.socketPath);
 		}
 		catch (err) {
-			logger.debug('Failed to close socketServer', err);
+			logger.debug('Failed to close socket server', err);
 		}
 	});
 

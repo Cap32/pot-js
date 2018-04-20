@@ -41,13 +41,15 @@ const getAll = async function getAll() {
 				const socket = await startClient(socketRef.socketPath);
 				if (socket) {
 					const state = await getState(socket);
-					const { pidFile, pid } = state;
-					refsList.push({
-						pidFile,
-						pid,
-						...socketRef,
-						socket,
-					});
+					if (state) {
+						const { pidFile, pid } = state;
+						refsList.push({
+							pidFile,
+							pid,
+							...socketRef,
+							socket,
+						});
+					}
 				}
 			}),
 		);
@@ -62,11 +64,13 @@ const getByName = async function getByName(name) {
 		refsList.map(async (ref) => {
 			const { socket } = ref;
 			const state = await getState(socket);
-			if (name === state.name) {
-				res.push(ref);
-			}
-			else {
-				await socket.close();
+			if (state) {
+				if (name === state.name) {
+					res.push(ref);
+				}
+				else {
+					await socket.close();
+				}
 			}
 		}),
 	);
@@ -80,11 +84,13 @@ const getByKey = async function getByKey(key) {
 		refsList.map(async (ref) => {
 			const { socket } = ref;
 			const state = await getState(socket);
-			if (key === state.key) {
-				res = ref;
-			}
-			else {
-				await socket.close();
+			if (state) {
+				if (key === state.key) {
+					res = ref;
+				}
+				else {
+					await socket.close();
+				}
 			}
 		}),
 	);
@@ -123,14 +129,8 @@ export default class Instance {
 	}
 
 	async _getState(...args) {
-		try {
-			const state = await getState(this._socket, ...args);
-			return this._response(state);
-		}
-		catch (err) {
-			logger.debug(err);
-			await this.disconnect();
-		}
+		const state = await getState(this._socket, ...args);
+		return this._response(state);
 	}
 
 	async setState(state) {
@@ -166,6 +166,7 @@ export default class Instance {
 	async requestStopServer(options) {
 		const socket = this._socket;
 		const state = await getState(socket);
+		if (!state) return;
 		const { key, ppid, socketPath, pidFile } = state;
 		await Promise.all([
 			new Promise((resolve) => {

@@ -40,7 +40,7 @@ describe('cli `pot start`', () => {
 			'--name',
 			name,
 		])
-			.assertUntil(new RegExp(`"${name}" started`, 'i'))
+			.assertUntil(new RegExp(`"${name} #1" started`, 'i'))
 			.doneAndKill();
 	});
 

@@ -174,7 +174,6 @@ const start = async function start(options) {
 					runEvent(EventTypes.START);
 				}
 				catch (err) {
-					logger.error(err.message);
 					logger.debug(err);
 					errors.push(err);
 				}
