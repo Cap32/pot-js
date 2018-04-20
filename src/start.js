@@ -12,6 +12,7 @@ import Connection from './Connection';
 import onExit from 'signal-exit';
 import fkill from 'fkill';
 import { version } from '../package.json';
+import AggregateError from 'aggregate-error';
 
 const potjs = { version };
 
@@ -156,7 +157,8 @@ const connectMonitor = async (monitorProc, options) => {
 			}
 			else if (type === 'error') {
 				monitorProc.kill();
-				reject(payload);
+				const { errors } = payload;
+				reject(new AggregateError(errors));
 			}
 		};
 		monitorProc.on('message', handleMonitorProcMessage);

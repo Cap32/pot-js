@@ -45,13 +45,13 @@ export default class Connection {
 		options.key = key;
 		options.pidFile = pidFile;
 		options.socketPath = socketPath;
+		options.displayName = options.name + (id ? ` #${id}` : '');
 
 		await startServer(monitor);
 		await writePid(options);
 	}
 
 	static async writePid(monitor) {
-		logger.info(monitor.data.pid);
 		await writePid(monitor.data);
 	}
 

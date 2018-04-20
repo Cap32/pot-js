@@ -17,17 +17,6 @@ if (!isProd) {
 	});
 }
 
-const startSocketServer = async function startSocketServer(monitor) {
-	try {
-		await Connection.serve(monitor);
-		return true;
-	}
-	catch (err) {
-		process.send({ type: 'error', payload: err });
-		return false;
-	}
-};
-
 const globalState = { instancesCount: 0 };
 
 const start = async function start(options) {
@@ -56,6 +45,11 @@ const start = async function start(options) {
 
 	workspace.set(space);
 	process.title = monitorProcessTitle;
+
+	const send = (type, payload) =>
+		process.connected && process.send({ type, payload });
+
+	const errors = [];
 
 	const monitors = respawn(command, {
 
@@ -89,7 +83,9 @@ const start = async function start(options) {
 		}
 	};
 
-	monitors.forEach((monitor) => {
+	const bootstraps = monitors.map((monitor) => {
+		let displayName = monitor.data.name;
+
 		const exit = async () => {
 			logger.debug('exit');
 			try {
@@ -105,34 +101,18 @@ const start = async function start(options) {
 			process.exit();
 		};
 
-		monitor.on(EventTypes.START, async () => {
-			monitor.id = ++globalState.instancesCount;
-			const success = await startSocketServer(monitor);
-			if (success) {
-				process.send({ type: 'start' });
-			}
-			logger.info(`"${name}" started`);
-			runEvent(EventTypes.START);
-		});
-
-		monitor.on(EventTypes.RESTART, async () => {
-			await Connection.writePid(monitor);
-			logger.info(`"${name}" restarted`);
-			runEvent(EventTypes.RESTART);
-		});
-
 		monitor.on(EventTypes.STOP, () => {
-			logger.warn(`"${name}" stopped`);
+			logger.warn(`"${displayName}" stopped`);
 			runEvent(EventTypes.STOP);
 		});
 
 		monitor.on(EventTypes.CRASH, () => {
-			logger.fatal(`"${name}" crashed`);
+			logger.fatal(`"${displayName}" crashed`);
 			runEvent(EventTypes.CRASH);
 		});
 
 		monitor.on(EventTypes.SLEEP, () => {
-			logger.warn(`"${name}" sleeped`);
+			logger.warn(`"${displayName}" sleeped`);
 			runEvent(EventTypes.SLEEP);
 		});
 
@@ -141,7 +121,9 @@ const start = async function start(options) {
 		});
 
 		monitor.on(EventTypes.EXIT, async (code, signal) => {
-			logger.debug(`"${name}" exit with code "${code}", signal "${signal}"`);
+			logger.debug(
+				`"${displayName}" exit with code "${code}", signal "${signal}"`,
+			);
 			runEvent(EventTypes.EXIT, code, signal);
 		});
 
@@ -176,8 +158,47 @@ const start = async function start(options) {
 			await monitor.restart();
 		});
 
-		monitor.start();
+		monitor.on(EventTypes.RESTART, async () => {
+			await Connection.writePid(monitor);
+			logger.info(`"${displayName}" restarted`);
+			runEvent(EventTypes.RESTART);
+		});
+
+		return new Promise((resolve) => {
+			monitor.on(EventTypes.START, async () => {
+				try {
+					monitor.id = ++globalState.instancesCount;
+					await Connection.serve(monitor);
+					displayName = monitor.data.displayName;
+					logger.info(`"${displayName}" started`);
+					runEvent(EventTypes.START);
+				}
+				catch (err) {
+					logger.error(err.message);
+					logger.debug(err);
+					errors.push(err);
+				}
+				resolve();
+			});
+			monitor.start();
+		});
 	});
+
+	await Promise.all(bootstraps);
+
+	const success = bootstraps.length > errors.length;
+
+	if (success) {
+		send('start');
+	}
+	else {
+		send('error', {
+			errors: errors.map((err) => ({
+				message: err.message,
+				stack: err.stack,
+			})),
+		});
+	}
 };
 
 process.on('message', (message) => {

@@ -22,7 +22,6 @@ describe('cli `pot start`', () => {
 			'--logLevel=DEBUG',
 		])
 			.assertUntil(/started/)
-			.assertUntil('test server started')
 			.doneAndKill();
 	});
 
@@ -54,15 +53,14 @@ describe('cli `pot start`', () => {
 			'--name',
 			name,
 		])
-			.assertUntil(/started/)
-			.assertUntil('test server started', {
+			.assertUntil(/started/, {
 				action: async () => {
 					const { pid } = await Connection.getState(name);
 					await fkill(pid, { force: /^win/.test(process.platform) });
 				},
 			})
 			.assertUntil(/sleeped/)
-			.assertUntil('test server started') // restarted
+			.assertUntil(/started/) // restarted
 			.doneAndKill();
 	});
 });
@@ -111,14 +109,14 @@ describe('cli `pot start` with config file', async () => {
 			'module.exports = { entry: \'fixtures/server.js\' }',
 		);
 		return Kapok.start(command, ['start'], { cwd: __dirname })
-			.assertUntil('test server started')
+			.assertUntil(/started/)
 			.doneAndKill();
 	});
 
 	test('should read `.potrc.json` config file', async () => {
 		await writeConfig('.potrc.json', '{ "entry": "fixtures/server.js" }');
 		return Kapok.start(command, ['start'], { cwd: __dirname })
-			.assertUntil('test server started')
+			.assertUntil(/started/)
 			.doneAndKill();
 	});
 });
@@ -126,7 +124,7 @@ describe('cli `pot start` with config file', async () => {
 describe('cli `pot stop`', () => {
 	test('should `pot stop` work', async () => {
 		await Kapok.start(command, ['start', '--entry', 'test/fixtures/server.js'])
-			.until('test server started', {
+			.until(/started/, {
 				async action() {
 					return Kapok.start(command, ['stop', '-f'])
 						.assert('INFO "pot-js" stopped')
@@ -187,7 +185,7 @@ describe('cli `pot dir`', () => {
 			['start', '--entry', 'test/fixtures/server.js', '--name', 'app'],
 			{ env: { ...process.env, PORT: 3001 } },
 		)
-			.until('test server started', {
+			.until(/started/, {
 				async assert() {
 					return Kapok.start(command, ['dir'])
 						.assertUntil(process.cwd())

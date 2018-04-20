@@ -49,6 +49,7 @@ class Monitor extends EventEmitter {
 		this.gid = opts.gid;
 		this.pid = 0;
 		this.ppid = opts.ppid;
+		this.restarts = -1;
 		this.crashes = 0;
 		this.stdio = opts.stdio;
 		this.stdout = opts.stdout;
@@ -110,15 +111,12 @@ class Monitor extends EventEmitter {
 			if (!restart) return false;
 			await this.stop();
 		}
-		else {
-			restart = false;
-		}
 
-		let restarts = 0;
 		let clock = 60000;
+		const env = Object.assign({}, process.env, this.env);
 
 		const loop = () => {
-			const env = Object.assign(process.env, this.env);
+			this.restarts++;
 
 			// const cmd =
 			// 	typeof this.command === 'function' ? this.command() : this.command;
@@ -206,31 +204,30 @@ class Monitor extends EventEmitter {
 
 				if (clock <= 0) {
 					clock = 60000;
-					restarts = 0;
 				}
 
 				this.crashes++;
 
-				if (++restarts > this.maxRestarts && this.maxRestarts !== -1) {
+				if (this.restarts > this.maxRestarts && this.maxRestarts !== -1) {
 					return this._crash();
 				}
 
 				this.status = 'sleeping';
 				this.emit(EventTypes.SLEEP);
 
-				const restartTimeout = this.sleep(restarts);
+				const restartTimeout = this.sleep(this.restarts);
 				this.timeout = setTimeout(loop, restartTimeout);
+			});
+
+			this.worker.on('online', () => {
+				this.emit(this.restarts ? EventTypes.RESTART : EventTypes.START);
 			});
 		};
 
 		clearTimeout(this.timeout);
 		loop();
 
-		if (this.status === 'running') {
-			this.emit(restart ? EventTypes.RESTART : EventTypes.START);
-			return true;
-		}
-		return false;
+		return this.status === 'running';
 	}
 
 	async restart() {
