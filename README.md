@@ -76,6 +76,7 @@ Spawn and monitor a process.
 
 ###### Options
 
+* `args` (String|String[]): List of string arguments. Defaults to `[]`.
 * `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`.
 * `config` (String): Path to the config file Defaults to `.potrc`.
 * `cwd` (String): Defining the current working directory. Defaults to `process.cwd()`.
@@ -92,8 +93,8 @@ Spawn and monitor a process.
   * `stdout`: Child process stdout has emitted data
   * `stderr`: Child process stderr has emitted data
   * `warn`: Child process has emitted an error
-* `execArgs` (String|[String]): Executing arguments. Defaults to `[]`.
-* `execCommand` (String): Executing command. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
+* `execArgs` (String|String[]): Execution arguments. Defaults to `[]`.
+* `execPath` (String): Execution Path. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
 * `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Defaults to `false`.
 * `instances` (Number): Cluster instances. Defaults to `1`.
 * `logLevel` (String|Object): Defining log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
@@ -112,7 +113,7 @@ Spawn and monitor a process.
 * `production` (Boolean): Enable `production` mode. Defaults to `true`.
 * `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
   * `enable` (Boolean): Enable `watch`. Defaults to `true`.
-  * `dirs` (String|[String]): Defining watching directories.
+  * `dirs` (String|String[]): Defining watching directories.
   * `ignoreDotFiles` (Boolean): Ignore watching `.*` files. Defaults to `true`.
   * `ignoreNodeModulesDir` (Boolean): Ignore watching `node_modules` directory. Defaults to `true`.
 * `workspace` (String): Workspace.

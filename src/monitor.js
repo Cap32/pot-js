@@ -25,7 +25,8 @@ const start = async function start(options) {
 		name,
 		workspace: space,
 		logsDir,
-		command,
+		execPath,
+		spawnArgs,
 		daemon,
 		force,
 		env,
@@ -51,10 +52,12 @@ const start = async function start(options) {
 
 	const errors = [];
 
-	const monitors = respawn(command, {
+	const monitors = respawn({
 
 		// stdio: ['ignore', 'pipe', 'pipe'],
 		...respawnOptions,
+		execPath,
+		execArgv: spawnArgs,
 		data: options,
 		globalState,
 		env: (function () {

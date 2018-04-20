@@ -4,6 +4,21 @@ import { reduce } from 'lodash';
 export default {
 	$schema: 'http://json-schema.org/draft-07/schema#',
 	properties: {
+		args: {
+			description: 'List of string arguments',
+			anyOf: [
+				{
+					type: 'array',
+					items: {
+						type: 'string',
+					},
+				},
+				{
+					type: 'string',
+				},
+			],
+			default: [],
+		},
 		baseDir: {
 			description: 'The base directory for resolving modules or directories',
 			type: 'string',
@@ -51,7 +66,7 @@ export default {
 			default: {},
 		},
 		execArgs: {
-			description: 'Exec args',
+			description: 'Execution arguments',
 			anyOf: [
 				{
 					type: 'array',
@@ -65,8 +80,8 @@ export default {
 			],
 			default: [],
 		},
-		execCommand: {
-			description: 'Exec command',
+		execPath: {
+			description: 'Execution path',
 			type: 'string',
 			default: process.execPath,
 		},

@@ -34,12 +34,13 @@ const EventTypes = {
 };
 
 class Monitor extends EventEmitter {
-	constructor(command, opts) {
+	constructor(opts) {
 		super();
 
 		this.id = 0;
 		this.status = 'stopped';
-		this.command = command;
+		this.execPath = opts.execPath;
+		this.execArgv = opts.execArgv;
 		this.name = opts.name;
 		this.cwd = opts.cwd || '.';
 		this.env = opts.env || {};
@@ -122,8 +123,8 @@ class Monitor extends EventEmitter {
 			// 	typeof this.command === 'function' ? this.command() : this.command;
 
 			cluster.setupMaster({
-				execPath: this.command[0],
-				execArgv: this.command.slice(1),
+				execPath: this.execPath,
+				execArgv: this.execArgv,
 				cwd: this.cwd,
 				uid: this.uid,
 				gid: this.gid,
@@ -269,9 +270,9 @@ class Monitor extends EventEmitter {
 	}
 }
 
-export default function respawn(command, opts = {}) {
+export default function respawn(opts = {}) {
 	const { instances = 1, ...options } = opts;
-	return new Array(instances).fill().map(() => new Monitor(command, options));
+	return new Array(instances).fill().map(() => new Monitor(options));
 }
 
 export { EventTypes };

@@ -115,25 +115,28 @@ const startMonitorProc = ({ cwd, daemon, env, name }) => {
 	return proc;
 };
 
-const getCommand = (options) => {
-	const { baseDir, entry, execCommand, execArgs, inspect } = options;
+/*
+ * The final command components:
+ * `{execPath} {...execArgs} {entry} {...args}`
+ */
+const getSpawnArgs = (options) => {
+	const { baseDir, entry, execArgs, args, inspect } = options;
 
-	const commandModulePath = resolve(baseDir, entry);
+	const entryFile = resolve(baseDir, entry);
 
-	// throw error if `commandModulePath` is not exits.
-	require.resolve(commandModulePath);
+	// throw error if `entryFile` is not exits.
+	require.resolve(entryFile);
 
-	const args = [...execArgs, commandModulePath];
+	const spawnArgs = [...execArgs, entryFile, ...args];
 	if (inspect) {
-		args.unshift(`--inspect=${inspect}`);
+		spawnArgs.unshift(`--inspect=${inspect}`);
 	}
-	const command = [execCommand, ...args];
-	logger.trace('command', chalk.gray(command.join(' ')));
-	return command;
+	logger.trace('spawn args', chalk.gray(spawnArgs.join(' ')));
+	return spawnArgs;
 };
 
 const connectMonitor = async (monitorProc, options) => {
-	const command = getCommand(options);
+	const spawnArgs = getSpawnArgs(options);
 	const { daemon } = options;
 	const ppid = monitorProc.pid;
 	logger.debug('monitor pid', chalk.magenta(ppid));
@@ -173,7 +176,7 @@ const connectMonitor = async (monitorProc, options) => {
 			payload: {
 				...options,
 				ppid,
-				command,
+				spawnArgs,
 				potjs,
 			},
 		});
