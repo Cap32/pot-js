@@ -1,11 +1,12 @@
 import { ensureLogger, logger, setLoggers } from 'pot-logger';
-import respawn, { EventTypes } from './utils/respawn';
+import chalk from 'chalk';
 import Connection from './Connection';
+import respawn, { EventTypes } from './utils/respawn';
 import workspace from './utils/workspace';
 import watch from './utils/watch';
 import onSignalExit from './utils/onSignalExit';
 import createScriptRunner from './utils/createScriptRunner';
-import chalk from 'chalk';
+import { ENV_VAR_KEY } from './utils/EnvVar';
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
@@ -28,7 +29,6 @@ const start = async function start(options) {
 		daemon,
 		force,
 		env,
-		configToEnv,
 		events,
 		watch: watchOptions,
 		monitorProcessTitle,
@@ -62,9 +62,7 @@ const start = async function start(options) {
 			if (!res.NODE_ENV) {
 				res.NODE_ENV = production ? 'production' : 'development';
 			}
-			if (configToEnv) {
-				res[configToEnv] = JSON.stringify(options);
-			}
+			res[ENV_VAR_KEY] = JSON.stringify(options);
 			return res;
 		})(),
 	});

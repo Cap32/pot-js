@@ -5,7 +5,7 @@ require('promise-ws')
 			return data;
 		});
 		server.reply('env', () => {
-			return process.env.POT_TESTING;
+			return process.env.POT_ENV_VAR;
 		});
 		console.log('socket server started');
 	})

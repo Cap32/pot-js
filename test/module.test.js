@@ -1,5 +1,5 @@
 import delay from 'delay';
-import { start, Connection } from '../src';
+import { start, Connection, ENV_VAR_KEY } from '../src';
 import { Client } from 'promise-ws';
 
 const entry = 'test/fixtures/socket.js';
@@ -38,21 +38,19 @@ describe('api module `start`', () => {
 		expect(state.monitor.crashes).toBe(2);
 	});
 
-	test('should `configToEnv` work', async () => {
+	test('should `ENV_VAR_KEY` work', async () => {
 		const hello = 'world';
 		proc = await start({
 			env: { PORT },
 			entry,
 			hello,
-			configToEnv: 'POT_TESTING',
 		});
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
 		const envString = await client.request('env');
 		expect(JSON.parse(envString)).toMatchObject({
-			hello: 'world',
+			hello,
 			entry,
-			configToEnv: 'POT_TESTING',
 		});
 	});
 });

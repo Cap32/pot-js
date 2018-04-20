@@ -15,10 +15,6 @@ export default {
 			default: '.potrc',
 			type: 'string',
 		},
-		configToEnv: {
-			description: 'Convert configuration to environment variable',
-			type: 'string',
-		},
 		cwd: {
 			description: 'Current working directory',
 			type: 'string',
