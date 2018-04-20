@@ -5,6 +5,7 @@ const { properties } = start;
 const logLevel = cloneDeep(properties.logLevel);
 const workspace = cloneDeep(properties.workspace);
 const name = cloneDeep(properties.name);
+const instances = cloneDeep(properties.instances);
 
 export { start };
 
@@ -50,6 +51,15 @@ export const reload = {
 
 export const reloadAll = {
 	properties: omit(reload.properties, ['name']),
+};
+
+export const scale = {
+	properties: {
+		logLevel,
+		name,
+		workspace,
+		instances,
+	},
 };
 
 export const list = {

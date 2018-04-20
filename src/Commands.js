@@ -51,6 +51,13 @@ export const stopall = {
 	operator: Operators.stopAll,
 };
 
+export const scale = {
+	command: 'scale [name] [instances]',
+	description: 'Scale up/down a process',
+	schema: Schemas.scale,
+	operator: Operators.scale,
+};
+
 export const list = {
 	command: 'list',
 	aliases: ['ls'],

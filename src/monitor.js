@@ -19,6 +19,9 @@ if (!isProd) {
 	});
 }
 
+const send = (type, payload) =>
+	process.connected && process.send({ type, payload });
+
 const globalState = { instancesCount: 0 };
 
 const start = async function start(options) {
@@ -48,9 +51,6 @@ const start = async function start(options) {
 	workspace.set(space);
 	process.title = monitorProcessTitle;
 
-	const send = (type, payload) =>
-		process.connected && process.send({ type, payload });
-
 	const errors = [];
 
 	const monitors = respawn({
@@ -70,6 +70,18 @@ const start = async function start(options) {
 			return res;
 		})(),
 	});
+
+	const cloneMonitor = async function cloneMonitor(number) {
+		const newMonitors = await start({
+			...options,
+			instances: +number,
+		});
+		monitors.push(...newMonitors);
+	};
+
+	const extend = (monitor) => {
+		monitor.clone = cloneMonitor;
+	};
 
 	const eventsLogger = ensureLogger('events', 'gray');
 	const runScript = createScriptRunner({ cwd, logger: eventsLogger });
@@ -187,6 +199,7 @@ const start = async function start(options) {
 				resolve();
 			});
 			monitor.start();
+			extend(monitor);
 		});
 	});
 
@@ -205,6 +218,8 @@ const start = async function start(options) {
 			})),
 		});
 	}
+
+	return monitors;
 };
 
 process.on('message', (message) => {

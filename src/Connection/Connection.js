@@ -78,6 +78,11 @@ export default class Connection {
 		return this._each('restart');
 	}
 
+	async scale(number) {
+		await this.instances[0].scale(number);
+		await this.disconnect();
+	}
+
 	async disconnect() {
 		return this._each('disconnect');
 	}

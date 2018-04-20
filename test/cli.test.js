@@ -17,7 +17,6 @@ describe('cli `pot start`', () => {
 	test('should work', async () => {
 		return Kapok.start(command, [
 			'start',
-			'--entry',
 			'test/fixtures/server.js',
 			'--logLevel=DEBUG',
 		])
@@ -25,7 +24,7 @@ describe('cli `pot start`', () => {
 			.doneAndKill();
 	});
 
-	test('should throw error if `--entry` is not exists.', async () => {
+	test('should throw error if `entry` is not exists.', async () => {
 		return Kapok.start(command, ['start'])
 			.assertUntil(/^ERROR Cannot find module/)
 			.doneAndKill();
@@ -35,7 +34,6 @@ describe('cli `pot start`', () => {
 		const name = 'hello';
 		return Kapok.start(command, [
 			'start',
-			'--entry',
 			'test/fixtures/server.js',
 			'--name',
 			name,
@@ -48,7 +46,7 @@ describe('cli `pot start`', () => {
 		const name = 'hello';
 		return Kapok.start(command, [
 			'start',
-			'--entry=test/fixtures/server.js',
+			'test/fixtures/server.js',
 			'--maxRestarts=1',
 			'--name',
 			name,
@@ -79,9 +77,9 @@ describe('cli `pot start` with daemon mode', async () => {
 		const port = 3010;
 		spawn.sync(command, [
 			'start',
+			'test/fixtures/socket.js',
 			`--name=${name}`,
 			`--env.PORT=${port}`,
-			'--entry=test/fixtures/socket.js',
 			'--daemon',
 		]);
 		await delay(2000);
@@ -123,7 +121,7 @@ describe('cli `pot start` with config file', async () => {
 
 describe('cli `pot stop`', () => {
 	test('should `pot stop` work', async () => {
-		await Kapok.start(command, ['start', '--entry', 'test/fixtures/server.js'])
+		await Kapok.start(command, ['start', 'test/fixtures/server.js'])
 			.until(/started/, {
 				async action() {
 					return Kapok.start(command, ['stop', '-f'])
@@ -145,23 +143,21 @@ describe('cli `pot stopall`', () => {
 	test('should `pot stopall` work', async () => {
 		await Kapok.start(command, [
 			'start',
+			'test/fixtures/socket.js',
 			'--name',
 			'a',
 			'--env.PORT',
 			3010,
-			'--entry',
-			'test/fixtures/socket.js',
 		])
 			.until('socket server started', {
 				async action() {
 					return Kapok.start(command, [
 						'start',
+						'test/fixtures/socket.js',
 						'--name',
 						'b',
 						'--env.PORT',
 						3011,
-						'--entry',
-						'test/fixtures/socket.js',
 					])
 						.until('socket server started', {
 							async action() {
@@ -182,7 +178,7 @@ describe('cli `pot dir`', () => {
 	test('should work', async () => {
 		return Kapok.start(
 			command,
-			['start', '--entry', 'test/fixtures/server.js', '--name', 'app'],
+			['start', 'test/fixtures/server.js', '--name', 'app'],
 			{ env: { ...process.env, PORT: 3001 } },
 		)
 			.until(/started/, {

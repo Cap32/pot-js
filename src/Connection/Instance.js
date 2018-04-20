@@ -1,4 +1,4 @@
-import { CLOSE, RESTART } from './constants';
+import { CLOSE, RESTART, CLONE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
 import { killPid, removePidFile, getPids } from './PidHelpers';
 import { logger } from 'pot-logger';
@@ -152,6 +152,12 @@ export default class Instance {
 
 	async restart() {
 		return this._response(this._socket.request(RESTART));
+	}
+
+	async scale(number) {
+
+		// TODO: should handle `down` case
+		return this._response(this._socket.request(CLONE, number));
 	}
 
 	async disconnect() {

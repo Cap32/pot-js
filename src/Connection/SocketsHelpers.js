@@ -3,7 +3,7 @@ import { basename, join } from 'path';
 import workspace from '../utils/workspace';
 import { createServer, createClient } from './ipc';
 import { ensureLocalDomainPath } from 'create-local-domain-socket';
-import { STATE, CLOSE, RESTART } from './constants';
+import { STATE, CLOSE, RESTART, CLONE } from './constants';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import globby from 'globby';
@@ -67,6 +67,10 @@ export async function startServer(monitor) {
 
 	socketServer.reply(RESTART, async () => {
 		return monitor.restart();
+	});
+
+	socketServer.reply(CLONE, async (number) => {
+		return monitor.clone(number);
 	});
 
 	return socketServer;

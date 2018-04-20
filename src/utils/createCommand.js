@@ -6,6 +6,7 @@ import getCliOptionsBySchema from './getCliOptionsBySchema';
 import validateBySchema from './validateBySchema';
 import { isFunction, isObject, forEach, flatten } from 'lodash';
 
+// TODO: should fix demanded bug
 const builder = function builder(yargs) {
 	const { middlewares, optional, demanded, original } = this;
 	const potStore = middlewares[0] || {};
@@ -20,7 +21,7 @@ const builder = function builder(yargs) {
 		return getBuilder.call(this, yargs, spec);
 	}
 	else if (isObject(spec)) {
-		const argv = yargs.usage(`$0 ${original}`);
+		const args = yargs.usage(`$0 ${original}`);
 		const positions = flatten([
 			...demanded.map(({ cmd }) => cmd),
 			...optional.map(({ cmd }) => cmd),
@@ -28,14 +29,19 @@ const builder = function builder(yargs) {
 		const options = {};
 		forEach(spec, (val, key) => {
 			if (~positions.indexOf(key)) {
-				argv.positional(key, val);
+				args.positional(key, val);
 			}
 			else {
 				options[key] = val;
 			}
 		});
-		argv.options(options);
-		return argv.argv;
+		args.options(options);
+
+		const { argv } = args;
+		positions.forEach((key, index) => {
+			argv[key] = argv._[index + 1];
+		});
+		return argv;
 	}
 
 	return yargs.argv;
