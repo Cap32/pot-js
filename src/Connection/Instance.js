@@ -1,4 +1,4 @@
-import { CLOSE, RESTART, CLONE } from './constants';
+import { CLOSE, RESTART, SCALE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
 import { killPid, removePidFile, getPids } from './PidHelpers';
 import { logger } from 'pot-logger';
@@ -155,9 +155,7 @@ export default class Instance {
 	}
 
 	async scale(number) {
-
-		// TODO: should handle `down` case
-		return this._response(this._socket.request(CLONE, number));
+		return this._response(this._socket.request(SCALE, number));
 	}
 
 	async disconnect() {
@@ -170,20 +168,6 @@ export default class Instance {
 	}
 
 	async requestStopServer(options) {
-		const socket = this._socket;
-		const state = await getState(socket);
-		if (!state) return;
-		const { key, ppid, socketPath, pidFile } = state;
-		await Promise.all([
-			new Promise((resolve) => {
-				socket.once('close', resolve);
-				socket.request(CLOSE).catch(logger.debug);
-			}),
-			killPid(key, ppid, options),
-		]);
-		await Promise.all([
-			removeDomainSocketFile(socketPath),
-			removePidFile(pidFile),
-		]);
+		return this._response(this._socket.requestClose(options));
 	}
 }

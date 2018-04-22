@@ -20,15 +20,16 @@ export default async function scale(options = {}) {
 		getChoices: Connection.getNames,
 	});
 
-	const throwError = function throwError() {
-		throw new Error(`"${appName}" NOT found`);
+	const throwError = function throwError(message) {
+		throw new Error(message || `"${appName}" NOT found`);
 	};
 
 	const connection = await Connection.getByName(appName);
 
 	if (!connection) throwError();
 
-	await connection.scale(instances);
+	const { ok } = await connection.scale(instances);
 
-	logger.info(`"${appName}" scale compeleted`);
+	if (ok) logger.info(`"${appName}" scale compeleted`);
+	else throwError(`"${appName}" scale failed`);
 }

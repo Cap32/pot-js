@@ -3,7 +3,7 @@ import { basename, join } from 'path';
 import workspace from '../utils/workspace';
 import { createServer, createClient } from './ipc';
 import { ensureLocalDomainPath } from 'create-local-domain-socket';
-import { STATE, CLOSE, RESTART, CLONE } from './constants';
+import { STATE, CLOSE, RESTART, SCALE } from './constants';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import globby from 'globby';
@@ -42,35 +42,30 @@ export async function getSocketPath(keyOrMonitor) {
 	return ensureLocalDomainPath(join(runDir, key));
 }
 
-export async function startServer(monitor) {
-	const { socketPath } = monitor.data;
+export async function startServer(masterMonitor, workerMonitor) {
+	const { socketPath } = workerMonitor.data;
 
 	logger.trace('unix domain socket path', chalk.gray(socketPath));
 	const socketServer = await createServer(socketPath);
 
-	socketServer.reply(CLOSE, async () => {
-		try {
-			await socketServer.close();
-			await removeDomainSocketFile(monitor.data.socketPath);
-		}
-		catch (err) {
-			logger.debug('Failed to close socket server', err);
-		}
+	// TODO: should adapt old version socket server.
+	socketServer.onReplyClose(async () => {
+		process.nextTick(async () => {
+			await masterMonitor.requestShutDown(workerMonitor);
+		});
+		return true;
 	});
 
-	socketServer.reply(STATE, async (state) => {
-		if (state) {
-			Object.assign(monitor.data, state);
-		}
-		return monitor.toJSON();
+	socketServer.reply(STATE, async (newState) => {
+		return masterMonitor.state(workerMonitor, newState);
 	});
 
 	socketServer.reply(RESTART, async () => {
-		return monitor.restart();
+		return masterMonitor.restart(workerMonitor);
 	});
 
-	socketServer.reply(CLONE, async (number) => {
-		return monitor.clone(number);
+	socketServer.reply(SCALE, async (number) => {
+		return masterMonitor.scale(number);
 	});
 
 	return socketServer;
