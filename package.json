@@ -3,7 +3,7 @@
 	"description": "A script runner",
 	"version": "0.0.0-beta.50",
 	"scripts": {
-		"start": "npm test -- --watchAll",
+		"start": "yarn cli start ./test/fixtures/socket",
 		"test": "cross-env POT_DEV=true jest --runInBand",
 		"test:server": "yarn cli start ./test/fixtures/server",
 		"cli": "cross-env POT_DEV=true ./bin/pot",
@@ -16,12 +16,7 @@
 	"bin": {
 		"pot": "bin/pot"
 	},
-	"files": [
-		"LICENSE.md",
-		"README.md",
-		"bin",
-		"lib"
-	],
+	"files": ["LICENSE.md", "README.md", "bin", "lib"],
 	"engines": {
 		"node": ">=6.0.0"
 	},
@@ -84,12 +79,7 @@
 		"which": "^1.3.0"
 	},
 	"jest": {
-		"collectCoverageFrom": [
-			"src/**/*.js"
-		],
-		"modulePathIgnorePatterns": [
-			"node_modules",
-			"lib"
-		]
+		"collectCoverageFrom": ["src/**/*.js"],
+		"modulePathIgnorePatterns": ["node_modules", "lib"]
 	}
 }

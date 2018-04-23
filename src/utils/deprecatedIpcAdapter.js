@@ -2,6 +2,8 @@ import { name as appspace } from '../../package.json';
 import nodeIpc from 'node-ipc';
 import { basename } from 'path';
 import { DEPRECATED_BRIDGE, DEPRECATED_GET_INFO } from './SocketEventTypes';
+import fkill from 'fkill';
+import isWin from './isWin';
 
 export async function createClient(socketPath) {
 	return new Promise((resolve, reject) => {
@@ -15,7 +17,7 @@ export async function createClient(socketPath) {
 		nodeIpc.connectTo(serverId, socketPath, () => {
 			const socket = nodeIpc.of[serverId];
 			socket.on('connect', () => {
-				socket.request = function request(eventType) {
+				socket.request = function request() {
 					return new Promise((resolve) => {
 						const handler = (data) => {
 							socket.off(DEPRECATED_BRIDGE, handler);
@@ -27,6 +29,10 @@ export async function createClient(socketPath) {
 						socket.emit(DEPRECATED_BRIDGE);
 						socket.emit(DEPRECATED_GET_INFO);
 					});
+				};
+				socket.requestClose = async function requestClose() {
+					const state = await socket.request();
+					await fkill(state.data.parentPid, { force: isWin, tree: true });
 				};
 				socket.close = function close() {
 					return Promise.resolve(nodeIpc.disconnect(socket.id));
