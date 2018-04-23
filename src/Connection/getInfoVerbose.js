@@ -1,6 +1,6 @@
 import pidUsage from 'pidusage';
 import { logger } from 'pot-logger';
-import formatBytes from '../utils/formatBytes';
+import filesize from 'filesize';
 import { totalmem } from 'os';
 
 const { assign } = Object;
@@ -17,7 +17,7 @@ const parseMemoryUsage = (state) => {
 		});
 	}
 	else {
-		const styledUsed = formatBytes(used);
+		const styledUsed = filesize(used);
 		const value = used / total * 100;
 		const percent = `${value.toFixed(2)}%`;
 		assign(memoryUsage, {

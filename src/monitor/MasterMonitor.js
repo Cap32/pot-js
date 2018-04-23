@@ -9,6 +9,13 @@ import watch from '../utils/watch';
 import onSignalExit from '../utils/onSignalExit';
 import createScriptRunner from '../utils/createScriptRunner';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
+import getKey from '../utils/getKey';
+import { getPidFile, writePid, removePidFile } from '../utils/PidHelpers';
+import {
+	startServer,
+	getSocketPath,
+	removeDomainSocketFile,
+} from '../utils/SocketsHelpers';
 
 export default class MasterMonitor extends EventEmitter {
 	constructor(options) {
@@ -41,8 +48,6 @@ export default class MasterMonitor extends EventEmitter {
 		process.title = monitorProcessTitle;
 
 		this._workerMonitorOptions = {
-
-			// stdio: ['ignore', 'pipe', 'pipe'],
 			...respawnOptions,
 			execPath,
 			execArgv: spawnArgs,
@@ -172,7 +177,7 @@ export default class MasterMonitor extends EventEmitter {
 			});
 
 			workerMonitor.on(EventTypes.RESTART, async () => {
-				await Connection.writePid(workerMonitor);
+				await writePid(workerMonitor.data);
 				logger.info(`"${displayName}" restarted`);
 				runEvent(EventTypes.RESTART);
 			});
@@ -181,7 +186,23 @@ export default class MasterMonitor extends EventEmitter {
 				workerMonitor.on(EventTypes.START, async () => {
 					try {
 						workerMonitor.id = ++this._count;
-						await Connection.serve(this, workerMonitor);
+
+						const { data: options, id } = workerMonitor;
+						workspace.set(options);
+
+						const key = getKey(workerMonitor);
+						const pidFile = await getPidFile(key);
+						const socketPath = await getSocketPath(key);
+
+						options.instanceId = id;
+						options.key = key;
+						options.pidFile = pidFile;
+						options.socketPath = socketPath;
+						options.displayName = options.name + (id ? ` #${id}` : '');
+
+						await startServer(this, workerMonitor);
+						await writePid(options);
+
 						displayName = workerMonitor.data.displayName;
 						logger.info(`"${displayName}" started`);
 						runEvent(EventTypes.START);
@@ -242,7 +263,20 @@ export default class MasterMonitor extends EventEmitter {
 		return workerMonitor.restart();
 	}
 
-	async requestShutDown(workerMonitor, options) {
-		await Connection.shutDown(this, workerMonitor, options);
+	async requestShutDown(workerMonitor) {
+		await workerMonitor.stop();
+
+		const { socketPath, pidFile } = workerMonitor.toJSON();
+
+		const { workerMonitors } = this;
+		const index = workerMonitors.indexOf(workerMonitor);
+		workerMonitors.splice(index, 1);
+
+		await Promise.all([
+			removeDomainSocketFile(socketPath),
+			removePidFile(pidFile),
+		]);
+
+		if (!workerMonitors.length) process.exit(0);
 	}
 }

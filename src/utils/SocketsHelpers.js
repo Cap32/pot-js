@@ -1,15 +1,21 @@
 import { remove } from 'fs-extra';
 import { basename, join } from 'path';
-import workspace from '../utils/workspace';
+import workspace from './workspace';
 import { createServer, createClient } from './ipc';
 import { ensureLocalDomainPath } from 'create-local-domain-socket';
-import { STATE, CLOSE, RESTART, SCALE } from './constants';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import globby from 'globby';
 import { noop, isObject } from 'lodash';
-import isWin from '../utils/isWin';
+import isWin from './isWin';
 import getKey from './getKey';
+import { STATE, RESTART, SCALE } from './SocketEventTypes';
+
+// TODO: deprecated
+export const DEPRECATED_BRIDGE = 'bridge';
+
+// TODO: deprecated
+export const DEPRECATED_GET_INFO = 'getInfo';
 
 export async function getSocketFiles() {
 	const runDir = await workspace.getRunDir();

@@ -1,13 +1,13 @@
 import processExists from 'process-exists';
 import { writeFile, readFile, remove } from 'fs-extra';
-import workspace from '../utils/workspace';
+import workspace from './workspace';
 import { basename, join } from 'path';
 import { trim, noop } from 'lodash';
 import globby from 'globby';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import fkill from 'fkill';
-import isWin from '../utils/isWin';
+import isWin from './isWin';
 import getKey from './getKey';
 
 const removePidFile = async function removePidFile(pidFile) {

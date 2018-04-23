@@ -1,13 +1,5 @@
-import { getPidFile, writePid, killPid, removePidFile } from './PidHelpers';
 import { uniq } from 'lodash';
-import {
-	startServer,
-	getSocketPath,
-	removeDomainSocketFile,
-} from './SocketsHelpers';
-import { ensureWorkspace } from './ConnectionUtils';
 import { logger } from 'pot-logger';
-import getKey from './getKey';
 import Instance from './Instance';
 
 export default class Connection {
@@ -36,53 +28,6 @@ export default class Connection {
 	static getAllInstances = Instance.getAllInstances;
 
 	static getList = Connection.getAllInstances;
-
-	static async serve(masterMonitor, workerMonitor) {
-		const { data: options, id } = workerMonitor;
-		ensureWorkspace(options);
-
-		const key = getKey(workerMonitor);
-		const pidFile = await getPidFile(key);
-		const socketPath = await getSocketPath(key);
-
-		options.instanceId = id;
-		options.key = key;
-		options.pidFile = pidFile;
-		options.socketPath = socketPath;
-		options.displayName = options.name + (id ? ` #${id}` : '');
-
-		await startServer(masterMonitor, workerMonitor);
-		await writePid(options);
-	}
-
-	static async writePid(monitor) {
-		await writePid(monitor.data);
-	}
-
-	static async shutDown(masterMonitor, workerMonitor, options) {
-		await workerMonitor.stop();
-
-		// TODO: remove `killPid`?
-		const { key, ppid, socketPath, pidFile } = workerMonitor.toJSON();
-
-		// console.log('key', key);
-		// console.log('ppid', ppid);
-		// console.log('socketPath', socketPath);
-		// console.log('process.pid', process.pid);
-
-		// await killPid(key, ppid, options);
-		// console.log('killed', ppid);
-
-		await Promise.all([
-			removeDomainSocketFile(socketPath),
-			removePidFile(pidFile),
-		]);
-
-		const { workerMonitors } = masterMonitor;
-		const index = workerMonitors.indexOf(workerMonitor);
-		workerMonitors.splice(index, 1);
-		if (!workerMonitors.length) process.exit(0);
-	}
 
 	constructor(name, instances = []) {
 		this._name = name;

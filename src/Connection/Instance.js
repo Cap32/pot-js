@@ -1,16 +1,37 @@
-import { CLOSE, RESTART, SCALE } from './constants';
 import getInfoVerbose from './getInfoVerbose';
-import { killPid, removePidFile, getPids } from './PidHelpers';
+import { RESTART, SCALE, STATE } from '../utils/SocketEventTypes';
+import { getPids } from '../utils/PidHelpers';
 import { logger } from 'pot-logger';
 import {
 	getSocketFiles,
 	startClient,
 	getSocketPath,
 	removeDomainSocketFile,
-} from './SocketsHelpers';
-import { ensureWorkspace, getState } from './ConnectionUtils';
-import { differenceWith } from 'lodash';
+} from '../utils/SocketsHelpers';
+import { differenceWith, noop } from 'lodash';
 import isWin from '../utils/isWin';
+import workspace from '../utils/workspace';
+
+const getState = async function getState(socket, ...args) {
+	try {
+		const state = await socket.request(STATE, ...args);
+
+		// DEPRECATED: adapt to old version state
+		if (state && state.data) {
+			const { data } = state;
+			delete state.data;
+			state.monitor = state;
+			Object.assign(state, data);
+			if (state.parentPid && !state.ppid) state.ppid = state.parentPid;
+		}
+
+		return state;
+	}
+	catch (err) {
+		socket.close().catch(noop);
+		return null;
+	}
+};
 
 const getAll = async function getAll() {
 	const pidRefs = await getPids();
@@ -99,19 +120,19 @@ const getByKey = async function getByKey(key) {
 
 export default class Instance {
 	static async getAllInstances(options) {
-		ensureWorkspace(options);
+		workspace.set(options);
 		const refs = await getAll();
 		return refs.map((ref) => new Instance(ref, options));
 	}
 
 	static async getInstanceByKey(key, options) {
-		ensureWorkspace(options);
+		workspace.set(options);
 		const refs = await getByKey(key);
 		return refs.map((ref) => new Instance(ref, options));
 	}
 
 	static async getInstancesByName(name, options) {
-		ensureWorkspace(options);
+		workspace.set(options);
 		const refs = await getByName(name);
 		return refs.map((ref) => new Instance(ref, options));
 	}

@@ -4,13 +4,13 @@ import { name } from '../../package.json';
 import { join } from 'path';
 import { isObject } from 'lodash';
 
-const { POT_WORKSPACE = 'defaults' } = process.env;
-
 const root = join(homeOrTmp, '.config', name);
 
 const workspace = {
+	default: process.env.POT_WORKSPACE || 'defaults',
+
 	async _getDir(dirname) {
-		const dir = join(root, this._name || POT_WORKSPACE, dirname);
+		const dir = join(root, this._name || this.default, dirname);
 		await ensureDir(dir);
 		return dir;
 	},
@@ -27,8 +27,9 @@ const workspace = {
 		return this._getDir('pot-run');
 	},
 
-	set(name) {
-		this._name = isObject(name) ? name.workspace : name || POT_WORKSPACE;
+	set(options) {
+		this._name = isObject(options) ? options.workspace : options;
+		if (!this._name) this._name = this.default;
 	},
 };
 

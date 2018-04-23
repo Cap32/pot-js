@@ -1,7 +1,7 @@
 import { name as appspace } from '../../package.json';
 import nodeIpc from 'node-ipc';
 import { basename } from 'path';
-import { DEPRECATED_BRIDGE, DEPRECATED_GET_INFO, CLOSE } from './constants';
+import { DEPRECATED_BRIDGE, DEPRECATED_GET_INFO } from './SocketEventTypes';
 
 export async function createClient(socketPath) {
 	return new Promise((resolve, reject) => {
@@ -16,9 +16,6 @@ export async function createClient(socketPath) {
 			const socket = nodeIpc.of[serverId];
 			socket.on('connect', () => {
 				socket.request = function request(eventType) {
-					if (eventType === CLOSE) {
-						return Promise.resolve({});
-					}
 					return new Promise((resolve) => {
 						const handler = (data) => {
 							socket.off(DEPRECATED_BRIDGE, handler);

@@ -1,5 +1,4 @@
 export const STATE = 'STATE';
-export const CLOSE = 'CLOSE';
 export const RESTART = 'RESTART';
 export const SCALE = 'SCALE';
 
