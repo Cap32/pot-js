@@ -210,12 +210,24 @@ export default class MasterMonitor extends EventEmitter {
 
 	async scale(number) {
 		const delta = number - this._count;
-		if (!delta) return { ok: true };
-		else if (delta > 0) return this.spawn(delta);
+		if (!delta) {
+			return { ok: true };
+		}
+		else if (delta > 0) {
+			return this.spawn(delta);
+		}
 		else {
-
-			// TODO: should kill processes
-			return { ok: false };
+			const { workerMonitors } = this;
+			const removes = workerMonitors.slice(workerMonitors.length + delta);
+			try {
+				await Promise.all(
+					removes.map((workerMonitor) => this.requestShutDown(workerMonitor)),
+				);
+				return { ok: true };
+			}
+			catch (error) {
+				return { ok: false, error };
+			}
 		}
 	}
 

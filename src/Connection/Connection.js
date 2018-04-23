@@ -60,6 +60,7 @@ export default class Connection {
 	}
 
 	static async shutDown(masterMonitor, workerMonitor, options) {
+		await workerMonitor.stop();
 
 		// TODO: remove `killPid`?
 		const { key, ppid, socketPath, pidFile } = workerMonitor.toJSON();
@@ -76,7 +77,11 @@ export default class Connection {
 			removeDomainSocketFile(socketPath),
 			removePidFile(pidFile),
 		]);
-		process.exit(0);
+
+		const { workerMonitors } = masterMonitor;
+		const index = workerMonitors.indexOf(workerMonitor);
+		workerMonitors.splice(index, 1);
+		if (!workerMonitors.length) process.exit(0);
 	}
 
 	constructor(name, instances = []) {
