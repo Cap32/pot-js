@@ -41,7 +41,7 @@ const defaultCells = [
 	{
 		title: 'Instance',
 		width: 10,
-		get: (state) => state.monitor.instanceId || 0,
+		get: (state) => `#${state.monitor.instanceId || 0}`,
 	},
 	{
 		title: 'Status',
@@ -85,7 +85,6 @@ const defaultCells = [
 		},
 	},
 	{ title: 'Started', width: 20, get: (state) => state.monitor.startedLocal },
-	{ title: 'PPID', width: 6, get: (state) => state.ppid },
 	{ title: 'PID', width: 6, get: (state) => state.pid },
 ];
 
