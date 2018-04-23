@@ -11,12 +11,6 @@ import isWin from './isWin';
 import getKey from './getKey';
 import { STATE, RESTART, SCALE } from './SocketEventTypes';
 
-// TODO: deprecated
-export const DEPRECATED_BRIDGE = 'bridge';
-
-// TODO: deprecated
-export const DEPRECATED_GET_INFO = 'getInfo';
-
 export async function getSocketFiles() {
 	const runDir = await workspace.getRunDir();
 
@@ -54,7 +48,6 @@ export async function startServer(masterMonitor, workerMonitor) {
 	logger.trace('unix domain socket path', chalk.gray(socketPath));
 	const socketServer = await createServer(socketPath);
 
-	// TODO: should adapt old version socket server.
 	socketServer.onReplyClose(async () => {
 		process.nextTick(async () => {
 			await masterMonitor.requestShutDown(workerMonitor);

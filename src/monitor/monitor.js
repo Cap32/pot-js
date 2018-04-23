@@ -12,8 +12,10 @@ const send = (type, payload) =>
 
 process.on('message', async (message) => {
 	if (message.type === 'start') {
-		const masterMonitor = new MasterMonitor(message.payload);
-		const { ok, errors } = await masterMonitor.spawn();
+		const options = message.payload;
+		const masterMonitor = new MasterMonitor(options);
+		const { instances } = options;
+		const { ok, errors } = await masterMonitor.spawn({ instances });
 		if (ok) send('start');
 		else send('error', { errors });
 	}

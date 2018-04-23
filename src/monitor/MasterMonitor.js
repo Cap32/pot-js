@@ -10,6 +10,7 @@ import onSignalExit from '../utils/onSignalExit';
 import createScriptRunner from '../utils/createScriptRunner';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
 import getKey from '../utils/getKey';
+import Errors from '../utils/Errors';
 import { getPidFile, writePid, removePidFile } from '../utils/PidHelpers';
 import {
 	startServer,
@@ -22,7 +23,6 @@ export default class MasterMonitor extends EventEmitter {
 		super();
 
 		const {
-			instances,
 			workspace: space,
 			logsDir,
 			execPath,
@@ -36,7 +36,7 @@ export default class MasterMonitor extends EventEmitter {
 			events,
 			watch: watchOptions,
 			...respawnOptions
-		} = (this._options = options);
+		} = options;
 
 		setLoggers({
 			...options,
@@ -78,7 +78,6 @@ export default class MasterMonitor extends EventEmitter {
 		};
 
 		this._count = 0;
-		this._instances = instances;
 		this.workerMonitors = [];
 
 		const exit = async () => {
@@ -120,17 +119,18 @@ export default class MasterMonitor extends EventEmitter {
 		});
 	}
 
-	async spawn(instances = this._instances) {
+	async spawn(options = {}) {
+		const { instances: newInstances } = options;
 		const { EventTypes } = WorkerMonitor;
 		const runEvent = this._runEvent;
 
-		const workerMonitors = new Array(instances)
+		const workerMonitors = new Array(newInstances)
 			.fill()
 			.map(() => new WorkerMonitor(this._workerMonitorOptions));
 
 		this.workerMonitors.push(...workerMonitors);
 
-		const errors = [];
+		const errors = new Errors();
 
 		const bootstraps = workerMonitors.map((workerMonitor) => {
 			let displayName = workerMonitor.data.name;
@@ -222,10 +222,7 @@ export default class MasterMonitor extends EventEmitter {
 		const ok = bootstraps.length > errors.length;
 		return {
 			ok,
-			errors: errors.map(({ message, stack }) => ({
-				message,
-				stack,
-			})),
+			errors: errors.toJSON(),
 		};
 	}
 
@@ -235,20 +232,18 @@ export default class MasterMonitor extends EventEmitter {
 			return { ok: true };
 		}
 		else if (delta > 0) {
-			return this.spawn(delta);
+			return this.spawn({ instances: delta });
 		}
 		else {
 			const { workerMonitors } = this;
 			const removes = workerMonitors.slice(workerMonitors.length + delta);
-			try {
-				await Promise.all(
-					removes.map((workerMonitor) => this.requestShutDown(workerMonitor)),
-				);
-				return { ok: true };
-			}
-			catch (error) {
-				return { ok: false, error };
-			}
+			const errors = new Errors();
+			await Promise.all(
+				removes
+					.map((workerMonitor) => this.requestShutDown(workerMonitor))
+					.catch((err) => errors.push(err)),
+			);
+			return { ok: !!errors.length, errors: errors.toJSON() };
 		}
 	}
 
