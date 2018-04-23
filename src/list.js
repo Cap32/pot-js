@@ -8,6 +8,13 @@ import chalk from 'chalk';
 import validateBySchema from './utils/validateBySchema';
 import { list as schema } from './schemas/cli';
 
+if (process.env !== 'production') {
+	process.on('unhandledRejection', (reason, promise) => {
+		console.warn('unhandledRejection: ' + reason);
+		console.error(promise);
+	});
+}
+
 const paddingSpaces = '    ';
 const tableOptions = {
 	chars: {

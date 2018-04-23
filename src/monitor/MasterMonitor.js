@@ -272,6 +272,8 @@ export default class MasterMonitor extends EventEmitter {
 		const index = workerMonitors.indexOf(workerMonitor);
 		workerMonitors.splice(index, 1);
 
+		this._count--;
+
 		await Promise.all([
 			removeDomainSocketFile(socketPath),
 			removePidFile(pidFile),
