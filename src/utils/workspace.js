@@ -3,11 +3,12 @@ import homeOrTmp from 'home-or-tmp';
 import { name } from '../../package.json';
 import { join } from 'path';
 import { isObject } from 'lodash';
+import schema from '../schemas/config';
 
 const root = join(homeOrTmp, '.config', name);
 
 const workspace = {
-	default: process.env.POT_WORKSPACE || 'defaults',
+	default: process.env.POT_WORKSPACE || schema.properties.workspace.default,
 
 	async _getDir(dirname) {
 		const dir = join(root, this._name || this.default, dirname);
