@@ -6,7 +6,6 @@ import getCliOptionsBySchema from './getCliOptionsBySchema';
 import validateBySchema from './validateBySchema';
 import { isFunction, isObject, forEach, flatten } from 'lodash';
 
-// TODO: should fix demanded bug
 const builder = function builder(yargs) {
 	const { middlewares, optional, demanded, original } = this;
 	const potStore = middlewares[0] || {};
@@ -36,12 +35,7 @@ const builder = function builder(yargs) {
 			}
 		});
 		args.options(options);
-
-		const { argv } = args;
-		positions.forEach((key, index) => {
-			argv[key] = argv._[index + 1];
-		});
-		return argv;
+		return args;
 	}
 
 	return yargs.argv;
