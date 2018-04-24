@@ -161,6 +161,7 @@ describe('cli `pot stopall`', () => {
 					])
 						.until('socket server started', {
 							async action() {
+								await delay(1000);
 								return Kapok.start(command, ['stopall', '-f'])
 									.assert(/INFO "[ab]" stopped/)
 									.assert(/INFO "[ab]" stopped/)
