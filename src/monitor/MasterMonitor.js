@@ -11,6 +11,7 @@ import createScriptRunner from '../utils/createScriptRunner';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
 import getKey from '../utils/getKey';
 import Errors from '../utils/Errors';
+import ensureInstanceNumber from '../utils/ensureInstanceNumber';
 import { getPidFile, writePid, removePidFile } from '../utils/PidHelpers';
 import {
 	startServer,
@@ -120,7 +121,7 @@ export default class MasterMonitor extends EventEmitter {
 	}
 
 	async spawn(options = {}) {
-		const { instances: newInstances } = options;
+		const newInstances = ensureInstanceNumber(options.instances);
 		const { EventTypes } = WorkerMonitor;
 		const runEvent = this._runEvent;
 
@@ -227,7 +228,7 @@ export default class MasterMonitor extends EventEmitter {
 	}
 
 	async scale(number) {
-		const delta = number - this._count;
+		const delta = ensureInstanceNumber(number) - this._count;
 		if (!delta) {
 			return { ok: true };
 		}
