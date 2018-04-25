@@ -6,6 +6,7 @@ const logLevel = cloneDeep(properties.logLevel);
 const workspace = cloneDeep(properties.workspace);
 const name = cloneDeep(properties.name);
 const instances = cloneDeep(properties.instances);
+const cells = { type: 'array', hidden: true };
 
 export { start };
 
@@ -64,6 +65,7 @@ export const scale = {
 
 export const list = {
 	properties: {
+		cells,
 		logLevel,
 		workspace,
 	},
@@ -71,6 +73,7 @@ export const list = {
 
 export const show = {
 	properties: {
+		cells,
 		logLevel,
 		name,
 		workspace,
