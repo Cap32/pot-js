@@ -79,10 +79,3 @@ export const show = {
 	schema: Schemas.show,
 	operator: Operators.show,
 };
-
-export const dir = {
-	command: 'dir [name]',
-	description: 'Show dir',
-	schema: Schemas.dir,
-	operator: Operators.dir,
-};

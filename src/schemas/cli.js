@@ -80,8 +80,6 @@ export const show = {
 	},
 };
 
-export const dir = restart;
-
 export const log = {
 	properties: {
 		category: {
