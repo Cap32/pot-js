@@ -90,6 +90,12 @@ export default {
 			description: 'Force restart even if the process is exists',
 			type: 'boolean',
 		},
+		fork: {
+			description:
+				'Use fork mode. Should set to `true` if it is NOT a node.js process',
+			type: 'boolean',
+			default: false,
+		},
 		inspect: {
 			description: 'Activate inspector. Require Node.js >= v6.3.0',
 			anyOf: [

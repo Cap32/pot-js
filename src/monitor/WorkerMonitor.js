@@ -43,6 +43,7 @@ export default class WorkerMonitor extends EventEmitter {
 		this.status = 'stopped';
 		this.execPath = opts.execPath;
 		this.execArgv = opts.execArgv;
+		this.fork = opts.fork;
 		this.name = opts.name;
 		this.cwd = opts.cwd || '.';
 		this.env = opts.env || {};
@@ -66,7 +67,6 @@ export default class WorkerMonitor extends EventEmitter {
 		this.maxRestarts = opts.maxRestarts === 0 ? 0 : opts.maxRestarts || -1;
 		this.kill = opts.kill === false ? false : opts.kill || 30000;
 		this.child = null;
-		this.worker = null;
 		this.started = null;
 		this.timeout = null;
 	}
@@ -120,33 +120,33 @@ export default class WorkerMonitor extends EventEmitter {
 		const loop = () => {
 			this.restarts++;
 
-			// const cmd =
-			// 	typeof this.command === 'function' ? this.command() : this.command;
-
-			cluster.setupMaster({
-				execPath: this.execPath,
-				execArgv: this.execArgv,
+			let worker;
+			let child;
+			const commomOptions = {
 				cwd: this.cwd,
 				uid: this.uid,
 				gid: this.gid,
+				stdio: this.stdio,
 				silent: this.silent,
 				windowsVerbatimArguments: this.windowsVerbatimArguments,
 				windowsHide: this.windowsHide,
-			});
+			};
 
-			this.worker = cluster.fork(env);
-			const child = this.worker.process;
-
-			// const child = spawn(cmd[0], cmd.slice(1), {
-			// 	cwd: this.cwd,
-			// 	env,
-			// 	uid: this.uid,
-			// 	gid: this.gid,
-			// 	stdio: this.stdio,
-			// 	silent: this.silent,
-			// 	windowsVerbatimArguments: this.windowsVerbatimArguments,
-			// 	windowsHide: this.windowsHide,
-			// });
+			if (this.fork) {
+				child = spawn(this.execPath, this.execArgv, {
+					...commomOptions,
+					env,
+				});
+			}
+			else {
+				cluster.setupMaster({
+					...commomOptions,
+					execPath: this.execPath,
+					execArgv: this.execArgv,
+				});
+				worker = cluster.fork(env);
+				child = worker.process;
+			}
 
 			this.started = new Date();
 			this.status = 'running';
@@ -221,9 +221,11 @@ export default class WorkerMonitor extends EventEmitter {
 				this.timeout = setTimeout(loop, restartTimeout);
 			});
 
-			this.worker.on('online', () => {
+			const emitReady = () => {
 				this.emit(this.restarts ? EventTypes.RESTART : EventTypes.START);
-			});
+			};
+
+			worker ? worker.on('online', emitReady) : emitReady();
 		};
 
 		clearTimeout(this.timeout);
