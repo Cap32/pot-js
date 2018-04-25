@@ -6,6 +6,7 @@ export scale from './scale';
 export list from './list';
 export log from './log';
 export show from './show';
+export { flush, flushAll } from './flush';
 export Connection from './Connection';
 export * as Commands from './Commands';
 export workspace from './utils/workspace';

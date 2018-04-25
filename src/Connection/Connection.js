@@ -42,14 +42,14 @@ export default class Connection {
 		return state;
 	}
 
-	async _each(method, ...args) {
+	async each(method, ...args) {
 		return Promise.all(
 			this.instances.map((instance) => instance[method](...args)),
 		);
 	}
 
 	async restart() {
-		return this._each('restart');
+		return this.each('restart');
 	}
 
 	async scale(number) {
@@ -59,11 +59,11 @@ export default class Connection {
 	}
 
 	async disconnect() {
-		return this._each('disconnect');
+		return this.each('disconnect');
 	}
 
 	async requestStopServer(options = {}) {
 		options.shouldLog && logger.info(`"${this._name}" stopped`);
-		return this._each('requestStopServer');
+		return this.each('requestStopServer');
 	}
 }

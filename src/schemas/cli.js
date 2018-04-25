@@ -103,3 +103,6 @@ export const log = {
 		workspace,
 	},
 };
+
+export const flush = restart;
+export const flushAll = restartAll;

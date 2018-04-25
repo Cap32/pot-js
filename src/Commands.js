@@ -79,3 +79,17 @@ export const show = {
 	schema: Schemas.show,
 	operator: Operators.show,
 };
+
+export const flush = {
+	command: 'flush [name]',
+	description: 'Remove log files',
+	schema: Schemas.flush,
+	operator: Operators.flush,
+};
+
+export const flushAll = {
+	command: 'flushall',
+	description: 'Remove all log files',
+	schema: Schemas.flushAll,
+	operator: Operators.flushAll,
+};
