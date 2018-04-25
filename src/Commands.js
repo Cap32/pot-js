@@ -44,7 +44,7 @@ export const stop = {
 	operator: Operators.stop,
 };
 
-export const stopall = {
+export const stopAll = {
 	command: 'stopall',
 	description: 'Stop all processes',
 	schema: Schemas.stopAll,
