@@ -1,11 +1,10 @@
 import { fork } from 'child_process';
 import { resolve } from 'path';
 import { ensureDir } from 'fs-extra';
-import workspace from './utils/workspace';
 import isWin from './utils/isWin';
-import validateBySchema from './utils/validateBySchema';
+import { prepareRun } from './utils/PrepareCli';
 import schema from './schemas/config';
-import { logger, setLoggers } from 'pot-logger';
+import { logger } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
 import chalk from 'chalk';
 import Connection from './Connection';
@@ -57,8 +56,6 @@ const ensureWatch = (options) => {
 };
 
 const ensureOptions = (options = {}) => {
-	options = validateBySchema(schema, options);
-
 	options.cwd = resolve(options.cwd);
 
 	// TODO: root is deprecated
@@ -184,6 +181,8 @@ const connectMonitor = async (monitorProc, options) => {
 };
 
 export default async function start(options = {}) {
+	prepareRun(schema, options);
+
 	let monitorProc;
 
 	const kill = async () => {
@@ -203,14 +202,10 @@ export default async function start(options = {}) {
 		const { name, force, baseDir } = ensureOptions(options);
 
 		await ensureDir(baseDir);
-
-		setLoggers('logLevel', options.logLevel);
 		if (options.logsDir) {
 			logger.trace('logs dir', chalk.gray(options.logsDir));
 		}
 		logger.trace('logLevel', options.logLevel);
-
-		workspace.set(options);
 
 		const connection = await Connection.getByName(name);
 

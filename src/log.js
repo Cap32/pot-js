@@ -1,36 +1,21 @@
 import { logger } from 'pot-logger';
 import { join } from 'path';
-import Connection from './Connection';
 import sliceFile from 'slice-file';
 import globby from 'globby';
 import ensureSelected from './utils/ensureSelected';
-import workspace from './utils/workspace';
-import validateBySchema from './utils/validateBySchema';
+import { prepareRun, prepareTarget } from './utils/PrepareCli';
 import { log as schema } from './schemas/cli';
 
 export default async function log(options = {}) {
-	validateBySchema(schema, options);
-	workspace.set(options);
+	prepareRun(schema, options);
 
-	const { name, line, category, follow } = options;
-
-	const appName = await ensureSelected({
-		value: name,
-		message: 'Please select the target app.',
-		errorMessage: 'No process is running',
-		getChoices: Connection.getNames,
-	});
-
-	const throwError = function throwError() {
-		throw new Error(`"${appName}" NOT found`);
-	};
-
-	const connection = await Connection.getByName(appName);
-
-	if (!connection) throwError();
+	const { line, category, follow } = options;
+	const { connection, targetName } = await prepareTarget(options);
 
 	const state = await connection.getState();
-	if (!state) throwError();
+	if (!state) {
+		throw new Error(`"${targetName}" NOT found`);
+	}
 
 	const { logsDir } = state;
 

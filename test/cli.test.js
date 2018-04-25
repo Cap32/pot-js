@@ -24,7 +24,7 @@ describe('cli `pot start`', () => {
 			.doneAndKill();
 	});
 
-	test('should throw error if `entry` is not exists.', async () => {
+	test('should throw error if `entry` is not exists', async () => {
 		return Kapok.start(command, ['start'])
 			.assertUntil(/^ERROR Cannot find module/)
 			.doneAndKill();

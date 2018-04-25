@@ -1,47 +1,26 @@
-import { logger, setLoggers } from 'pot-logger';
-import workspace from './utils/workspace';
+import { logger } from 'pot-logger';
+import { prepareRun, prepareTarget } from './utils/PrepareCli';
 import Connection from './Connection';
-import ensureSelected from './utils/ensureSelected';
 import inquirer from 'inquirer';
-import validateBySchema from './utils/validateBySchema';
 import { stop as schema } from './schemas/cli';
 
 export const stop = async function stop(options = {}) {
-	validateBySchema(schema, options);
-
-	let { name } = options;
-	const { force, logLevel } = options;
-
-	workspace.set(options);
-	setLoggers('logLevel', logLevel);
-
-	name = await ensureSelected({
-		value: name,
-		message: 'Please select the target app.',
-		errorMessage: 'No process is running',
-		getChoices: Connection.getNames,
-	});
-
-	name += ''; // prevent `name` is `Number`
-
-	const connection = await Connection.getByName(name);
-
-	if (!connection) {
-		logger.error(`"${name}" NOT found`);
-		return false;
-	}
+	prepareRun(schema, options);
+	const { connection, targetName } = await prepareTarget(options);
+	const { force } = options;
 
 	if (!force) {
 		const confirmed = await inquirer.prompt({
 			type: 'confirm',
 			name: 'yes',
-			message: `Are you sure to stop "${name}"?`,
+			message: `Are you sure to stop "${targetName}"?`,
 			default: false,
 		});
 
 		if (!confirmed.yes) {
 			await connection.disconnect();
-			return false;
+			logger.warn('Canceled');
+			return;
 		}
 	}
 

@@ -1,11 +1,10 @@
-import { logger, setLoggers } from 'pot-logger';
-import workspace from './utils/workspace';
+import { logger } from 'pot-logger';
 import createTable from './utils/createTable';
 import { isUndefined, isFunction } from 'lodash';
 import Connection from './Connection';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
-import validateBySchema from './utils/validateBySchema';
+import { prepareRun } from './utils/PrepareCli';
 import { list as schema } from './schemas/cli';
 
 if (process.env !== 'production') {
@@ -70,19 +69,12 @@ const defaultCells = [
 ];
 
 const list = async function list(options = {}) {
-	validateBySchema(schema, options);
-	workspace.set(options);
+	prepareRun(schema, options);
 
-	const { cells: getCells = defaultCells, logLevel } = options;
+	const { cells: getCells = defaultCells } = options;
 	const cells = isFunction(getCells) ? getCells(defaultCells) : getCells;
 
-	if (logLevel) {
-		setLoggers('logLevel', logLevel);
-	}
-
-	if (!cells.length) {
-		cells.push();
-	}
+	if (!cells.length) cells.push();
 
 	const instances = await Connection.getAllInstances({ keepAlive: true });
 

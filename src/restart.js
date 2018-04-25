@@ -1,38 +1,14 @@
-import { logger, setLoggers } from 'pot-logger';
+import { logger } from 'pot-logger';
 import Connection from './Connection';
-import ensureSelected from './utils/ensureSelected';
-import workspace from './utils/workspace';
-import validateBySchema from './utils/validateBySchema';
+import { prepareRun, prepareTarget } from './utils/PrepareCli';
 import { restart as schema } from './schemas/cli';
 
 export const restart = async function restart(options = {}) {
-	validateBySchema(schema, options);
-
-	workspace.set(options);
-	setLoggers('logLevel', options.logLevel);
-
-	const { name } = options;
-
-	const appName = await ensureSelected({
-		value: name,
-		message: 'Please select the target app.',
-		errorMessage: 'No process is running.',
-		getChoices: Connection.getNames,
-	});
-
-	const connection = await Connection.getByName(appName);
-
-	if (!connection) {
-		throw new Error(`"${appName}" NOT found`);
-	}
-
+	prepareRun(schema, options);
+	const { connection, targetName } = await prepareTarget(options);
 	const ok = await connection.restart();
-	if (ok) {
-		logger.info(`"${appName}" restarted`);
-	}
-	else {
-		logger.error(`Failed to restart "${appName}"`);
-	}
+	if (ok) logger.info(`"${targetName}" restarted`);
+	else logger.error(`Failed to restart "${targetName}"`);
 };
 
 export const restartAll = async function restartAll(options = {}) {

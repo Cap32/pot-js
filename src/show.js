@@ -1,20 +1,10 @@
-import { logger, setLoggers } from 'pot-logger';
-import workspace from './utils/workspace';
+import { logger } from 'pot-logger';
 import createTable from './utils/createTable';
 import { isObject, isBoolean } from 'lodash';
-import ensureSelected from './utils/ensureSelected';
-import Connection from './Connection';
 import chalk from 'chalk';
-import validateBySchema from './utils/validateBySchema';
+import { prepareRun, prepareTarget } from './utils/PrepareCli';
 import { show as schema } from './schemas/cli';
 import logSymbols from 'log-symbols';
-
-if (process.env !== 'production') {
-	process.on('unhandledRejection', (reason, promise) => {
-		console.warn('unhandledRejection: ' + reason);
-		console.error(promise);
-	});
-}
 
 const defaultCells = [
 	['name', (state) => state.name],
@@ -40,26 +30,9 @@ const defaultCells = [
 ];
 
 const show = async function show(options = {}) {
-	validateBySchema(schema, options);
-	workspace.set(options);
-	setLoggers('logLevel', options.logLevel);
-
-	const { name, cells = defaultCells } = options;
-
-	const appName = await ensureSelected({
-		value: name,
-		message: 'Please select the target app.',
-		errorMessage: 'No process is running.',
-		getChoices: Connection.getNames,
-	});
-
-	const throwError = function throwError(message) {
-		throw new Error(message || `"${appName}" NOT found`);
-	};
-
-	const connection = await Connection.getByName(appName);
-
-	if (!connection) throwError();
+	prepareRun(schema, options);
+	const { cells = defaultCells } = options;
+	const { connection } = await prepareTarget(options);
 
 	const table = createTable({ padding: 4 });
 
