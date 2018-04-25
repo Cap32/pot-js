@@ -28,7 +28,7 @@ export default {
 			alias: 'c',
 			description: 'Path to the config file',
 			default: '.potrc',
-			type: 'string',
+			anyOf: [{ type: 'string' }, { type: 'boolean' }],
 		},
 		cwd: {
 			description: 'Current working directory',

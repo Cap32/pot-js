@@ -44,10 +44,11 @@ const builder = function builder(yargs) {
 const handler = async function handler(argv) {
 	try {
 		const potStore = this.middlewares[0] || {};
-		const { operator, configFile, schema, validate } = potStore;
+		const { operator, configFile: configFileKey, schema, validate } = potStore;
 
 		if (isFunction(operator)) {
-			if (configFile) {
+			if (configFileKey) {
+				const configFile = argv[configFileKey];
 				argv = await resolveConfig(argv, configFile);
 			}
 			if (validate && schema) {

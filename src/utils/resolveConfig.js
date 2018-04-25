@@ -2,17 +2,19 @@ import { merge } from 'lodash';
 import importFile from 'import-file';
 import { isAbsolute } from 'path';
 
-export default function resolveConfig(cliOptions = {}, configFileKey) {
-	const configFile = cliOptions[configFileKey];
-	if (configFile) {
+export default function resolveConfig(argv = {}, configFile, options = {}) {
+	if (configFile !== false) {
+		const { merge: mergeConfig = merge, ...importOptions } = options;
 		const useFindUp = !isAbsolute(configFile);
 		try {
-			const config = importFile(configFile, { useFindUp });
-			return merge(config, cliOptions);
+			const config = importFile(configFile, { useFindUp, ...importOptions });
+			return mergeConfig(config, argv);
 		}
 		catch (err) {
-			delete cliOptions[configFileKey];
+			if (err && err.errno !== 'ENOENT') {
+				throw err;
+			}
 		}
 	}
-	return cliOptions;
+	return argv;
 }
