@@ -73,6 +73,13 @@ export const log = {
 	operator: Operators.log,
 };
 
+export const show = {
+	command: 'show [name]',
+	description: 'Show process information',
+	schema: Schemas.show,
+	operator: Operators.show,
+};
+
 export const dir = {
 	command: 'dir [name]',
 	description: 'Show dir',

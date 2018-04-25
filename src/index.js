@@ -5,6 +5,7 @@ export { reload, reloadAll } from './reload';
 export scale from './scale';
 export list from './list';
 export log from './log';
+export show from './show';
 export dir from './dir';
 export Bridge from './Bridge';
 export Connection from './Connection';

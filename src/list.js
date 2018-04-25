@@ -1,6 +1,6 @@
 import { logger, setLoggers } from 'pot-logger';
 import workspace from './utils/workspace';
-import Table from 'cli-table';
+import createTable from './utils/createTable';
 import { isUndefined, isFunction } from 'lodash';
 import Connection from './Connection';
 import logUpdate from 'log-update';
@@ -16,32 +16,6 @@ if (process.env !== 'production') {
 }
 
 const paddingSpaces = '    ';
-const tableOptions = {
-	chars: {
-		top: '',
-		'top-mid': '',
-		'top-left': '',
-		'top-right': '',
-		bottom: '',
-		'bottom-mid': '',
-		'bottom-left': '',
-		'bottom-right': '',
-		left: '',
-		'left-mid': '',
-		mid: '',
-		'mid-mid': '',
-		right: '',
-		'right-mid': '',
-		middle: ' ',
-	},
-	style: {
-		head: [],
-		border: [],
-		compact: true,
-		'padding-left': 0,
-		'padding-right': 0,
-	},
-};
 
 const defaultCells = [
 	{ title: 'Name', width: 10, get: (state) => state.name },
@@ -113,8 +87,7 @@ export default async function list(options = {}) {
 	const instances = await Connection.getAllInstances({ keepAlive: true });
 
 	const loop = async () => {
-		const table = new Table({
-			...tableOptions,
+		const table = createTable({
 			head: cells.map(({ title = '' }) => chalk.blue(title)),
 			colWidths: cells.map(({ width }) => width || 10),
 		});

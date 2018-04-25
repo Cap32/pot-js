@@ -55,16 +55,24 @@ export const reloadAll = {
 
 export const scale = {
 	properties: {
+		instances,
 		logLevel,
 		name,
 		workspace,
-		instances,
 	},
 };
 
 export const list = {
 	properties: {
 		logLevel,
+		workspace,
+	},
+};
+
+export const show = {
+	properties: {
+		logLevel,
+		name,
 		workspace,
 	},
 };
