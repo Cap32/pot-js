@@ -69,7 +69,7 @@ const defaultCells = [
 	{ title: 'PID', width: 6, get: (state) => state.pid },
 ];
 
-export default async function list(options = {}) {
+const list = async function list(options = {}) {
 	validateBySchema(schema, options);
 	workspace.set(options);
 
@@ -122,4 +122,8 @@ export default async function list(options = {}) {
 	};
 
 	await loop();
-}
+};
+
+list.defaultCells = defaultCells;
+
+export default list;

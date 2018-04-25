@@ -16,29 +16,30 @@ if (process.env !== 'production') {
 	});
 }
 
-const defaultCells = (state) => [
-	['name', state.name],
-	['instance', state.instanceId],
-	['started', state.monitor.startedLocal],
-	['status', state.monitor.status],
-	['crashes', state.monitor.crashes],
-	['entry', state.entry],
-	['args', state.args],
-	['execPath', state.execPath],
-	['execArgs', state.execArgs],
-	['production', state.production],
-	['daemon', state.daemon],
-	['fork', state.fork],
-	['cwd', state.cwd],
-	['baseDir', state.baseDir],
-	['watch', state.watch.enable],
-	['maxRestarts', state.maxRestarts],
-	['pid', state.pid],
-	['ppid', state.ppid],
-	['memory', state.memoryUsage.styled],
+const defaultCells = [
+	['name', (state) => state.name],
+	['instance', (state) => state.instanceId],
+	['started', (state) => state.monitor.startedLocal],
+	['status', (state) => state.monitor.status],
+	['crashes', (state) => state.monitor.crashes],
+	['entry', (state) => state.entry],
+	['args', (state) => state.args],
+	['execPath', (state) => state.execPath],
+	['execArgs', (state) => state.execArgs],
+	['production', (state) => state.production],
+	['daemon', (state) => state.daemon],
+	['fork', (state) => state.fork],
+	['cwd', (state) => state.cwd],
+	['baseDir', (state) => state.baseDir],
+	['logs', (state) => state.logsDir],
+	['watch', (state) => state.watch.enable],
+	['maxRestarts', (state) => state.maxRestarts],
+	['pid', (state) => state.pid],
+	['ppid', (state) => state.ppid],
+	['memory', (state) => state.memoryUsage.styled],
 ];
 
-export default async function show(options = {}) {
+const show = async function show(options = {}) {
 	validateBySchema(schema, options);
 	workspace.set(options);
 	setLoggers('logLevel', options.logLevel);
@@ -78,11 +79,12 @@ export default async function show(options = {}) {
 		table.push(['']);
 		table.push([chalk.bgRed(` ${state.displayName} `)]);
 		table.push(['']);
-		cells(state).forEach((cell) => {
+		cells.forEach((cell) => {
 			if (Array.isArray(cell)) {
-				const [key, value] = cell;
-				const val = (function () {
-					const val = value === undefined ? '' : value;
+				const [key, getValue] = cell;
+				const value = (function () {
+					const res = getValue(state, chalk);
+					const val = res === undefined ? '' : res;
 					if (isBoolean(val)) {
 						return val ? logSymbols.success : logSymbols.error;
 					}
@@ -91,7 +93,7 @@ export default async function show(options = {}) {
 					}
 					return val.toString();
 				})();
-				table.push([chalk.blue(key), val]);
+				table.push([chalk.blue(key), value]);
 			}
 			else {
 				table.push([cell]);
@@ -103,4 +105,8 @@ export default async function show(options = {}) {
 	table.push(['']);
 
 	console.log(table.toString());
-}
+};
+
+show.defaultCells = defaultCells;
+
+export default show;
