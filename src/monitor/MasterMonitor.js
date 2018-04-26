@@ -82,7 +82,6 @@ export default class MasterMonitor extends EventEmitter {
 			}
 		};
 
-		this._count = 0;
 		this.workerMonitors = [];
 
 		const exit = async () => {
@@ -132,8 +131,6 @@ export default class MasterMonitor extends EventEmitter {
 		const workerMonitors = new Array(newInstances)
 			.fill()
 			.map(() => new WorkerMonitor(this._workerMonitorOptions));
-
-		this.workerMonitors.push(...workerMonitors);
 
 		const errors = new Errors();
 
@@ -190,7 +187,12 @@ export default class MasterMonitor extends EventEmitter {
 			return new Promise((resolve) => {
 				workerMonitor.on(EventTypes.START, async () => {
 					try {
-						workerMonitor.id = ++this._count;
+						const { workerMonitors } = this;
+						const numbers = workerMonitors.length ?
+							workerMonitors.map((wm) => wm.id) :
+							[0];
+						workerMonitor.id = Math.max(...numbers) + 1;
+						workerMonitors.push(workerMonitor);
 
 						const { data: options, id } = workerMonitor;
 						workspace.set(options);
@@ -208,6 +210,8 @@ export default class MasterMonitor extends EventEmitter {
 						await startServer(this, workerMonitor);
 						await writePid(options);
 
+						workerMonitors.sort((a, b) => a.id - b.id);
+
 						displayName = workerMonitor.data.displayName;
 						logger.info(`"${displayName}" started`);
 						runEvent(EventTypes.START);
@@ -216,39 +220,48 @@ export default class MasterMonitor extends EventEmitter {
 						logger.debug(err);
 						errors.push(err);
 					}
-					resolve();
+					resolve(workerMonitor.toJSON());
 				});
 				workerMonitor.start();
 			});
 		});
 
-		await Promise.all(bootstraps);
+		const added = await Promise.all(bootstraps);
 
 		const ok = bootstraps.length > errors.length;
 		return {
 			ok,
 			errors: errors.toJSON(),
+			added,
 		};
 	}
 
 	async scale(number) {
-		const delta = ensureInstanceNumber(number) - this._count;
+		const delta = ensureInstanceNumber(number) - this.workerMonitors.length;
 		if (!delta) {
-			return { ok: true };
+			return { ok: true, errors: [] };
 		}
 		else if (delta > 0) {
 			return this.spawn({ instances: delta });
 		}
 		else {
 			const { workerMonitors } = this;
-			const removes = workerMonitors.slice(workerMonitors.length + delta);
+			const toRemove = workerMonitors.slice(workerMonitors.length + delta);
 			const errors = new Errors();
-			await Promise.all(
-				removes
-					.map((workerMonitor) => this.requestShutDown(workerMonitor))
-					.catch((err) => errors.push(err)),
+			const removed = await Promise.all(
+				toRemove.map(async (workerMonitor) => {
+					const state = workerMonitor.toJSON();
+					await this.requestShutDown(workerMonitor).catch((err) =>
+						errors.push(err),
+					);
+					return state;
+				}),
 			);
-			return { ok: !!errors.length, errors: errors.toJSON() };
+			return {
+				ok: !errors.length,
+				errors: errors.toJSON(),
+				removed,
+			};
 		}
 	}
 
@@ -271,18 +284,14 @@ export default class MasterMonitor extends EventEmitter {
 		return false;
 	}
 
-	async requestShutDown() {
-		const { currentWorkerMonitor } = this;
-		await currentWorkerMonitor.stop();
+	async requestShutDown(workerMonitor) {
+		await workerMonitor.stop();
 
-		const { socketPath, pidFile } = currentWorkerMonitor.toJSON();
+		const { socketPath, pidFile } = workerMonitor.toJSON();
 
 		const { workerMonitors } = this;
-		const index = workerMonitors.indexOf(currentWorkerMonitor);
+		const index = workerMonitors.indexOf(workerMonitor);
 		workerMonitors.splice(index, 1);
-
-		this._count--;
-
 		await Promise.all([
 			removeDomainSocketFile(socketPath),
 			removePidFile(pidFile),
