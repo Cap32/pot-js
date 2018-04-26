@@ -1,6 +1,4 @@
-export const STATE = 'STATE';
-export const RESTART = 'RESTART';
-export const SCALE = 'SCALE';
+export const CALL = 'CALL';
 
 // TODO: deprecated
 export const DEPRECATED_BRIDGE = 'bridge';

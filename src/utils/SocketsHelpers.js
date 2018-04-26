@@ -6,10 +6,10 @@ import { ensureLocalDomainPath } from 'create-local-domain-socket';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import globby from 'globby';
-import { noop, isObject } from 'lodash';
+import { noop, isObject, isFunction } from 'lodash';
 import isWin from './isWin';
 import getKey from './getKey';
-import { STATE, RESTART, SCALE } from './SocketEventTypes';
+import { CALL } from './SocketEventTypes';
 
 export async function getSocketFiles() {
 	const runDir = await workspace.getRunDir();
@@ -55,16 +55,20 @@ export async function startServer(masterMonitor, workerMonitor) {
 		return true;
 	});
 
-	socketServer.reply(STATE, async (newState) => {
-		return masterMonitor.state(workerMonitor, newState);
-	});
-
-	socketServer.reply(RESTART, async () => {
-		return masterMonitor.restart(workerMonitor);
-	});
-
-	socketServer.reply(SCALE, async (number) => {
-		return masterMonitor.scale(number);
+	socketServer.reply(CALL, async (data) => {
+		if (data && data.method) {
+			const { args = [], method } = data;
+			masterMonitor.currentWorkerMonitor = workerMonitor;
+			logger.trace(
+				`Received API call "${method}" via workerMonitor #${workerMonitor.id}`,
+			);
+			if (isFunction(masterMonitor[method])) {
+				return masterMonitor[method](...args);
+			}
+			else {
+				logger.warn(`Received API call "${method}", but it's not supported`);
+			}
+		}
 	});
 
 	return socketServer;

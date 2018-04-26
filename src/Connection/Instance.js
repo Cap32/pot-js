@@ -1,5 +1,5 @@
 import getInfoVerbose from './getInfoVerbose';
-import { RESTART, SCALE, STATE } from '../utils/SocketEventTypes';
+import { CALL } from '../utils/SocketEventTypes';
 import { getPids } from '../utils/PidHelpers';
 import { logger } from 'pot-logger';
 import {
@@ -12,9 +12,14 @@ import { differenceWith, noop } from 'lodash';
 import isWin from '../utils/isWin';
 import workspace from '../utils/workspace';
 
+const call = async function call(socket, method, ...args) {
+	const data = { method, args };
+	return socket.request(CALL, data);
+};
+
 const getState = async function getState(socket, ...args) {
 	try {
-		const state = await socket.request(STATE, ...args);
+		const state = await call(socket, 'state', ...args);
 
 		// DEPRECATED: adapt to old version state
 		if (state && state.data) {
@@ -142,24 +147,18 @@ export default class Instance {
 		this._socket = socket;
 	}
 
-	async _response(res) {
-		let response;
-		if (res) response = await res;
-		if (!this._keepAlive) this.disconnect();
+	async call(method, ...args) {
+		const response = await call(this._socket, method, ...args);
+		if (!this._keepAlive) await this.disconnect();
 		return response;
 	}
 
-	async _getState(...args) {
-		const state = await getState(this._socket, ...args);
-		return this._response(state);
-	}
-
-	async setState(state) {
-		return this._getState(state);
+	async setState(newState) {
+		return this.call('state', newState);
 	}
 
 	async getState() {
-		return this._getState();
+		return this.call('state');
 	}
 
 	async getInfo() {
@@ -172,11 +171,11 @@ export default class Instance {
 	}
 
 	async restart() {
-		return this._response(this._socket.request(RESTART));
+		return this.call('restart');
 	}
 
 	async scale(number) {
-		return this._response(this._socket.request(SCALE, number));
+		return this.call('scale', number);
 	}
 
 	async disconnect() {
@@ -189,6 +188,7 @@ export default class Instance {
 	}
 
 	async requestStopServer(options) {
-		return this._response(this._socket.requestClose(options));
+		await this._socket.requestClose(options);
+		await this.disconnect();
 	}
 }

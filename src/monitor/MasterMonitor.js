@@ -20,6 +20,10 @@ import {
 } from '../utils/SocketsHelpers';
 
 export default class MasterMonitor extends EventEmitter {
+
+	// will be set by server socket
+	currentWorkerMonitor = null;
+
 	constructor(options) {
 		super();
 
@@ -248,24 +252,33 @@ export default class MasterMonitor extends EventEmitter {
 		}
 	}
 
-	async state(workerMonitor, newState) {
-		if (newState) {
-			Object.assign(workerMonitor.data, newState);
+	async state(newState) {
+		const { currentWorkerMonitor } = this;
+		if (currentWorkerMonitor) {
+			if (newState) {
+				Object.assign(currentWorkerMonitor.data, newState);
+			}
+			return currentWorkerMonitor.toJSON();
 		}
-		return workerMonitor.toJSON();
 	}
 
-	async restart(workerMonitor) {
-		return workerMonitor.restart();
+	async restart() {
+		const { currentWorkerMonitor } = this;
+		if (currentWorkerMonitor) {
+			await currentWorkerMonitor.restart();
+			return true;
+		}
+		return false;
 	}
 
-	async requestShutDown(workerMonitor) {
-		await workerMonitor.stop();
+	async requestShutDown() {
+		const { currentWorkerMonitor } = this;
+		await currentWorkerMonitor.stop();
 
-		const { socketPath, pidFile } = workerMonitor.toJSON();
+		const { socketPath, pidFile } = currentWorkerMonitor.toJSON();
 
 		const { workerMonitors } = this;
-		const index = workerMonitors.indexOf(workerMonitor);
+		const index = workerMonitors.indexOf(currentWorkerMonitor);
 		workerMonitors.splice(index, 1);
 
 		this._count--;
