@@ -5,7 +5,7 @@ const { properties } = start;
 const logLevel = cloneDeep(properties.logLevel);
 const workspace = cloneDeep(properties.workspace);
 const name = cloneDeep(properties.name);
-const instances = cloneDeep(properties.instances);
+const instances = omit(properties.instances, ['default']);
 const cells = { type: 'array', hidden: true };
 
 export { start };

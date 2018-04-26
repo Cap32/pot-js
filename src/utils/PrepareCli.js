@@ -1,8 +1,23 @@
 import { setLoggers } from 'pot-logger';
+import inquirer from 'inquirer';
 import Connection from '../Connection';
-import ensureSelected from './ensureSelected';
 import workspace from './workspace';
 import validateBySchema from './validateBySchema';
+
+export async function ensureArg(options) {
+	const { value, errorMessage, getChoices, type = 'list', ...other } = options;
+	if (value) return value;
+
+	const promptOptions = { name: 'value', type, ...other };
+	if (type === 'list') {
+		const choices = await getChoices();
+		if (!choices.length) throw new Error(errorMessage);
+		if (choices.length === 1) return choices[0];
+		promptOptions.choices = choices;
+	}
+	const anweser = await inquirer.prompt(promptOptions);
+	return anweser.value;
+}
 
 export function prepareRun(schema, argv) {
 	if (process.env !== 'production') {
@@ -19,7 +34,7 @@ export function prepareRun(schema, argv) {
 
 export async function prepareTarget(argv, options) {
 	const { name } = argv;
-	const targetName = await ensureSelected({
+	const targetName = await ensureArg({
 		value: name,
 		message: 'Please select the target app',
 		errorMessage: 'No process is running',

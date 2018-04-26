@@ -1,11 +1,18 @@
 import { logger } from 'pot-logger';
-import { prepareRun, prepareTarget } from './utils/PrepareCli';
+import { prepareRun, prepareTarget, ensureArg } from './utils/PrepareCli';
 import { scale as schema } from './schemas/cli';
 
 export default async function scale(options = {}) {
 	prepareRun(schema, options);
 	const { connection, targetName } = await prepareTarget(options);
-	const { instances } = options;
+	const errorMessage = 'INVALID number';
+	const instances = await ensureArg({
+		type: 'input',
+		validate: (input) => /^-?\d+$/.test(input) || errorMessage,
+		value: options.instances,
+		message: 'Please input instances count (Integer)',
+		errorMessage,
+	});
 	const { ok, added, removed, errors } = await connection.scale(instances);
 
 	if (errors && errors.length) {

@@ -124,6 +124,7 @@ export default {
 			description: 'Cluster instances',
 			default: 1,
 			type: 'number',
+			maximum: 50,
 		},
 		logLevel: {
 			alias: 'l',

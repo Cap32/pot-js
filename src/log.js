@@ -2,8 +2,7 @@ import { logger } from 'pot-logger';
 import { join } from 'path';
 import sliceFile from 'slice-file';
 import globby from 'globby';
-import ensureSelected from './utils/ensureSelected';
-import { prepareRun, prepareTarget } from './utils/PrepareCli';
+import { prepareRun, prepareTarget, ensureArg } from './utils/PrepareCli';
 import { log as schema } from './schemas/cli';
 
 export default async function log(options = {}) {
@@ -24,7 +23,7 @@ export default async function log(options = {}) {
 		return;
 	}
 
-	let appCategory = await ensureSelected({
+	let appCategory = await ensureArg({
 		value: category,
 		message: 'Please select a log file',
 		errorMessage: 'Log file NOT found',
