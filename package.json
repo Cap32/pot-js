@@ -51,7 +51,7 @@
 		"node-ipc": "^9.1.0",
 		"npm-path": "^2.0.4",
 		"pidusage": "^2.0.6",
-		"pot-logger": "^0.4.0",
+		"pot-logger": "^0.5.0",
 		"process-exists": "^3.0.0",
 		"promise-ws": "^0.4.1",
 		"respawn": "^2.5.0",
