@@ -1,5 +1,5 @@
 import delay from 'delay';
-import { start, Connection, ENV_VAR_KEY } from '../src';
+import { exec, Connection } from '../src';
 import { Client } from 'promise-ws';
 
 const entry = 'test/fixtures/socket.js';
@@ -18,9 +18,9 @@ afterEach(async () => {
 	}
 });
 
-describe('api module `start`', () => {
+describe('api module `exec`', () => {
 	test('should `entry` and `port` work', async () => {
-		proc = await start({ env: { PORT }, entry });
+		proc = await exec({ env: { PORT }, entry });
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
 		const text = await client.request('test', '掂');
@@ -28,7 +28,7 @@ describe('api module `start`', () => {
 	});
 
 	test('should `crashes` work', async () => {
-		proc = await start({
+		proc = await exec({
 			entry: 'test/fixtures/crash.js',
 			maxRestarts: 1,
 		});
@@ -40,7 +40,7 @@ describe('api module `start`', () => {
 
 	test('should `ENV_VAR_KEY` work', async () => {
 		const hello = 'world';
-		proc = await start({
+		proc = await exec({
 			env: { PORT },
 			entry,
 			hello,
@@ -58,7 +58,7 @@ describe('api module `start`', () => {
 describe('api module `Connection.getList()`', () => {
 	test('should `getState` work', async () => {
 		const name = 'hello';
-		proc = await start({ name, entry });
+		proc = await exec({ name, entry });
 		await delay(1000);
 		const connections = await Connection.getList();
 		const state = await connections[0].getState();
@@ -71,7 +71,7 @@ describe('api module `Connection.getList()`', () => {
 
 	test('should `setState` work', async () => {
 		const name = 'hello';
-		proc = await start({ name, entry });
+		proc = await exec({ name, entry });
 		await delay(1000);
 		{
 			const connections = await Connection.getList();
