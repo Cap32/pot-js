@@ -32,7 +32,7 @@ export function prepareRun(schema, argv) {
 	setLoggers('logLevel', argv.logLevel);
 }
 
-export async function prepareTarget(argv, options) {
+export async function prepareTarget(argv = {}, options = {}) {
 	const { name } = argv;
 	const targetName = await ensureArg({
 		value: name,
@@ -40,7 +40,11 @@ export async function prepareTarget(argv, options) {
 		errorMessage: 'No process is running',
 		getChoices: Connection.getNames,
 	});
-	const connection = await Connection.getByName(targetName, options);
+
+	const { noConnection, ...connectionOption } = options;
+	if (noConnection) return { targetName };
+
+	const connection = await Connection.getByName(targetName, connectionOption);
 	if (!connection || !connection.instances.length) {
 		throw new Error(`"${targetName}" NOT found`);
 	}
