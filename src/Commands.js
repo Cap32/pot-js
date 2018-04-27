@@ -52,7 +52,7 @@ export const stopAll = {
 };
 
 export const scale = {
-	command: 'scale [name]',
+	command: 'scale [name] [instances]',
 	description: 'Scale up/down a process',
 	schema: Schemas.scale,
 	operator: Operators.scale,
