@@ -149,7 +149,7 @@ describe('cli `pot stopall`', () => {
 			'--env.PORT',
 			3010,
 		])
-			.until('socket server started', {
+			.until('INFO socket server started', {
 				async action() {
 					return Kapok.start(command, [
 						'start',
@@ -159,7 +159,7 @@ describe('cli `pot stopall`', () => {
 						'--env.PORT',
 						3011,
 					])
-						.until('socket server started', {
+						.until('INFO socket server started', {
 							async action() {
 								await delay(1000);
 								return Kapok.start(command, ['stopall', '-f'])

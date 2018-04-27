@@ -53,6 +53,7 @@ export default class MasterMonitor extends EventEmitter {
 		process.title = monitorProcessTitle;
 
 		this._workerMonitorOptions = {
+			stdio: 'pipe',
 			...respawnOptions,
 			execPath,
 			execArgv: spawnArgs,
