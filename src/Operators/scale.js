@@ -2,6 +2,7 @@ import { logger } from 'pot-logger';
 import { prepareRun, prepareTarget, ensureArg } from '../utils/PrepareCli';
 import { scale as schema } from '../schemas/cli';
 import inquirer from 'inquirer';
+import chalk from 'chalk';
 
 const isValidNumber = (n) => /^-?\d+$/.test(n);
 
@@ -43,12 +44,12 @@ export default async function scale(options = {}) {
 	if (ok) {
 		if (added) {
 			added.forEach(({ displayName }) => {
-				logger.info(`"${displayName}" created`);
+				logger.info(chalk.gray(`"${displayName}" created`));
 			});
 		}
 		else if (removed) {
 			removed.forEach(({ displayName }) => {
-				logger.info(`"${displayName}" removed`);
+				logger.info(chalk.gray(`"${displayName}" removed`));
 			});
 		}
 		logger.info(`"${targetName}" scale compeleted`);
