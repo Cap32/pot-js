@@ -6,14 +6,21 @@ import spawn from 'cross-spawn';
 import { EventEmitter } from 'events';
 import fkill from 'fkill';
 import cluster from 'cluster';
-import { noop } from 'lodash';
+import { noop, isBoolean } from 'lodash';
 import isWin from '../utils/isWin';
+import { basename } from 'path';
 
 const defaultSleep = function defaultSleep(sleep) {
 	sleep = Array.isArray(sleep) ? sleep : [sleep || 1000];
 	return function (restarts) {
 		return sleep[restarts - 1] || sleep[sleep.length - 1];
 	};
+};
+
+// if `cluster` is not set, and the base name of `execPath` includes `node`
+// `cluster` will be `true`
+const ensureClusterMode = function ensureClusterMode({ cluster, execPath }) {
+	return isBoolean(cluster) ? cluster : /\bnode\b/.test(basename(execPath));
 };
 
 const kill = async function kill(pid) {
@@ -43,7 +50,7 @@ export default class WorkerMonitor extends EventEmitter {
 		this.status = 'stopped';
 		this.execPath = opts.execPath;
 		this.execArgv = opts.execArgv;
-		this.fork = opts.fork;
+		this.cluster = ensureClusterMode(opts);
 		this.name = opts.name;
 		this.cwd = opts.cwd || '.';
 		this.env = opts.env || {};
@@ -132,13 +139,7 @@ export default class WorkerMonitor extends EventEmitter {
 				windowsHide: this.windowsHide,
 			};
 
-			if (this.fork) {
-				child = spawn(this.execPath, this.execArgv, {
-					...commomOptions,
-					env,
-				});
-			}
-			else {
+			if (this.cluster) {
 				cluster.setupMaster({
 					...commomOptions,
 					execPath: this.execPath,
@@ -146,6 +147,12 @@ export default class WorkerMonitor extends EventEmitter {
 				});
 				worker = cluster.fork(env);
 				child = worker.process;
+			}
+			else {
+				child = spawn(this.execPath, this.execArgv, {
+					...commomOptions,
+					env,
+				});
 			}
 
 			this.started = new Date();

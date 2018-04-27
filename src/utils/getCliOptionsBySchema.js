@@ -19,16 +19,14 @@ const getDefaultDescription = function getDefaultDescription(defaults) {
 const skip = function skip(prop) {
 	const defaults = prop.default;
 	prop.skipValidation = true;
-	if (defaults !== undefined) {
-		if (prop.defaultDescription === undefined) {
-			prop.defaultDescription = getDefaultDescription(defaults);
-		}
-		if (prop.type && prop.type.startsWith('bool')) {
-			prop.default = undefined;
-		}
-		else {
-			delete prop.default;
-		}
+	if (prop.defaultDescription === undefined && defaults !== undefined) {
+		prop.defaultDescription = getDefaultDescription(defaults);
+	}
+	if (prop.type && prop.type.startsWith('bool')) {
+		prop.default = undefined;
+	}
+	else if (defaults !== undefined) {
+		delete prop.default;
 	}
 };
 

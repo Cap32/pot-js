@@ -24,6 +24,10 @@ export default {
 			type: 'string',
 			default: '.',
 		},
+		cluster: {
+			description: 'Enforce using cluster mode',
+			type: 'boolean',
+		},
 		config: {
 			alias: 'c',
 			description: 'Path to the config file',
@@ -89,12 +93,6 @@ export default {
 			alias: 'f',
 			description: 'Force restart even if the process is exists',
 			type: 'boolean',
-		},
-		fork: {
-			description:
-				'Use fork mode. Should set to `true` if it is NOT a node.js process',
-			type: 'boolean',
-			default: false,
 		},
 		inspect: {
 			description: 'Activate inspector. Require Node.js >= v6.3.0',
