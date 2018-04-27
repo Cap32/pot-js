@@ -2,8 +2,8 @@ import { logger } from 'pot-logger';
 import { join } from 'path';
 import sliceFile from 'slice-file';
 import globby from 'globby';
-import { prepareRun, prepareTarget, ensureArg } from './utils/PrepareCli';
-import { log as schema } from './schemas/cli';
+import { prepareRun, prepareTarget, ensureArg } from '../utils/PrepareCli';
+import { log as schema } from '../schemas/cli';
 
 export default async function log(options = {}) {
 	prepareRun(schema, options);

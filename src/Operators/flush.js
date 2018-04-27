@@ -1,7 +1,7 @@
 import { logger, flush as flushLogFiles } from 'pot-logger';
-import Connection from './Connection';
-import { prepareRun, prepareTarget } from './utils/PrepareCli';
-import { flush as schema } from './schemas/cli';
+import Connection from '../Connection';
+import { prepareRun, prepareTarget } from '../utils/PrepareCli';
+import { flush as schema } from '../schemas/cli';
 
 export const flush = async function flush(options = {}) {
 	prepareRun(schema, options);

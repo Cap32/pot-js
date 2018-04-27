@@ -1,12 +1,5 @@
-export start from './start';
-export { stop, stopAll } from './stop';
-export { restart, restartAll } from './restart';
-export { reload, reloadAll } from './reload';
-export scale from './scale';
-export list from './list';
-export log from './log';
-export show from './show';
-export { flush, flushAll } from './flush';
+export exec from './exec';
+export * as Operators from './Operators';
 export Connection from './Connection';
 export * as Commands from './Commands';
 export workspace from './utils/workspace';

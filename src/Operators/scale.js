@@ -1,6 +1,6 @@
 import { logger } from 'pot-logger';
-import { prepareRun, prepareTarget, ensureArg } from './utils/PrepareCli';
-import { scale as schema } from './schemas/cli';
+import { prepareRun, prepareTarget, ensureArg } from '../utils/PrepareCli';
+import { scale as schema } from '../schemas/cli';
 
 export default async function scale(options = {}) {
 	prepareRun(schema, options);

@@ -108,6 +108,7 @@ const startMonitorProc = ({ cwd, daemon, env, name }) => {
 		const connection = await Connection.getByName(name);
 		if (connection) await connection.requestStopServer();
 	};
+	proc.name = name;
 
 	return proc;
 };
@@ -180,7 +181,7 @@ const connectMonitor = async (monitorProc, options) => {
 	});
 };
 
-export default async function start(options = {}) {
+export default async function run(options = {}) {
 	prepareRun(schema, options);
 
 	let monitorProc;

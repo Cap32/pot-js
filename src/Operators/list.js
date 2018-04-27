@@ -1,11 +1,11 @@
 import { logger } from 'pot-logger';
-import createTable from './utils/createTable';
+import createTable from '../utils/createTable';
 import { isUndefined, isFunction } from 'lodash';
-import Connection from './Connection';
+import Connection from '../Connection';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
-import { prepareRun } from './utils/PrepareCli';
-import { list as schema } from './schemas/cli';
+import { prepareRun } from '../utils/PrepareCli';
+import { list as schema } from '../schemas/cli';
 
 if (process.env !== 'production') {
 	process.on('unhandledRejection', (reason, promise) => {
