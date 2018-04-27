@@ -4,6 +4,8 @@
 
 Script runner
 
+![logger](./screenshot.gif)
+
 ## Table of Contents
 
 <!-- TOC -->
@@ -14,13 +16,9 @@ Script runner
 * [CLI Reference](#cli-reference)
 * [Node.js module API Reference](#nodejs-module-api-reference)
   * [start([options])](#startoptions)
-    * [Options](#options)
   * [stop([options])](#stopoptions)
-    * [Options](#options-1)
   * [stopall([options])](#stopalloptions)
-    * [Options](#options-2)
   * [list([options])](#listoptions)
-    * [Options](#options-3)
   * [log([options])](#logoptions)
   * [dir([options])](#diroptions)
 * [License](#license)
