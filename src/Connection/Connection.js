@@ -1,6 +1,7 @@
-import { uniq } from 'lodash';
+import { uniq, isFunction } from 'lodash';
 import { logger } from 'pot-logger';
 import Instance from './Instance';
+import delay from 'delay';
 
 export default class Connection {
 	static async getNames(options) {
@@ -50,6 +51,21 @@ export default class Connection {
 
 	async restart() {
 		return this.each('restart');
+	}
+
+	async reload(options = {}) {
+		const { instances } = this;
+		const { length } = instances;
+		const { delay: timeout, onProgress } = options;
+		const eachTimeout = length > 1 ? Math.max(100, timeout / length) : 0;
+		for (const instance of instances) {
+			const state = await instance.getState();
+			if (!state) continue;
+			const ok = await instance.restart();
+			if (isFunction(onProgress)) onProgress(ok, state);
+			await instance.disconnect();
+			await delay(eachTimeout);
+		}
 	}
 
 	async scale(number) {
