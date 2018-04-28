@@ -1,7 +1,8 @@
 import { uniq, isFunction } from 'lodash';
-import { logger } from 'pot-logger';
+import { logger, flush } from 'pot-logger';
 import Instance from './Instance';
 import delay from 'delay';
+import flushOfflineDirs from '../utils/flushOfflineDirs';
 
 export default class Connection {
 	static async getNames(options) {
@@ -27,8 +28,12 @@ export default class Connection {
 	}
 
 	static getAllInstances = Instance.getAllInstances;
-
 	static getList = Connection.getAllInstances;
+
+	static async flushOffline(onlinesNames) {
+		if (!onlinesNames) onlinesNames = await Connection.getNames();
+		return flushOfflineDirs(onlinesNames);
+	}
 
 	constructor(name, instances = []) {
 		this._name = name;
@@ -72,6 +77,17 @@ export default class Connection {
 		const res = await this.instances[0].scale(number);
 		await this.disconnect();
 		return res;
+	}
+
+	async flush() {
+		const stateList = await this.each('getState');
+		const logs = stateList
+			.filter(({ logsDir }) => !!logsDir)
+			.map(({ logsDir, monitor }) => ({
+				logsDir,
+				removeDir: monitor.status !== 'running',
+			}));
+		return Promise.all(logs.map(flush));
 	}
 
 	async disconnect() {

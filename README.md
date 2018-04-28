@@ -163,9 +163,12 @@ _(TODO)_
 * `Connection.getByName(name, options)`
 * `Connection.getState(name, options)`
 * `Connection.getAllInstances(options)`
+* `Connection.flushOffline()`
 * `connection#getState(instanceId)`
 * `connection#restart()`
+* `connection#reload(options)`
 * `connection#scale(number)`
+* `connection#flush()`
 * `connection#disconnect()`
 * `connection#requestStopServer(options)`
 
