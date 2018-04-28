@@ -17,8 +17,14 @@ export async function getSocketFiles() {
 	// DEPRECATED: workspace.DEPRECATED_getSocketsDir()
 	const deprecatedSocketsDir = await workspace.DEPRECATED_getSocketsDir();
 
-	const patterns = [`${runDir}/**/!(*.*)`, `${deprecatedSocketsDir}/**/!(*.*)`];
-	const socketPaths = await globby(patterns, { absolute: true });
+	const patterns = [`${runDir}/**/*.sock`, `${deprecatedSocketsDir}/**/*`];
+
+	const socketPaths = await globby(patterns, {
+		absolute: true,
+		expandDirectories: false,
+		onlyFiles: false,
+	});
+
 	return socketPaths.map((socketPath) => ({
 		socketPath,
 		key: basename(socketPath, '.sock'),
@@ -39,7 +45,7 @@ export async function removeDomainSocketFile(socketPath) {
 export async function getSocketPath(keyOrMonitor) {
 	const runDir = await workspace.getRunDir();
 	const key = getKey(keyOrMonitor);
-	return ensureLocalDomainPath(join(runDir, key));
+	return ensureLocalDomainPath(join(runDir, key) + '.sock');
 }
 
 export async function startServer(masterMonitor, workerMonitor) {
