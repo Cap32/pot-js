@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { ensureDir } from 'fs-extra';
 import isWin from './utils/isWin';
 import { prepareRun } from './utils/PrepareCli';
+import potConfigDir from './utils/potConfigDir';
 import schema from './schemas/config';
 import { logger } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
@@ -57,6 +58,7 @@ const ensureWatch = (options) => {
 
 const ensureOptions = (options = {}) => {
 	options.cwd = resolve(options.cwd);
+	ensureName(options);
 
 	// TODO: root is deprecated
 	options.baseDir = resolve(options.cwd, options.root || options.baseDir);
@@ -64,8 +66,13 @@ const ensureOptions = (options = {}) => {
 	// DEPRECATED
 	options.root = options.baseDir;
 
-	if (options.logsDir) {
-		options.logsDir = resolve(options.baseDir, options.logsDir);
+	if (options.logsDir !== false) {
+		if (!options.logsDir) {
+			options.logsDir = resolve(potConfigDir, 'logs', options.name);
+		}
+		else {
+			options.logsDir = resolve(options.baseDir, options.logsDir);
+		}
 	}
 
 	options.execArgs = [].concat(options.execArgs || []);
@@ -86,7 +93,6 @@ const ensureOptions = (options = {}) => {
 	if (isUndefined(options.maxRestarts)) {
 		options.maxRestarts = options.production ? -1 : 0;
 	}
-	ensureName(options);
 	ensureWatch(options);
 	return options;
 };

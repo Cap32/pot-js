@@ -65,9 +65,6 @@ export async function startServer(masterMonitor, workerMonitor) {
 		if (data && data.method) {
 			const { args = [], method } = data;
 			masterMonitor.currentWorkerMonitor = workerMonitor;
-			logger.trace(
-				`Received API call "${method}" via workerMonitor #${workerMonitor.id}`,
-			);
 			if (isFunction(masterMonitor[method])) {
 				return masterMonitor[method](...args);
 			}

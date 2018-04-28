@@ -1,17 +1,14 @@
-import { ensureDir } from 'fs-extra';
-import homeOrTmp from 'home-or-tmp';
-import { name } from '../../package.json';
 import { join } from 'path';
 import { isObject } from 'lodash';
 import schema from '../schemas/config';
-
-const root = join(homeOrTmp, '.config', name);
+import potConfigDir from './potConfigDir';
+import { ensureDir } from 'fs-extra';
 
 const workspace = {
 	default: process.env.POT_WORKSPACE || schema.properties.workspace.default,
 
 	async _getDir(dirname) {
-		const dir = join(root, this._name || this.default, dirname);
+		const dir = join(potConfigDir, this._name || this.default, dirname);
 		await ensureDir(dir);
 		return dir;
 	},

@@ -139,7 +139,6 @@ export default {
 					type: 'string',
 				},
 			],
-			default: false,
 		},
 		maxRestarts: {
 			description:
