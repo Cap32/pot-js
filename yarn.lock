@@ -2717,12 +2717,12 @@ ignore@^3.3.5:
   version "3.3.8"
   resolved "http://registry.npm.taobao.org/ignore/download/ignore-3.3.8.tgz#3f8e9c35d38708a3a7e0e9abb6c73e7ee7707b2b"
 
-import-file@^1.2.4:
-  version "1.2.4"
-  resolved "http://registry.npm.taobao.org/import-file/download/import-file-1.2.4.tgz#1146c4780a30c5a74d05cad37a4080478ab31ffa"
+import-file@^1.3.0:
+  version "1.3.0"
+  resolved "http://registry.npm.taobao.org/import-file/download/import-file-1.3.0.tgz#24a902a9bdd90a21914e9bbe0259b1e2bb77b509"
   dependencies:
     find-up "^2.1.0"
-    interpret "^1.0.1"
+    interpret "^1.1.0"
     rechoir "^0.6.2"
     require-reload "^0.2.2"
 
@@ -2808,9 +2808,9 @@ inquirer@^5.2.0:
     strip-ansi "^4.0.0"
     through "^2.3.6"
 
-interpret@^1.0.1:
-  version "1.0.3"
-  resolved "http://registry.npm.taobao.org/interpret/download/interpret-1.0.3.tgz#cbc35c62eeee73f19ab7b10a801511401afc0f90"
+interpret@^1.1.0:
+  version "1.1.0"
+  resolved "http://registry.npm.taobao.org/interpret/download/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
 
 into-stream@^2.0.0:
   version "2.0.1"

@@ -9,12 +9,8 @@ import { isFunction, isObject, forEach, flatten } from 'lodash';
 const builder = function builder(yargs) {
 	const { middlewares, optional, demanded, original } = this;
 	const potStore = middlewares[0] || {};
-	const { schema, getBuilder, configFile } = potStore;
-	const spec = getCliOptionsBySchema(schema, [configFile]);
-
-	if (schema && schema.properties && schema.properties[configFile]) {
-		delete schema.properties[configFile];
-	}
+	const { schema, getBuilder } = potStore;
+	const spec = getCliOptionsBySchema(schema);
 
 	if (isFunction(getBuilder)) {
 		return getBuilder.call(this, yargs, spec);
@@ -48,8 +44,7 @@ const handler = async function handler(argv) {
 
 		if (isFunction(operator)) {
 			if (configFileKey) {
-				const configFile = argv[configFileKey];
-				argv = await resolveConfig(argv, configFile);
+				argv = await resolveConfig(argv, configFileKey, schema);
 			}
 			if (validate && schema) {
 				validateBySchema(schema, argv);

@@ -1,17 +1,28 @@
-import { merge } from 'lodash';
+import { merge as lodashMerge } from 'lodash';
 import importFile from 'import-file';
 import { isAbsolute } from 'path';
 
-export default function resolveConfig(argv = {}, configFile, options = {}) {
+export default function resolveConfig(argv = {}, key, schema, options = {}) {
+	const defaultVal =
+		schema &&
+		schema.properties &&
+		schema.properties[key] &&
+		schema.properties[key].default;
+	let useDefault = false;
+	let configFile = argv[key];
+	if (configFile === undefined && defaultVal !== undefined) {
+		useDefault = true;
+		configFile = defaultVal;
+	}
 	if (configFile !== false) {
-		const { merge: mergeConfig = merge, ...importOptions } = options;
+		const { merge = lodashMerge, ...importOptions } = options;
 		const useFindUp = !isAbsolute(configFile);
 		try {
 			const config = importFile(configFile, { useFindUp, ...importOptions });
-			return mergeConfig(config, argv);
+			return merge(config, argv);
 		}
 		catch (err) {
-			if (err && err.errno !== 'ENOENT') {
+			if (err && (!useDefault || err.errno !== 'ENOENT')) {
 				throw err;
 			}
 		}
