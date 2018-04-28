@@ -17,6 +17,11 @@ Process management module
 * [CLI Reference](#cli-reference)
 * [Node.js module API Reference](#nodejs-module-api-reference)
   * [exec([options])](#execoptions)
+  * [Operators](#operators)
+  * [Connection](#connection)
+  * [Commands](#commands)
+  * [createCli()](#createcli)
+  * [Schemas](#schemas)
 * [License](#license)
 
 <!-- /TOC -->
@@ -74,7 +79,7 @@ Options:
 
 ## Node.js module API Reference
 
-#### exec([options])
+### exec([options])
 
 Spawn and monitor a process.
 
@@ -125,6 +130,68 @@ Spawn and monitor a process.
 * `workspace` (String): Workspace.
 
 ---
+
+### Operators
+
+Command lines interface helper functions
+
+_(TODO)_
+
+* `Operators.start(options)`
+* `Operators.restart(options)`
+* `Operators.restartAll(options)`
+* `Operators.reload(options)`
+* `Operators.reloadAll(options)`
+* `Operators.stop(options)`
+* `Operators.stopAll(options)`
+* `Operators.scale(options)`
+* `Operators.list(options)`
+* `Operators.show(options)`
+* `Operators.log(options)`
+* `Operators.flush(options)`
+* `Operators.flushAll(options)`
+
+---
+
+### Connection
+
+API to communicate with monitors
+
+_(TODO)_
+
+* `Connection.getNames(options)`
+* `Connection.getByName(name, options)`
+* `Connection.getState(name, options)`
+* `Connection.getAllInstances(options)`
+* `connection#getState(instanceId)`
+* `connection#restart()`
+* `connection#scale(number)`
+* `connection#disconnect()`
+* `connection#requestStopServer(options)`
+
+---
+
+### Commands
+
+`pot-js` commands descriptor. Useful to extend or modify command via `createCli()`
+
+_(TODO)_
+
+---
+
+### createCli()
+
+A helper function to create CLI, built on top of [yargs](https://github.com/yargs/yargs)
+
+_(TODO)_
+
+---
+
+### Schemas
+
+Config and CLI json schemas
+
+_(TODO)_
 
 ## License
 
