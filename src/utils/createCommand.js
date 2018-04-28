@@ -4,7 +4,7 @@ import { logger, setLoggers } from 'pot-logger';
 import resolveConfig from './resolveConfig';
 import getCliOptionsBySchema from './getCliOptionsBySchema';
 import validateBySchema from './validateBySchema';
-import { isFunction, isObject, forEach, flatten } from 'lodash';
+import { isFunction, isObject, forEach, flatten, omit } from 'lodash';
 
 const builder = function builder(yargs) {
 	const { middlewares, optional, demanded, original } = this;
@@ -21,16 +21,10 @@ const builder = function builder(yargs) {
 			...demanded.map(({ cmd }) => cmd),
 			...optional.map(({ cmd }) => cmd),
 		]);
-		const options = {};
-		forEach(spec, (val, key) => {
-			if (~positions.indexOf(key)) {
-				args.positional(key, val);
-			}
-			else {
-				options[key] = val;
-			}
+		positions.forEach((key) => {
+			if (spec[key]) args.positional(key, omit(spec[key], ['alias']));
 		});
-		args.options(options);
+		args.options(omit(spec, positions));
 		return args;
 	}
 
