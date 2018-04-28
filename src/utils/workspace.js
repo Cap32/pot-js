@@ -1,14 +1,21 @@
-import { join } from 'path';
+import homeOrTmp from 'home-or-tmp';
 import { isObject } from 'lodash';
 import schema from '../schemas/config';
-import potConfigDir from './potConfigDir';
 import { ensureDir } from 'fs-extra';
+import { join } from 'path';
+import { name as pkgName } from '../../package.json';
+
+const base = join(homeOrTmp, '.config', pkgName);
 
 const workspace = {
 	default: process.env.POT_WORKSPACE || schema.properties.workspace.default,
 
-	async _getDir(dirname) {
-		const dir = join(potConfigDir, this._name || this.default, dirname);
+	async _getDir(...paths) {
+		const dir = join(
+			base,
+			this._name || this.default,
+			...paths.filter(Boolean),
+		);
 		await ensureDir(dir);
 		return dir;
 	},
@@ -23,6 +30,10 @@ const workspace = {
 
 	async getRunDir() {
 		return this._getDir('pot-run');
+	},
+
+	async getLogsDir(name) {
+		return this._getDir('logs', name);
 	},
 
 	set(options) {

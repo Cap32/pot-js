@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { ensureDir } from 'fs-extra';
 import isWin from './utils/isWin';
 import { prepareRun } from './utils/PrepareCli';
-import potConfigDir from './utils/potConfigDir';
+import workspace from './utils/workspace';
 import schema from './schemas/config';
 import { logger } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
@@ -56,7 +56,7 @@ const ensureWatch = (options) => {
 	};
 };
 
-const ensureOptions = (options = {}) => {
+const ensureOptions = async (options = {}) => {
 	options.cwd = resolve(options.cwd);
 	ensureName(options);
 
@@ -69,7 +69,7 @@ const ensureOptions = (options = {}) => {
 	if (options.logsDir !== false) {
 		if (!options.logsDir) {
 			const { daemon, name } = options;
-			options.logsDir = daemon ? resolve(potConfigDir, 'logs', name) : false;
+			options.logsDir = daemon ? await workspace.getLogsDir(name) : false;
 		}
 		else {
 			options.logsDir = resolve(options.baseDir, options.logsDir);
@@ -207,7 +207,7 @@ export default async function run(options = {}) {
 	});
 
 	try {
-		const { name, force, baseDir } = ensureOptions(options);
+		const { name, force, baseDir } = await ensureOptions(options);
 
 		await ensureDir(baseDir);
 		if (options.logsDir) {
