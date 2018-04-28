@@ -19,18 +19,7 @@ const call = async function call(socket, method, ...args) {
 
 const getState = async function getState(socket, ...args) {
 	try {
-		const state = await call(socket, 'state', ...args);
-
-		// DEPRECATED: adapt to old version state
-		if (state && state.data) {
-			const { data } = state;
-			delete state.data;
-			state.monitor = state;
-			Object.assign(state, data);
-			if (state.parentPid && !state.ppid) state.ppid = state.parentPid;
-		}
-
-		return state;
+		return await call(socket, 'state', ...args);
 	}
 	catch (err) {
 		socket.close().catch(noop);

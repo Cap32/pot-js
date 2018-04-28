@@ -19,10 +19,23 @@ export async function createClient(socketPath) {
 			socket.on('connect', () => {
 				socket.request = function request() {
 					return new Promise((resolve) => {
-						const handler = (data) => {
+						const handler = (res) => {
 							socket.off(DEPRECATED_BRIDGE, handler);
 							socket.off(DEPRECATED_GET_INFO, handler);
-							resolve(data);
+
+							if (res && res.data && res.started) {
+								if (res.data) {
+									const { data } = res;
+									delete res.data;
+									res.monitor = { ...res };
+									Object.assign(res, data);
+								}
+								if (res.parentPid && !res.ppid) {
+									res.ppid = res.parentPid;
+								}
+							}
+
+							resolve(res);
 						};
 						socket.on(DEPRECATED_BRIDGE, handler);
 						socket.on(DEPRECATED_GET_INFO, handler);
@@ -32,7 +45,7 @@ export async function createClient(socketPath) {
 				};
 				socket.requestClose = async function requestClose() {
 					const state = await socket.request();
-					await fkill(state.data.parentPid, { force: isWin, tree: true });
+					await fkill(state.parentPid, { force: isWin, tree: true });
 				};
 				socket.close = function close() {
 					return Promise.resolve(nodeIpc.disconnect(socket.id));
