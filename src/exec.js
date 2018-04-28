@@ -68,7 +68,8 @@ const ensureOptions = (options = {}) => {
 
 	if (options.logsDir !== false) {
 		if (!options.logsDir) {
-			options.logsDir = resolve(potConfigDir, 'logs', options.name);
+			const { daemon, name } = options;
+			options.logsDir = daemon ? resolve(potConfigDir, 'logs', name) : false;
 		}
 		else {
 			options.logsDir = resolve(options.baseDir, options.logsDir);
