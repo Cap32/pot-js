@@ -115,8 +115,6 @@ const startMonitorProc = ({ cwd, daemon, env, name }) => {
 		const connection = await Connection.getByName(name);
 		if (connection) await connection.requestStopServer();
 	};
-	proc.name = name;
-
 	return proc;
 };
 
