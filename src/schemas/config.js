@@ -25,7 +25,8 @@ export default {
 			default: '.',
 		},
 		cluster: {
-			description: 'Enforce using cluster mode',
+			description:
+				'Enforce using cluster mode. If not set, it will automatically set to `true` when spawning a Node.js related process',
 			type: 'boolean',
 		},
 		config: {
@@ -91,11 +92,11 @@ export default {
 		},
 		force: {
 			alias: 'f',
-			description: 'Force restart even if the process is exists',
+			description: 'Enforce restart even if the process is exists',
 			type: 'boolean',
 		},
 		inspect: {
-			description: 'Activate inspector. Require Node.js >= v6.3.0',
+			description: 'Enable inspector. Require Node.js >= v6.3.0',
 			anyOf: [
 				{
 					type: 'string',
@@ -141,8 +142,7 @@ export default {
 			],
 		},
 		maxRestarts: {
-			description:
-				'How many restarts are allowed within 60s. `-1` for infinite restarts. If `production` is `true`, default value is `-1`, otherwise is `0`',
+			description: 'How many restarts are allowed within 60s',
 			type: 'number',
 			minimum: -1,
 		},
@@ -153,7 +153,7 @@ export default {
 		},
 		name: {
 			type: 'string',
-			description: 'Process name',
+			description: 'Process name. Shoule be unique',
 		},
 		production: {
 			alias: 'p',
