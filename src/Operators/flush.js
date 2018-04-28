@@ -1,7 +1,7 @@
 import { logger, flush as flushLogFiles } from 'pot-logger';
 import Connection from '../Connection';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
-import { flush as schema } from '../schemas/cli';
+import { flush as schema } from '../Schemas/cli';
 import globby from 'globby';
 import workspace from '../utils/workspace';
 import { difference } from 'lodash';

@@ -1,7 +1,7 @@
 import { logger } from 'pot-logger';
 import Connection from '../Connection';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
-import { restart as schema } from '../schemas/cli';
+import { restart as schema } from '../Schemas/cli';
 
 export const restart = async function restart(options = {}) {
 	prepareRun(schema, options);

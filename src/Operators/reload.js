@@ -1,7 +1,7 @@
 import { logger } from 'pot-logger';
 import Connection from '../Connection';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
-import { reload as schema } from '../schemas/cli';
+import { reload as schema } from '../Schemas/cli';
 import delay from 'delay';
 
 export const reload = async function reload(options = {}) {

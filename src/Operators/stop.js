@@ -2,7 +2,7 @@ import { logger } from 'pot-logger';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
 import Connection from '../Connection';
 import inquirer from 'inquirer';
-import { stop as schema } from '../schemas/cli';
+import { stop as schema } from '../Schemas/cli';
 
 export const stop = async function stop(options = {}) {
 	prepareRun(schema, options);

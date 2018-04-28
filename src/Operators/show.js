@@ -3,7 +3,7 @@ import createTable from '../utils/createTable';
 import { isObject, isBoolean } from 'lodash';
 import chalk from 'chalk';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
-import { show as schema } from '../schemas/cli';
+import { show as schema } from '../Schemas/cli';
 import logSymbols from 'log-symbols';
 
 const defaultCells = [

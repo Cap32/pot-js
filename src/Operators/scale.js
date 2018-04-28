@@ -1,6 +1,6 @@
 import { logger } from 'pot-logger';
 import { prepareRun, prepareTarget, ensureArg } from '../utils/PrepareCli';
-import { scale as schema } from '../schemas/cli';
+import { scale as schema } from '../Schemas/cli';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 

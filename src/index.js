@@ -6,4 +6,4 @@ export workspace from './utils/workspace';
 export createCli from './utils/createCli';
 export resolveConfig from './utils/resolveConfig';
 export * from './utils/EnvVar';
-export Schemas from './Schema';
+export Schemas from './Schemas';

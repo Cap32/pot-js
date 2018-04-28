@@ -1,4 +1,4 @@
-import * as Schemas from './schemas/cli';
+import * as Schemas from './Schemas/cli';
 import * as Operators from './Operators';
 
 export const start = {

@@ -5,7 +5,7 @@ import Connection from '../Connection';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
 import { prepareRun } from '../utils/PrepareCli';
-import { list as schema } from '../schemas/cli';
+import { list as schema } from '../Schemas/cli';
 
 if (process.env !== 'production') {
 	process.on('unhandledRejection', (reason, promise) => {

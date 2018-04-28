@@ -1,6 +1,6 @@
 import homeOrTmp from 'home-or-tmp';
 import { isObject } from 'lodash';
-import schema from '../schemas/config';
+import schema from '../Schemas/config';
 import { ensureDir } from 'fs-extra';
 import { join } from 'path';
 import { name as pkgName } from '../../package.json';
