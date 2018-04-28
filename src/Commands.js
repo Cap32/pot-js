@@ -67,7 +67,7 @@ export const list = {
 };
 
 export const log = {
-	command: 'log [name]',
+	command: 'log [name] [category]',
 	description: 'Show log',
 	schema: Schemas.log,
 	operator: Operators.log,

@@ -83,7 +83,6 @@ export const show = {
 export const log = {
 	properties: {
 		category: {
-			alias: 'c',
 			description: 'Log category',
 			type: 'string',
 		},
