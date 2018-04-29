@@ -18,11 +18,11 @@ Process management module
   * [CLI Reference](#cli-reference)
   * [Node.js module API Reference](#nodejs-module-api-reference)
     * [exec([options])](#execoptions) - [Options](#options)
-    * [Operators](#operators)
     * [Connection](#connection)
-    * [Commands](#commands)
-    * [createCli()](#createcli)
+    * [Operators](#operators)
     * [Schemas](#schemas)
+    * [Commands](#commands)
+    * [createCli(pkg, commands)](#createclipkg-commands)
   * [License](#license)
 
 <!-- /TOC -->
@@ -99,7 +99,7 @@ Spawn and monitor a process.
   * `start`: The monitor has started
   * `stop`: The monitor has fully stopped and the process is killed
   * `crash`: The monitor has crashed (too many restarts or spawn error)
-  * `sleep`: monitor is sleeping
+  * `sleep`: The monitor is sleeping
   * `exit`: Child process has exited
   * `stdout`: Child process stdout has emitted data
   * `stderr`: Child process stderr has emitted data
@@ -132,6 +132,27 @@ Spawn and monitor a process.
 
 ---
 
+### Connection
+
+API to communicate with monitors
+
+_(TODO)_
+
+* `Connection.getNames(options)`
+* `Connection.getByName(name, options)`
+* `Connection.getState(name, options)`
+* `Connection.getAllInstances(options)`
+* `Connection.flushOffline()`
+* `connection#getState(instanceId)`
+* `connection#restart()`
+* `connection#reload(options)`
+* `connection#scale(number)`
+* `connection#flush()`
+* `connection#disconnect()`
+* `connection#requestStopServer(options)`
+
+---
+
 ### Operators
 
 Command lines interface helper functions
@@ -154,24 +175,11 @@ _(TODO)_
 
 ---
 
-### Connection
+### Schemas
 
-API to communicate with monitors
+Config and CLI json schemas
 
 _(TODO)_
-
-* `Connection.getNames(options)`
-* `Connection.getByName(name, options)`
-* `Connection.getState(name, options)`
-* `Connection.getAllInstances(options)`
-* `Connection.flushOffline()`
-* `connection#getState(instanceId)`
-* `connection#restart()`
-* `connection#reload(options)`
-* `connection#scale(number)`
-* `connection#flush()`
-* `connection#disconnect()`
-* `connection#requestStopServer(options)`
 
 ---
 
@@ -179,23 +187,24 @@ _(TODO)_
 
 `pot-js` commands descriptor. Useful to extend or modify command via `createCli()`
 
+A command may contain these props:
+
+* `command` (String): A string representing the command. eg: `stop [name]`
+* `description` (String): Command description
+* `schema` (Object): The JSON schema of options and positional arguments
+* `operator` (Function): The operator function of the command
+
 _(TODO)_
 
 ---
 
-### createCli()
+### createCli(pkg, commands)
 
 A helper function to create CLI, built on top of [yargs](https://github.com/yargs/yargs)
 
 _(TODO)_
 
 ---
-
-### Schemas
-
-Config and CLI json schemas
-
-_(TODO)_
 
 ## License
 
