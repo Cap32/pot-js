@@ -10,19 +10,20 @@ Process management module
 
 <!-- TOC -->
 
-* [Table of Contents](#table-of-contents)
-* [Motivation](#motivation)
-* [Features](#features)
-* [Installing](#installing)
-* [CLI Reference](#cli-reference)
-* [Node.js module API Reference](#nodejs-module-api-reference)
-  * [exec([options])](#execoptions)
-  * [Operators](#operators)
-  * [Connection](#connection)
-  * [Commands](#commands)
-  * [createCli()](#createcli)
-  * [Schemas](#schemas)
-* [License](#license)
+* [pot-js](#pot-js)
+  * [Table of Contents](#table-of-contents)
+  * [Motivation](#motivation)
+  * [Features](#features)
+  * [Installing](#installing)
+  * [CLI Reference](#cli-reference)
+  * [Node.js module API Reference](#nodejs-module-api-reference)
+    * [exec([options])](#execoptions) - [Options](#options)
+    * [Operators](#operators)
+    * [Connection](#connection)
+    * [Commands](#commands)
+    * [createCli()](#createcli)
+    * [Schemas](#schemas)
+  * [License](#license)
 
 <!-- /TOC -->
 
@@ -120,7 +121,7 @@ Spawn and monitor a process.
 * `logsDir` (String): Log files directory. In `daemon` mode, log messages will write to some `.log` files.
 * `maxRestarts` (Number): How many restarts are allowed within 60s.
 * `monitorProcessTitle` (String): Monitor process title. Defaults to "node".
-* `name` (String): Process monitor name. Shoule be unique. Defaults to the basename of `baseDir`.
+* `name` (String): Process monitor name. Should be unique. Defaults to the basename of `baseDir`.
 * `production` (Boolean): Production mode. Short hand for setting NODE_ENV="production" env. Defaults to `true`.
 * `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
   * `enable` (Boolean): Enable `watch`. Defaults to `true`.
