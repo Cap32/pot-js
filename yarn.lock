@@ -357,7 +357,7 @@ async-each@^1.0.0:
 
 async-limiter@~1.0.0:
   version "1.0.0"
-  resolved "http://registry.npm.taobao.org/async-limiter/download/async-limiter-1.0.0.tgz#78faed8c3d074ab81f22b4e985d79e8738f720f8"
+  resolved "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.0.tgz#78faed8c3d074ab81f22b4e985d79e8738f720f8"
 
 async@^1.4.0:
   version "1.5.2"
@@ -1997,6 +1997,10 @@ event-stream@~0.5:
   resolved "http://registry.npm.taobao.org/event-stream/download/event-stream-0.5.3.tgz#b77b9309f7107addfeab63f0c0eafd8db0bd8c1c"
   dependencies:
     optimist "0.2"
+
+eventemitter2@~0.4.14:
+  version "0.4.14"
+  resolved "https://registry.npmjs.org/eventemitter2/-/eventemitter2-0.4.14.tgz#8f61b75cde012b2e9eb284d4545583b5643b61ab"
 
 exec-sh@^0.2.0:
   version "0.2.0"
@@ -3641,6 +3645,10 @@ lazy-cache@^1.0.3:
   version "1.0.4"
   resolved "http://registry.npm.taobao.org/lazy-cache/download/lazy-cache-1.0.4.tgz#a1d78fc3a50474cb80845d3b3b6e1da49a446e8e"
 
+lazy@~1.0.11:
+  version "1.0.11"
+  resolved "https://registry.npmjs.org/lazy/-/lazy-1.0.11.tgz#daa068206282542c088288e975c297c1ae77b690"
+
 lcid@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/lcid/download/lcid-1.0.0.tgz#308accafa0bc483a3867b4b6f2b9506251d1b835"
@@ -4255,6 +4263,13 @@ npmlog@^4.0.2:
     gauge "~2.7.3"
     set-blocking "~2.0.0"
 
+nssocket@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.npmjs.org/nssocket/-/nssocket-0.6.0.tgz#59f96f6ff321566f33c70f7dbeeecdfdc07154fa"
+  dependencies:
+    eventemitter2 "~0.4.14"
+    lazy "~1.0.11"
+
 number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/number-is-nan/download/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
@@ -4645,7 +4660,7 @@ progress@^2.0.0:
 
 promise-ws@^0.4.1:
   version "0.4.1"
-  resolved "http://registry.npm.taobao.org/promise-ws/download/promise-ws-0.4.1.tgz#3dd7a2f4f5b16934d4ca402b5dd245250261ed0d"
+  resolved "https://registry.npmjs.org/promise-ws/-/promise-ws-0.4.1.tgz#3dd7a2f4f5b16934d4ca402b5dd245250261ed0d"
   dependencies:
     delay "^2.0.0"
     pify "^3.0.0"
@@ -5962,8 +5977,8 @@ write@^0.2.1:
     mkdirp "^0.5.1"
 
 ws@^5.0.0:
-  version "5.0.0"
-  resolved "http://registry.npm.taobao.org/ws/download/ws-5.0.0.tgz#fb4ede3fddcff99b157d292a1069ace8d6e04db9"
+  version "5.2.2"
+  resolved "https://registry.npmjs.org/ws/-/ws-5.2.2.tgz#dffef14866b8e8dc9133582514d1befaf96e980f"
   dependencies:
     async-limiter "~1.0.0"
 

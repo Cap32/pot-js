@@ -17,6 +17,7 @@ export async function createClient(socketPath) {
 		nodeIpc.connectTo(serverId, socketPath, () => {
 			const socket = nodeIpc.of[serverId];
 			socket.on('connect', () => {
+				// FIXME: should make compatible with nodeIpc
 				socket.request = function request() {
 					return new Promise((resolve) => {
 						const handler = (res) => {
@@ -47,8 +48,8 @@ export async function createClient(socketPath) {
 					const state = await socket.request();
 					await fkill(state.parentPid, { force: isWin, tree: true });
 				};
-				socket.close = function close() {
-					return Promise.resolve(nodeIpc.disconnect(socket.id));
+				socket.end = function end() {
+					return nodeIpc.disconnect(socket.id);
 				};
 
 				resolve(socket);

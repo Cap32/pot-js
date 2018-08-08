@@ -1,5 +1,5 @@
 import getInfoVerbose from './getInfoVerbose';
-import { CALL } from '../utils/SocketEventTypes';
+import { REQUEST, PUBLISH } from '../utils/SocketEventTypes';
 import { getPids } from '../utils/PidHelpers';
 import { logger } from 'pot-logger';
 import {
@@ -8,21 +8,29 @@ import {
 	getSocketPath,
 	removeDomainSocketFile,
 } from '../utils/SocketsHelpers';
-import { differenceWith, noop } from 'lodash';
+import { differenceWith } from 'lodash';
 import isWin from '../utils/isWin';
 import workspace from '../utils/workspace';
 
-const call = async function call(socket, method, ...args) {
+const request = async function request(socket, method, ...args) {
 	const data = { method, args };
-	return socket.request(CALL, data);
+	socket.send(REQUEST, data);
+	return new Promise((resolve) => {
+		socket.dataOnce(method, resolve);
+	});
+};
+
+const publish = function publish(socket, method, ...args) {
+	const data = { method, args };
+	socket.send(PUBLISH, data);
 };
 
 const getState = async function getState(socket, ...args) {
 	try {
-		return await call(socket, 'state', ...args);
+		return await request(socket, 'state', ...args);
 	}
 	catch (err) {
-		socket.close().catch(noop);
+		socket.end();
 		return null;
 	}
 };
@@ -30,7 +38,6 @@ const getState = async function getState(socket, ...args) {
 const getAll = async function getAll() {
 	const pidRefs = await getPids();
 	const socketRefs = await getSocketFiles();
-
 	const refsList = [];
 	await Promise.all(
 		pidRefs.map(async ({ pid, key, pidFile }) => {
@@ -84,7 +91,7 @@ const getByName = async function getByName(name) {
 					res.push(ref);
 				}
 				else {
-					await socket.close();
+					socket.end();
 				}
 			}
 		}),
@@ -104,7 +111,7 @@ const getByKey = async function getByKey(key) {
 					res = ref;
 				}
 				else {
-					await socket.close();
+					socket.end();
 				}
 			}
 		}),
@@ -136,18 +143,22 @@ export default class Instance {
 		this._socket = socket;
 	}
 
-	async call(method, ...args) {
-		const response = await call(this._socket, method, ...args);
+	async request(method, ...args) {
+		const response = await request(this._socket, method, ...args);
 		if (!this._keepAlive) await this.disconnect();
 		return response;
 	}
 
+	async publish(method, ...args) {
+		publish(this._socket, method, ...args);
+	}
+
 	async setState(newState) {
-		return this.call('state', newState);
+		return this.request('state', newState);
 	}
 
 	async getState() {
-		return this.call('state');
+		return this.request('state');
 	}
 
 	async getInfo() {
@@ -160,24 +171,25 @@ export default class Instance {
 	}
 
 	async restart() {
-		return this.call('restart');
+		return this.request('restart');
 	}
 
 	async scale(number) {
-		return this.call('scale', number);
+		return this.request('scale', number);
 	}
 
 	async disconnect() {
 		try {
-			await this._socket.close();
+			this._socket.end();
+			// this._socket.destroy();
 		}
 		catch (err) {
 			logger.debug(err);
 		}
 	}
 
-	async requestStopServer(options) {
-		await this._socket.requestClose(options);
+	async requestStopServer() {
+		this.publish('requestShutDown');
 		await this.disconnect();
 	}
 }

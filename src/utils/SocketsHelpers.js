@@ -9,7 +9,7 @@ import globby from 'globby';
 import { noop, isObject, isFunction } from 'lodash';
 import isWin from './isWin';
 import getKey from './getKey';
-import { CALL } from './SocketEventTypes';
+import { REQUEST, PUBLISH } from './SocketEventTypes';
 
 export async function getSocketFiles() {
 	const runDir = await workspace.getRunDir();
@@ -52,29 +52,34 @@ export async function startServer(masterMonitor, workerMonitor) {
 	const { socketPath } = workerMonitor.data;
 
 	logger.trace('unix domain socket path', chalk.gray(socketPath));
-	const socketServer = await createServer(socketPath);
+	await createServer(socketPath, (socket) => {
+		const createListener = (event) => {
+			socket.data(event, async (data) => {
+				if (!data || !data.method) return;
 
-	socketServer.onReplyClose(async () => {
-		process.nextTick(async () => {
-			await masterMonitor.requestShutDown(workerMonitor);
-		});
-		return true;
+				const { args = [], method } = data;
+				try {
+					masterMonitor.currentWorkerMonitor = workerMonitor;
+					if (isFunction(masterMonitor[method])) {
+						const resp = await masterMonitor[method](...args);
+						if (event === REQUEST) {
+							socket.send(method, resp);
+						}
+					}
+					else {
+						logger.warn(
+							`Received API call "${method}", but it's not supported`,
+						);
+					}
+				}
+				catch (err) {
+					logger.error(`Failed to handle API call "${method}".`, err);
+				}
+			});
+		};
+		createListener(REQUEST);
+		createListener(PUBLISH);
 	});
-
-	socketServer.reply(CALL, async (data) => {
-		if (data && data.method) {
-			const { args = [], method } = data;
-			masterMonitor.currentWorkerMonitor = workerMonitor;
-			if (isFunction(masterMonitor[method])) {
-				return masterMonitor[method](...args);
-			}
-			else {
-				logger.warn(`Received API call "${method}", but it's not supported`);
-			}
-		}
-	});
-
-	return socketServer;
 }
 
 export async function startClient(socketPath, options = {}) {

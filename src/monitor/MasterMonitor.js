@@ -20,7 +20,6 @@ import {
 } from '../utils/SocketsHelpers';
 
 export default class MasterMonitor extends EventEmitter {
-
 	// will be set by server socket
 	currentWorkerMonitor = null;
 
@@ -285,7 +284,7 @@ export default class MasterMonitor extends EventEmitter {
 		return false;
 	}
 
-	async requestShutDown(workerMonitor) {
+	async requestShutDown(workerMonitor = this.currentWorkerMonitor) {
 		await workerMonitor.stop();
 
 		const { socketPath, pidFile } = workerMonitor.toJSON();

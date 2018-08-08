@@ -1,26 +1,18 @@
-import { Server, Client } from 'promise-ws';
+import nssocket from 'nssocket';
 import createLocalDomainSocket from 'create-local-domain-socket';
-import http from 'http';
 import * as deprecatedIpcAdapter from './deprecatedIpcAdapter';
 import delay from 'delay';
 import { basename, dirname } from 'path';
 import deprecated from '../utils/deprecated';
 
-export async function createServer(socketPath) {
-	const server = http.createServer((req, res) => {
-		const body = http.STATUS_CODES[426];
-		res.writeHead(426, {
-			'Content-Length': body.length,
-			'Content-Type': 'text/plain',
-		});
-		res.end(body);
+export async function createServer(socketPath, connect) {
+	const server = nssocket.createServer((socket) => {
+		connect(socket);
 	});
-
 	await createLocalDomainSocket(server, socketPath);
-	const wsServer = await Server.create({ server });
-
-	wsServer.reply('close', wsServer.close.bind(wsServer));
-	return wsServer;
+	return server;
+	// TODO:
+	// wsServer.reply('close', wsServer.close.bind(wsServer));
 }
 
 export async function createClient(socketPath) {
@@ -36,7 +28,12 @@ export async function createClient(socketPath) {
 			deprecated('"$name" has been deprecated', basename(socketPath));
 			return deprecatedIpcAdapter.createClient(socketPath);
 		}
-		return Client.create(`ws+unix://${socketPath}`);
+		const client = new nssocket.NsSocket();
+		return new Promise((resolve, reject) => {
+			client.on('start', () => resolve(client));
+			client.on('error', reject);
+			client.connect(socketPath);
+		});
 	})();
 
 	try {
