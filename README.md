@@ -8,24 +8,30 @@ Process management module
 
 ## Table of Contents
 
-<!-- TOC -->
-
-- [pot-js](#pot-js)
-  - [Table of Contents](#table-of-contents)
-  - [Motivation](#motivation)
-  - [Features](#features)
-  - [Installing](#installing)
-  - [CLI Reference](#cli-reference)
-  - [Node.js module API Reference](#nodejs-module-api-reference)
-    - [exec([options])](#execoptions) - [Options](#options)
-    - [Connection](#connection)
-    - [Operators](#operators)
-    - [Schemas](#schemas)
-    - [Commands](#commands)
-    - [createCli(pkg, commands)](#createclipkg-commands)
-  - [License](#license)
-
-<!-- /TOC -->
+- [Table of Contents](#table-of-contents)
+- [Motivation](#motivation)
+- [Features](#features)
+- [Installing](#installing)
+- [CLI Reference](#cli-reference)
+- [Node.js module API Reference](#nodejs-module-api-reference)
+  - [Pot.exec([options])](#potexecoptions)
+  - [Pot.getNames()](#potgetnames)
+  - [Pot.getByName(name, options)](#potgetbynamename-options)
+  - [Pot.getState(name, options)](#potgetstatename-options)
+  - [Pot.getAllInstances(options)](#potgetallinstancesoptions)
+  - [Pot.flushOffline(options)](#potflushofflineoptions)
+  - [pot.Operators](#potoperators)
+  - [pot.Schemas](#potschemas)
+  - [pot.Commands](#potcommands)
+  - [pot.createCli(pkg, commands)](#potcreateclipkg-commands)
+  - [pot#getState(instanceId)](#potgetstateinstanceid)
+  - [pot#restart()](#potrestart)
+  - [pot#reload(options)](#potreloadoptions)
+  - [pot#scale(number)](#potscalenumber)
+  - [pot#flush()](#potflush)
+  - [pot#disconnect()](#potdisconnect)
+  - [pot#requestStopServer(options)](#potrequeststopserveroptions)
+- [License](#license)
 
 ## Motivation
 
