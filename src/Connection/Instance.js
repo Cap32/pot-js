@@ -1,12 +1,11 @@
 import getInfoVerbose from './getInfoVerbose';
 import { REQUEST, PUBLISH } from '../utils/SocketEventTypes';
 import { getPids } from '../utils/PidHelpers';
-import { logger } from 'pot-logger';
 import {
-	getSocketFiles,
+	getSocketDiscripers,
 	startClient,
 	getSocketPath,
-	removeDomainSocketFile,
+	removeDomainSocket,
 } from '../utils/SocketsHelpers';
 import { differenceWith } from 'lodash';
 import isWin from '../utils/isWin';
@@ -37,7 +36,7 @@ const getState = async function getState(socket, ...args) {
 
 const getAll = async function getAll() {
 	const pidRefs = await getPids();
-	const socketRefs = await getSocketFiles();
+	const socketRefs = await getSocketDiscripers();
 	const refsList = [];
 	await Promise.all(
 		pidRefs.map(async ({ pid, key, pidFile }) => {
@@ -47,7 +46,7 @@ const getAll = async function getAll() {
 				refsList.push({ key, socket, pid, pidFile, socketPath });
 			}
 			else {
-				removeDomainSocketFile(socketPath);
+				removeDomainSocket(socketPath);
 			}
 		}),
 	);
@@ -145,7 +144,7 @@ export default class Instance {
 
 	async request(method, ...args) {
 		const response = await request(this._socket, method, ...args);
-		if (!this._keepAlive) await this.disconnect();
+		if (!this._keepAlive) this.disconnect();
 		return response;
 	}
 
@@ -178,18 +177,13 @@ export default class Instance {
 		return this.request('scale', number);
 	}
 
-	async disconnect() {
-		try {
-			this._socket.end();
-			// this._socket.destroy();
-		}
-		catch (err) {
-			logger.debug(err);
-		}
+	disconnect() {
+		this._socket.end();
+		// this._socket.destroy();
 	}
 
-	async requestStopServer() {
+	requestStopServer() {
 		this.publish('requestShutDown');
-		await this.disconnect();
+		this.disconnect();
 	}
 }

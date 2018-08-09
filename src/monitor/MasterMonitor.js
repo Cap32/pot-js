@@ -16,7 +16,7 @@ import { getPidFile, writePid, removePidFile } from '../utils/PidHelpers';
 import {
 	startServer,
 	getSocketPath,
-	removeDomainSocketFile,
+	removeDomainSocket,
 } from '../utils/SocketsHelpers';
 
 export default class MasterMonitor extends EventEmitter {
@@ -292,10 +292,7 @@ export default class MasterMonitor extends EventEmitter {
 		const { workerMonitors } = this;
 		const index = workerMonitors.indexOf(workerMonitor);
 		workerMonitors.splice(index, 1);
-		await Promise.all([
-			removeDomainSocketFile(socketPath),
-			removePidFile(pidFile),
-		]);
+		await Promise.all([removeDomainSocket(socketPath), removePidFile(pidFile)]);
 
 		if (!workerMonitors.length) process.exit(0);
 	}

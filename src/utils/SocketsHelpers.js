@@ -1,7 +1,5 @@
 import { remove } from 'fs-extra';
-import { basename, join } from 'path';
 import workspace from './workspace';
-import { createServer, createClient } from './ipc';
 import { ensureLocalDomainPath } from 'create-local-domain-socket';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
@@ -10,8 +8,12 @@ import { noop, isObject, isFunction } from 'lodash';
 import isWin from './isWin';
 import getKey from './getKey';
 import { REQUEST, PUBLISH } from './SocketEventTypes';
+import { createServer, createClient } from './nssocketPromise';
+import * as deprecatedIpcAdapter from './deprecatedIpcAdapter';
+import { basename, dirname, join } from 'path';
+import deprecated from '../utils/deprecated';
 
-export async function getSocketFiles() {
+export async function getSocketDiscripers() {
 	const runDir = await workspace.getRunDir();
 
 	// DEPRECATED: workspace.DEPRECATED_getSocketsDir()
@@ -31,7 +33,7 @@ export async function getSocketFiles() {
 	}));
 }
 
-export async function removeDomainSocketFile(socketPath) {
+export async function removeDomainSocket(socketPath) {
 	if (isWin) {
 		return;
 	}
@@ -86,16 +88,24 @@ export async function startClient(socketPath, options = {}) {
 	const { silence } = options;
 
 	try {
-		const clientSocket = await createClient(socketPath);
-		silence || logger.trace('start client socket', socketPath);
+		let clientSocket;
+		const socketBase = basename(dirname(socketPath));
+		if (socketBase === 'sockets') {
+			deprecated('"$name" has been deprecated', basename(socketPath));
+			clientSocket = await deprecatedIpcAdapter.createClient(socketPath);
+		}
+		else {
+			clientSocket = await createClient(socketPath);
+		}
+		!silence && logger.trace('start client socket', socketPath);
 		return clientSocket;
 	}
 	catch (err) {
 		if (err && ~['ECONNRESET', 'ECONNREFUSED', 'ENOENT'].indexOf(err.code)) {
-			await removeDomainSocketFile(socketPath);
+			await removeDomainSocket(socketPath);
 		}
 		else {
-			silence || logger.error('socket error', err);
+			!silence && logger.error('socket error', err);
 		}
 	}
 }
