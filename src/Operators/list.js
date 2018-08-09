@@ -1,7 +1,7 @@
 import { logger } from 'pot-logger';
 import createTable from '../utils/createTable';
 import { isUndefined, isFunction } from 'lodash';
-import Connection from '../Connection';
+import Pot from '../core/Pot';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
 import { prepareRun } from '../utils/PrepareCli';
@@ -76,7 +76,7 @@ const list = async function list(options = {}) {
 
 	if (!cells.length) cells.push();
 
-	const instances = await Connection.getAllInstances({ keepAlive: true });
+	const instances = await Pot.getAllInstances({ keepAlive: true });
 
 	const loop = async () => {
 		const table = createTable({

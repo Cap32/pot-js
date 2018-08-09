@@ -1,6 +1,6 @@
 import { setLoggers } from 'pot-logger';
 import inquirer from 'inquirer';
-import Connection from '../Connection';
+import Pot from '../core/Pot';
 import workspace from './workspace';
 import validateBySchema from './validateBySchema';
 
@@ -38,15 +38,15 @@ export async function prepareTarget(argv = {}, options = {}) {
 		value: name,
 		message: 'Please select the target app',
 		errorMessage: 'No process is running',
-		getChoices: Connection.getNames,
+		getChoices: Pot.getNames,
 	});
 
-	const { noConnection, ...connectionOption } = options;
-	if (noConnection) return { targetName };
+	const { noPot, ...potOption } = options;
+	if (noPot) return { targetName };
 
-	const connection = await Connection.getByName(targetName, connectionOption);
-	if (!connection || !connection.instances.length) {
+	const pot = await Pot.getByName(targetName, potOption);
+	if (!pot || !pot.instances.length) {
 		throw new Error(`"${targetName}" NOT found`);
 	}
-	return { connection, targetName };
+	return { pot, targetName };
 }

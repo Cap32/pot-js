@@ -1,5 +1,5 @@
-import * as Schemas from './Schemas/cli';
-import * as Operators from './Operators';
+import * as Schemas from '../Schemas/cli';
+import * as Operators from '../Operators';
 
 export const start = {
 	command: 'start [entry]',

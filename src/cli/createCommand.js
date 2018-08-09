@@ -1,10 +1,10 @@
 /* A helper function to create yargs command */
 
 import { logger, setLoggers } from 'pot-logger';
-import resolveConfig from './resolveConfig';
-import getCliOptionsBySchema from './getCliOptionsBySchema';
-import validateBySchema from './validateBySchema';
-import { isFunction, isObject, forEach, flatten, omit } from 'lodash';
+import resolveConfig from '../utils/resolveConfig';
+import getCliOptionsBySchema from '../utils/getCliOptionsBySchema';
+import validateBySchema from '../utils/validateBySchema';
+import { isFunction, isObject, flatten, omit } from 'lodash';
 
 const builder = function builder(yargs) {
 	const { middlewares, optional, demanded, original } = this;

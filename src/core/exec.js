@@ -1,17 +1,17 @@
 import { fork } from 'child_process';
 import { resolve } from 'path';
 import { ensureDir } from 'fs-extra';
-import isWin from './utils/isWin';
-import { prepareRun } from './utils/PrepareCli';
-import workspace from './utils/workspace';
-import schema from './Schemas/config';
+import isWin from '../utils/isWin';
+import { prepareRun } from '../utils/PrepareCli';
+import workspace from '../utils/workspace';
+import schema from '../Schemas/config';
 import { logger } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
 import chalk from 'chalk';
-import Connection from './Connection';
+import Pot from './Pot';
 import onExit from 'signal-exit';
 import fkill from 'fkill';
-import { version } from '../package.json';
+import { version } from '../../package.json';
 import AggregateError from 'aggregate-error';
 
 const potjs = { version };
@@ -99,7 +99,7 @@ const ensureOptions = async (options = {}) => {
 };
 
 const startMonitorProc = ({ cwd, daemon, env, name }) => {
-	const scriptFile = resolve(__dirname, '../bin/monitor');
+	const scriptFile = resolve(__dirname, '../../bin/monitor');
 	const stdio = daemon ? 'ignore' : 'inherit';
 	const proc = fork(scriptFile, [], {
 		stdio: ['ipc', stdio, stdio],
@@ -112,8 +112,8 @@ const startMonitorProc = ({ cwd, daemon, env, name }) => {
 
 	proc.originalKill = proc.kill;
 	proc.kill = async () => {
-		const connection = await Connection.getByName(name);
-		if (connection) await connection.requestStopServer();
+		const pot = await Pot.getByName(name);
+		if (pot) await pot.requestStopServer();
 	};
 	return proc;
 };
@@ -213,14 +213,14 @@ export default async function run(options = {}) {
 		}
 		logger.trace('logLevel', options.logLevel);
 
-		const connection = await Connection.getByName(name);
+		const pot = await Pot.getByName(name);
 
-		if (connection) {
+		if (pot) {
 			if (force) {
-				await connection.requestStopServer();
+				await pot.requestStopServer();
 			}
 			else {
-				await connection.disconnect();
+				await pot.disconnect();
 				throw new Error(`"${name}" is running.`);
 			}
 		}

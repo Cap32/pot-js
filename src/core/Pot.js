@@ -1,10 +1,10 @@
 import { uniq, isFunction } from 'lodash';
 import { logger, flush } from 'pot-logger';
-import Instance from './Instance';
+import Instance from '../Instance';
 import delay from 'delay';
 import flushOfflineDirs from '../utils/flushOfflineDirs';
 
-export default class Connection {
+export default class Pot {
 	static async getNames(options) {
 		const instances = await Instance.getAllInstances(options);
 		const names = await Promise.all(
@@ -18,20 +18,20 @@ export default class Connection {
 
 	static async getByName(name, options) {
 		const instances = await Instance.getInstancesByName(name, options);
-		return instances.length ? new Connection(name, instances) : null;
+		return instances.length ? new Pot(name, instances) : null;
 	}
 
 	static async getState(name, options = {}) {
-		const connection = await Connection.getByName(name, options);
-		if (!connection) return {};
-		return connection.getState(options.instanceIndex);
+		const pot = await Pot.getByName(name, options);
+		if (!pot) return {};
+		return pot.getState(options.instanceIndex);
 	}
 
 	static getAllInstances = Instance.getAllInstances;
-	static getList = Connection.getAllInstances;
+	static getList = Pot.getAllInstances;
 
 	static async flushOffline(onlinesNames) {
-		if (!onlinesNames) onlinesNames = await Connection.getNames();
+		if (!onlinesNames) onlinesNames = await Pot.getNames();
 		return flushOfflineDirs(onlinesNames);
 	}
 

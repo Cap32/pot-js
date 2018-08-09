@@ -1,12 +1,12 @@
 import { logger } from 'pot-logger';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
-import Connection from '../Connection';
+import Pot from '../core/Pot';
 import inquirer from 'inquirer';
 import { stop as schema } from '../Schemas/cli';
 
 export const stop = async function stop(options = {}) {
 	prepareRun(schema, options);
-	const { connection, targetName } = await prepareTarget(options);
+	const { pot, targetName } = await prepareTarget(options);
 	const { force } = options;
 
 	if (!force) {
@@ -18,17 +18,17 @@ export const stop = async function stop(options = {}) {
 		});
 
 		if (!confirmed.yes) {
-			await connection.disconnect();
+			await pot.disconnect();
 			logger.warn('Canceled');
 			return;
 		}
 	}
 
-	return connection.requestStopServer({ shouldLog: true });
+	return pot.requestStopServer({ shouldLog: true });
 };
 
 export const stopAll = async function stopAll(options = {}) {
-	const names = await Connection.getNames();
+	const names = await Pot.getNames();
 	if (options.force) {
 		await Promise.all(names.map(async (name) => stop({ ...options, name })));
 	}

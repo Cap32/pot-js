@@ -8,7 +8,7 @@ const isValidNumber = (n) => /^-?\d+$/.test(n);
 
 export default async function scale(options = {}) {
 	if (options.instances === undefined && isValidNumber(options.name)) {
-		const { targetName } = await prepareTarget({}, { noConnection: true });
+		const { targetName } = await prepareTarget({}, { noPot: true });
 		const maybeInstances = options.name;
 		const promptOptions = {
 			name: 'instance',
@@ -24,7 +24,7 @@ export default async function scale(options = {}) {
 
 	prepareRun(schema, options);
 
-	const { connection, targetName } = await prepareTarget(options);
+	const { pot, targetName } = await prepareTarget(options);
 	const errorMessage = 'INVALID number';
 	const instances = await ensureArg({
 		type: 'input',
@@ -33,7 +33,7 @@ export default async function scale(options = {}) {
 		message: 'Please input instances count (Integer)',
 		errorMessage,
 	});
-	const { ok, added, removed, errors } = await connection.scale(instances);
+	const { ok, added, removed, errors } = await pot.scale(instances);
 
 	if (errors && errors.length) {
 		const { length } = errors;

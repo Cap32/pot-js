@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { ensureLogger, logger, setLoggers } from 'pot-logger';
 import chalk from 'chalk';
 import delay from 'delay';
-import Connection from '../Connection';
+import Pot from '../core/Pot';
 import WorkerMonitor from './WorkerMonitor';
 import workspace from '../utils/workspace';
 import watch from '../utils/watch';
@@ -87,9 +87,9 @@ export default class MasterMonitor extends EventEmitter {
 		const exit = async () => {
 			logger.debug('exit');
 			try {
-				const connection = await Connection.getByName(name);
-				if (connection) {
-					await connection.requestStopServer();
+				const pot = await Pot.getByName(name);
+				if (pot) {
+					await pot.requestStopServer();
 				}
 				await Promise.all(
 					this.workerMonitors.map(async (monitor) => monitor.stop()),

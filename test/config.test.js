@@ -1,4 +1,4 @@
-import schema from '../src/schemas/config';
+import schema from '../src/Schemas/config';
 import validateBySchema from '../src/utils/validateBySchema';
 
 describe('default config', () => {

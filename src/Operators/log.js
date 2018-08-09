@@ -9,9 +9,9 @@ export default async function log(options = {}) {
 	prepareRun(schema, options);
 
 	const { line, category, follow } = options;
-	const { connection, targetName } = await prepareTarget(options);
+	const { pot, targetName } = await prepareTarget(options);
 
-	const state = await connection.getState();
+	const state = await pot.getState();
 	if (!state) {
 		throw new Error(`"${targetName}" NOT found`);
 	}

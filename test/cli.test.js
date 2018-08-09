@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 import { writeFile, remove } from 'fs-extra';
 import spawn from 'cross-spawn';
-import { Connection } from '../src';
+import Pot from '../src';
 import Kapok from 'kapok-js';
 import delay from 'delay';
 import { Client } from 'promise-ws';
@@ -53,7 +53,7 @@ describe('cli `pot start`', () => {
 		])
 			.assertUntil(/started/, {
 				action: async () => {
-					const { pid } = await Connection.getState(name);
+					const { pid } = await Pot.getState(name);
 					await fkill(pid, { force: /^win/.test(process.platform) });
 				},
 			})

@@ -1,4 +1,4 @@
-import exec from '../exec';
+import exec from '../core/exec';
 import logger from 'pot-logger';
 import chalk from 'chalk';
 import { basename } from 'path';

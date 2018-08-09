@@ -1,17 +1,14 @@
 import { logger } from 'pot-logger';
-import Connection from '../Connection';
+import Pot from '../core/Pot';
 import { prepareRun, prepareTarget } from '../utils/PrepareCli';
 import { reload as schema } from '../Schemas/cli';
 
 export const reload = async function reload(options = {}) {
 	prepareRun(schema, options);
-	const connectionOptions = { keepAlive: true };
-	const { connection, targetName } = await prepareTarget(
-		options,
-		connectionOptions,
-	);
+	const potOptions = { keepAlive: true };
+	const { pot, targetName } = await prepareTarget(options, potOptions);
 
-	await connection.reload({
+	await pot.reload({
 		...options,
 		onProgress(ok, state) {
 			const displayName = state.displayName || targetName;
@@ -28,6 +25,6 @@ export const reload = async function reload(options = {}) {
 };
 
 export const reloadAll = async function reloadAll(options = {}) {
-	const names = await Connection.getNames();
+	const names = await Pot.getNames();
 	return Promise.all(names.map(async (name) => reload({ ...options, name })));
 };

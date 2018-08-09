@@ -32,12 +32,12 @@ const defaultCells = [
 const show = async function show(options = {}) {
 	prepareRun(schema, options);
 	const { cells = defaultCells } = options;
-	const { connection } = await prepareTarget(options);
+	const { pot } = await prepareTarget(options);
 
 	const table = createTable({ padding: 4 });
 
 	let stateList = await Promise.all(
-		connection.instances.map((instance) => instance.getInfoVerbose()),
+		pot.instances.map((instance) => instance.getInfoVerbose()),
 	);
 
 	stateList = stateList.filter(Boolean);
