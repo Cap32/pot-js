@@ -10,20 +10,20 @@ Process management module
 
 <!-- TOC -->
 
-* [pot-js](#pot-js)
-  * [Table of Contents](#table-of-contents)
-  * [Motivation](#motivation)
-  * [Features](#features)
-  * [Installing](#installing)
-  * [CLI Reference](#cli-reference)
-  * [Node.js module API Reference](#nodejs-module-api-reference)
-    * [exec([options])](#execoptions) - [Options](#options)
-    * [Connection](#connection)
-    * [Operators](#operators)
-    * [Schemas](#schemas)
-    * [Commands](#commands)
-    * [createCli(pkg, commands)](#createclipkg-commands)
-  * [License](#license)
+- [pot-js](#pot-js)
+  - [Table of Contents](#table-of-contents)
+  - [Motivation](#motivation)
+  - [Features](#features)
+  - [Installing](#installing)
+  - [CLI Reference](#cli-reference)
+  - [Node.js module API Reference](#nodejs-module-api-reference)
+    - [exec([options])](#execoptions) - [Options](#options)
+    - [Connection](#connection)
+    - [Operators](#operators)
+    - [Schemas](#schemas)
+    - [Commands](#commands)
+    - [createCli(pkg, commands)](#createclipkg-commands)
+  - [License](#license)
 
 <!-- /TOC -->
 
@@ -33,13 +33,13 @@ Process management module
 
 ## Features
 
-* Automatically restart process if it crashes. Like [forever](https://github.com/foreverjs/forever)
-* Able to scale or reload instances with zero down time. Like [pm2](https://github.com/Unitech/pm2)
-* Provides both CLI and Node.js module API
-* Supports isolated workspaces
-* User friendly interactive CLI
-* Easy to extend
-* Built-in powerful logger system
+- Automatically restart process if it crashes. Like [forever](https://github.com/foreverjs/forever)
+- Able to scale or reload instances with zero down time. Like [pm2](https://github.com/Unitech/pm2)
+- Provides both CLI and Node.js module API
+- Supports isolated workspaces
+- User friendly interactive CLI
+- Easy to extend
+- Built-in powerful logger system
 
 ## Installing
 
@@ -80,129 +80,150 @@ Options:
 
 ## Node.js module API Reference
 
-### exec([options])
+### Pot.exec([options])
 
-Spawn and monitor a process.
+Spawn and monitor a process. Returns a promise of a `Pot` instance.
 
-###### Options
+##### Options
 
-* `args` (String|String[]): List of string arguments. Defaults to `[]`.
-* `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`.
-* `cluster` (Boolean): Enforce using cluster mode. If not set, it will automatically set to `true` when spawning a Node.js related process.
-* `config` (String): Path to the config file. Defaults to `.potrc`.
-* `cwd` (String): Current working directory. Defaults to `process.cwd()`.
-* `daemon` (Boolean): Run as a daemon. Defaults to `false`.
-* `entry` (String): Entry script path. Defaults to `./index.js`.
-* `env` (Object): Environment variables object. Defaults to `process.env`.
-* `events` (Object): Defining scripts by event hooks. Like `scripts` in `package.json`. Here are available event hooks:
-  * `spawn`: New child process has been spawned
-  * `start`: The monitor has started
-  * `stop`: The monitor has fully stopped and the process is killed
-  * `crash`: The monitor has crashed (too many restarts or spawn error)
-  * `sleep`: The monitor is sleeping
-  * `exit`: Child process has exited
-  * `stdout`: Child process stdout has emitted data
-  * `stderr`: Child process stderr has emitted data
-  * `warn`: Child process has emitted an error
-* `execArgs` (String|String[]): Execution arguments. Defaults to `[]`.
-* `execPath` (String): Execution Path. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
-* `force` (Boolean): Enforce restart even if the process is exists. Defaults to `false`.
-* `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Require Node.js >= v6.3.0. Defaults to `false`.
-* `instances` (Number): Cluster instances. Defaults to `1`.
-* `logLevel` (String|Object): Log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
-  * ALL
-  * TRACE
-  * DEBUG (default in `development` mode)
-  * INFO (default in `production` mode)
-  * WARN
-  * ERROR
-  * FATAL
-  * OFF
-* `logsDir` (String): Log files directory. In `daemon` mode, log messages will write to some `.log` files.
-* `maxRestarts` (Number): How many restarts are allowed within 60s.
-* `monitorProcessTitle` (String): Monitor process title. Defaults to "node".
-* `name` (String): Process monitor name. Should be unique. Defaults to the basename of `baseDir`.
-* `production` (Boolean): Production mode. Short hand for setting NODE_ENV="production" env. Defaults to `true`.
-* `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
-  * `enable` (Boolean): Enable `watch`. Defaults to `true`.
-  * `dirs` (String|String[]): Defining watching directories.
-  * `ignoreDotFiles` (Boolean): Ignore watching `.*` files. Defaults to `true`.
-  * `ignoreNodeModulesDir` (Boolean): Ignore watching `node_modules` directory. Defaults to `true`.
-* `workspace` (String): Workspace.
-
----
-
-### Connection
-
-API to communicate with monitors
-
-_(TODO)_
-
-* `Connection.getNames(options)`
-* `Connection.getByName(name, options)`
-* `Connection.getState(name, options)`
-* `Connection.getAllInstances(options)`
-* `Connection.flushOffline()`
-* `connection#getState(instanceId)`
-* `connection#restart()`
-* `connection#reload(options)`
-* `connection#scale(number)`
-* `connection#flush()`
-* `connection#disconnect()`
-* `connection#requestStopServer(options)`
+- `args` (String|String[]): List of string arguments. Defaults to `[]`.
+- `baseDir` (String): The base directory for resolving modules or directories. Defaults to the `current working directory`.
+- `cluster` (Boolean): Enforce using cluster mode. If not set, it will automatically set to `true` when spawning a Node.js related process.
+- `config` (String): Path to the config file. Defaults to `.potrc`.
+- `cwd` (String): Current working directory. Defaults to `process.cwd()`.
+- `daemon` (Boolean): Run as a daemon. Defaults to `false`.
+- `entry` (String): Entry script path. Defaults to `./index.js`.
+- `env` (Object): Environment variables object. Defaults to `process.env`.
+- `events` (Object): Defining scripts by event hooks. Like `scripts` in `package.json`. Here are available event hooks:
+  - `spawn`: New child process has been spawned
+  - `start`: The monitor has started
+  - `stop`: The monitor has fully stopped and the process is killed
+  - `crash`: The monitor has crashed (too many restarts or spawn error)
+  - `sleep`: The monitor is sleeping
+  - `exit`: Child process has exited
+  - `stdout`: Child process stdout has emitted data
+  - `stderr`: Child process stderr has emitted data
+  - `warn`: Child process has emitted an error
+- `execArgs` (String|String[]): Execution arguments. Defaults to `[]`.
+- `execPath` (String): Execution Path. Defaults to `process.execPath`, which returns the absolute pathname of the executable that started the Node.js process. i.e. `/usr/local/bin/node`.
+- `force` (Boolean): Enforce restart even if the process is exists. Defaults to `false`.
+- `inspect` (Boolean|String|Object): Enable [node inspector](https://nodejs.org/api/cli.html#cli_inspect_host_port). Require Node.js >= v6.3.0. Defaults to `false`.
+- `instances` (Number): Cluster instances. Defaults to `1`.
+- `logLevel` (String|Object): Log level. See [pot-logger](https://github.com/cantonjs/pot-logger) for detail. Here are available levels:
+  - ALL
+  - TRACE
+  - DEBUG (default in `development` mode)
+  - INFO (default in `production` mode)
+  - WARN
+  - ERROR
+  - FATAL
+  - OFF
+- `logsDir` (String): Log files directory. In `daemon` mode, log messages will write to some `.log` files.
+- `maxRestarts` (Number): How many restarts are allowed within 60s.
+- `monitorProcessTitle` (String): Monitor process title. Defaults to "node".
+- `name` (String): Process monitor name. Should be unique. Defaults to the basename of `baseDir`.
+- `production` (Boolean): Production mode. Short hand for setting NODE_ENV="production" env. Defaults to `true`.
+- `watch` (Boolean|Object): Enable watch mode. Defaults to `false`. Here are available props for object config:
+  - `enable` (Boolean): Enable `watch`. Defaults to `true`.
+  - `dirs` (String|String[]): Defining watching directories.
+  - `ignoreDotFiles` (Boolean): Ignore watching `.*` files. Defaults to `true`.
+  - `ignoreNodeModulesDir` (Boolean): Ignore watching `node_modules` directory. Defaults to `true`.
+- `workspace` (String): Workspace.
 
 ---
 
-### Operators
+### Pot.getNames()
+
+Get all running `pots`. Returns a promise of array.
+
+### Pot.getByName(name, options)
+
+Get `pot` by name. Returns a promise of `Pot` instance.
+
+### Pot.getState(name, options)
+
+Get `pot` state by name. Returns a promise of a state object.
+
+### Pot.getAllInstances(options)
+
+Get all running process `instances`. Returns a promise of array.
+
+### Pot.flushOffline(options)
+
+Flush offline processes (pid and log files).
+
+### pot.Operators
 
 Command lines interface helper functions
 
 _(TODO)_
 
-* `Operators.start(options)`
-* `Operators.restart(options)`
-* `Operators.restartAll(options)`
-* `Operators.reload(options)`
-* `Operators.reloadAll(options)`
-* `Operators.stop(options)`
-* `Operators.stopAll(options)`
-* `Operators.scale(options)`
-* `Operators.list(options)`
-* `Operators.show(options)`
-* `Operators.log(options)`
-* `Operators.flush(options)`
-* `Operators.flushAll(options)`
+- `Operators.start(options)`
+- `Operators.restart(options)`
+- `Operators.restartAll(options)`
+- `Operators.reload(options)`
+- `Operators.reloadAll(options)`
+- `Operators.stop(options)`
+- `Operators.stopAll(options)`
+- `Operators.scale(options)`
+- `Operators.list(options)`
+- `Operators.show(options)`
+- `Operators.log(options)`
+- `Operators.flush(options)`
+- `Operators.flushAll(options)`
 
----
-
-### Schemas
+### pot.Schemas
 
 Config and CLI json schemas
 
 _(TODO)_
 
----
-
-### Commands
+### pot.Commands
 
 `pot-js` commands descriptor. Useful to extend or modify command via `createCli()`
 
 A command may contain these props:
 
-* `command` (String): A string representing the command. eg: `stop [name]`
-* `description` (String): Command description
-* `schema` (Object): The JSON schema of options and positional arguments
-* `operator` (Function): The operator function of the command
+- `command` (String): A string representing the command. eg: `stop [name]`
+- `description` (String): Command description
+- `schema` (Object): The JSON schema of options and positional arguments
+- `operator` (Function): The operator function of the command
 
 _(TODO)_
 
----
-
-### createCli(pkg, commands)
+### pot.createCli(pkg, commands)
 
 A helper function to create CLI, built on top of [yargs](https://github.com/yargs/yargs)
 
 _(TODO)_
+
+### pot#getState(instanceId)
+
+Get pot state by instance id
+
+### pot#restart()
+
+Restart
+
+### pot#reload(options)
+
+Reload
+
+### pot#scale(number)
+
+Scale
+
+### pot#flush()
+
+Flush pid and log files
+
+### pot#disconnect()
+
+Disconnect
+
+### pot#requestStopServer(options)
+
+Request to shut down
 
 ---
 
