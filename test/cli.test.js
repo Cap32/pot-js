@@ -63,8 +63,7 @@ describe('cli `pot start`', () => {
 	});
 });
 
-// FIXME:
-describe.skip('cli `pot start` with daemon mode', async () => {
+describe('cli `pot start` with daemon mode', async () => {
 	const name = 'daemon-testing';
 
 	afterEach(async () => {

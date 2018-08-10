@@ -205,7 +205,7 @@ export default async function run(options = {}) {
 	});
 
 	try {
-		const { name, force, baseDir } = await ensureOptions(options);
+		const { name, force, baseDir, daemon } = await ensureOptions(options);
 
 		await ensureDir(baseDir);
 		if (options.logsDir) {
@@ -228,7 +228,7 @@ export default async function run(options = {}) {
 		monitorProc = startMonitorProc(options);
 		await connectMonitor(monitorProc, options);
 
-		return Pot.getByName(name);
+		if (!daemon) return Pot.getByName(name);
 	}
 	catch (err) {
 		await kill();
