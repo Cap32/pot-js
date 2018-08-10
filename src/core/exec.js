@@ -113,7 +113,7 @@ const startMonitorProc = ({ cwd, daemon, env, name }) => {
 	proc.originalKill = proc.kill;
 	proc.kill = async () => {
 		const pot = await Pot.getByName(name);
-		if (pot) await pot.requestStopServer();
+		if (pot) await pot.requestShutDown();
 	};
 	return proc;
 };
@@ -213,25 +213,25 @@ export default async function run(options = {}) {
 		}
 		logger.trace('logLevel', options.logLevel);
 
-		const pot = await Pot.getByName(name);
+		const existsPot = await Pot.getByName(name);
 
-		if (pot) {
+		if (existsPot) {
 			if (force) {
-				await pot.requestStopServer();
+				await existsPot.requestShutDown();
 			}
 			else {
-				await pot.disconnect();
+				await existsPot.disconnect();
 				throw new Error(`"${name}" is running.`);
 			}
 		}
 
 		monitorProc = startMonitorProc(options);
 		await connectMonitor(monitorProc, options);
+
+		return Pot.getByName(name);
 	}
 	catch (err) {
 		await kill();
 		throw err;
 	}
-
-	return monitorProc;
 }

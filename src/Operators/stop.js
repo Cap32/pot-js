@@ -24,7 +24,7 @@ export const stop = async function stop(options = {}) {
 		}
 	}
 
-	return pot.requestStopServer({ shouldLog: true });
+	return pot.requestShutDown({ shouldLog: true });
 };
 
 export const stopAll = async function stopAll(options = {}) {

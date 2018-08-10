@@ -182,7 +182,7 @@ export default class Instance {
 		// this._socket.destroy();
 	}
 
-	requestStopServer() {
+	requestShutDown() {
 		this.publish('requestShutDown');
 		this.disconnect();
 	}

@@ -94,8 +94,8 @@ export default class Pot {
 		return this.each('disconnect');
 	}
 
-	async requestStopServer(options = {}) {
+	async requestShutDown(options = {}) {
 		options.shouldLog && logger.info(`"${this._name}" stopped`);
-		return this.each('requestStopServer');
+		return this.each('requestShutDown');
 	}
 }

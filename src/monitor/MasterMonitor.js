@@ -89,7 +89,7 @@ export default class MasterMonitor extends EventEmitter {
 			try {
 				const pot = await Pot.getByName(name);
 				if (pot) {
-					await pot.requestStopServer();
+					await pot.requestShutDown();
 				}
 				await Promise.all(
 					this.workerMonitors.map(async (monitor) => monitor.stop()),
