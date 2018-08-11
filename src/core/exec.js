@@ -227,8 +227,7 @@ export default async function run(options = {}) {
 
 		monitorProc = startMonitorProc(options);
 		await connectMonitor(monitorProc, options);
-
-		if (!daemon) return Pot.getByName(name);
+		return Pot.getByName(name);
 	}
 	catch (err) {
 		await kill();
