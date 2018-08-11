@@ -9,7 +9,7 @@ export default async function start(options = {}) {
 
 	if (daemon) {
 		const { logsDir, name, $0 } = options;
-		const command = basename($0);
+		const command = $0 ? basename($0) : 'pot';
 
 		console.log();
 		logger.info(`"${name}" started with daemon mode`);
