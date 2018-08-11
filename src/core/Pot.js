@@ -39,7 +39,7 @@ export default class Pot {
 	}
 
 	constructor(name, instances = []) {
-		this._name = name;
+		this.name = name;
 		this.instances = instances;
 	}
 
@@ -89,12 +89,16 @@ export default class Pot {
 		return Promise.all(logs.map(flush));
 	}
 
+	size() {
+		return this.instances.length;
+	}
+
 	async disconnect() {
 		return this.each('disconnect');
 	}
 
 	async requestShutDown(options = {}) {
-		options.shouldLog && logger.info(`"${this._name}" stopped`);
+		options.shouldLog && logger.info(`"${this.name}" stopped`);
 		return this.each('requestShutDown');
 	}
 }

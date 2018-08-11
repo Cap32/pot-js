@@ -25,6 +25,21 @@ describe('operators', () => {
 		});
 	});
 
+	describe('operator.scale', () => {
+		test('should operator.scale work', async () => {
+			const pot = await Operators.start({
+				entry: 'test/fixtures/timeout.js',
+				logLevel: 'ERROR',
+			});
+			pot.disconnect();
+			expect(pot.size()).toBe(1);
+			await Operators.scale({ instances: 2 });
+			const newPot = await Pot.getByName(pot.name);
+			pots.add(newPot);
+			expect(newPot.size()).toBe(2);
+		});
+	});
+
 	describe('operator.stop', () => {
 		test('should operator.stop work', async () => {
 			const pot = await Operators.start({
