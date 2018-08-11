@@ -1,5 +1,5 @@
 import { logger } from 'pot-logger';
-import { prepareRun, prepareTarget, ensureArg } from '../utils/PrepareCli';
+import { init, ensureTarget, ensureArg } from '../cli/initializer';
 import { scale as schema } from '../Schemas/cli';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -8,7 +8,7 @@ const isValidNumber = (n) => /^-?\d+$/.test(n);
 
 export default async function scale(options = {}) {
 	if (options.instances === undefined && isValidNumber(options.name)) {
-		const { targetName } = await prepareTarget({}, { noPot: true });
+		const { targetName } = await ensureTarget({}, { noPot: true });
 		const maybeInstances = options.name;
 		const promptOptions = {
 			name: 'instance',
@@ -22,9 +22,9 @@ export default async function scale(options = {}) {
 		}
 	}
 
-	prepareRun(schema, options);
+	init(schema, options);
 
-	const { pot, targetName } = await prepareTarget(options);
+	const { pot, targetName } = await ensureTarget(options);
 	const errorMessage = 'INVALID number';
 	const instances = await ensureArg({
 		type: 'input',

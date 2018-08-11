@@ -2,7 +2,7 @@ import { fork } from 'child_process';
 import { resolve } from 'path';
 import { ensureDir } from 'fs-extra';
 import isWin from '../utils/isWin';
-import { prepareRun } from '../utils/PrepareCli';
+import { init } from '../cli/initializer';
 import workspace from '../utils/workspace';
 import schema from '../Schemas/config';
 import { logger } from 'pot-logger';
@@ -187,7 +187,7 @@ const connectMonitor = async (monitorProc, options) => {
 };
 
 export default async function run(options = {}) {
-	prepareRun(schema, options);
+	init(schema, options);
 
 	let monitorProc;
 

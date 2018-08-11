@@ -1,11 +1,11 @@
 import { logger } from 'pot-logger';
 import Pot from '../core/Pot';
-import { prepareRun, prepareTarget } from '../utils/PrepareCli';
+import { init, ensureTarget } from '../cli/initializer';
 import { reload as schema } from '../Schemas/cli';
 
 export const reload = async function reload(options = {}) {
-	prepareRun(schema, options);
-	const { pot, targetName } = await prepareTarget(options);
+	init(schema, options);
+	const { pot, targetName } = await ensureTarget(options);
 
 	await pot.reload({
 		...options,

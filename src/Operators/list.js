@@ -4,7 +4,7 @@ import { isUndefined, isFunction } from 'lodash';
 import Pot from '../core/Pot';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
-import { prepareRun } from '../utils/PrepareCli';
+import { init } from '../cli/initializer';
 import { list as schema } from '../Schemas/cli';
 
 if (process.env !== 'production') {
@@ -69,7 +69,7 @@ const defaultCells = [
 ];
 
 const list = async function list(options = {}) {
-	prepareRun(schema, options);
+	init(schema, options);
 
 	const { cells: getCells = defaultCells } = options;
 	const cells = isFunction(getCells) ? getCells(defaultCells) : getCells;

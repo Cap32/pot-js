@@ -1,11 +1,11 @@
 import { logger } from 'pot-logger';
 import Pot from '../core/Pot';
-import { prepareRun, prepareTarget } from '../utils/PrepareCli';
+import { init, ensureTarget } from '../cli/initializer';
 import { restart as schema } from '../Schemas/cli';
 
 export const restart = async function restart(options = {}) {
-	prepareRun(schema, options);
-	const { pot, targetName } = await prepareTarget(options);
+	init(schema, options);
+	const { pot, targetName } = await ensureTarget(options);
 	const ok = await pot.restart();
 	pot.disconnect();
 	if (ok) logger.info(`"${targetName}" restarted`);

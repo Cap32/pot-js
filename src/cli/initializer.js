@@ -1,8 +1,8 @@
 import { setLoggers } from 'pot-logger';
 import inquirer from 'inquirer';
 import Pot from '../core/Pot';
-import workspace from './workspace';
-import validateBySchema from './validateBySchema';
+import workspace from '../utils/workspace';
+import validateBySchema from '../utils/validateBySchema';
 
 export async function ensureArg(options) {
 	const { value, errorMessage, getChoices, type = 'list', ...other } = options;
@@ -24,7 +24,7 @@ const unhandledRejection = function unhandledRejection(reason, promise) {
 	console.error(promise);
 };
 
-export function prepareRun(schema, argv) {
+export function init(schema, argv) {
 	if (process.env.NODE_ENV !== 'production') {
 		process.removeListener('unhandledRejection', unhandledRejection);
 		process.on('unhandledRejection', unhandledRejection);
@@ -35,7 +35,7 @@ export function prepareRun(schema, argv) {
 	setLoggers('logLevel', argv.logLevel);
 }
 
-export async function prepareTarget(argv = {}, options = {}) {
+export async function ensureTarget(argv = {}, options = {}) {
 	const { name } = argv;
 	const targetName = await ensureArg({
 		value: name,

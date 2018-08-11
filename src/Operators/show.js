@@ -2,7 +2,7 @@ import { logger } from 'pot-logger';
 import createTable from '../utils/createTable';
 import { isObject, isBoolean } from 'lodash';
 import chalk from 'chalk';
-import { prepareRun, prepareTarget } from '../utils/PrepareCli';
+import { init, ensureTarget } from '../cli/initializer';
 import { show as schema } from '../Schemas/cli';
 import logSymbols from 'log-symbols';
 
@@ -30,9 +30,9 @@ const defaultCells = [
 ];
 
 const show = async function show(options = {}) {
-	prepareRun(schema, options);
+	init(schema, options);
 	const { cells = defaultCells } = options;
-	const { pot } = await prepareTarget(options);
+	const { pot } = await ensureTarget(options);
 
 	const table = createTable({ padding: 4 });
 

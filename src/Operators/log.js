@@ -2,14 +2,14 @@ import { logger } from 'pot-logger';
 import { join } from 'path';
 import sliceFile from 'slice-file';
 import globby from 'globby';
-import { prepareRun, prepareTarget, ensureArg } from '../utils/PrepareCli';
+import { init, ensureTarget, ensureArg } from '../cli/initializer';
 import { log as schema } from '../Schemas/cli';
 
 export default async function log(options = {}) {
-	prepareRun(schema, options);
+	init(schema, options);
 
 	const { line, category, follow } = options;
-	const { pot, targetName } = await prepareTarget(options);
+	const { pot, targetName } = await ensureTarget(options);
 
 	const state = await pot.getState();
 	if (!state) {

@@ -1,12 +1,12 @@
 import { logger } from 'pot-logger';
-import { prepareRun, prepareTarget } from '../utils/PrepareCli';
+import { init, ensureTarget } from '../cli/initializer';
 import Pot from '../core/Pot';
 import inquirer from 'inquirer';
 import { stop as schema } from '../Schemas/cli';
 
 export const stop = async function stop(options = {}) {
-	prepareRun(schema, options);
-	const { pot, targetName } = await prepareTarget(options);
+	init(schema, options);
+	const { pot, targetName } = await ensureTarget(options);
 	const { force } = options;
 
 	if (!force) {
