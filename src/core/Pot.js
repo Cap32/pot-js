@@ -10,6 +10,7 @@ export default class Pot {
 		const names = await Promise.all(
 			instances.map(async (instance) => {
 				const state = await instance.getState();
+				instance.disconnect();
 				return state && state.name;
 			}),
 		);
@@ -24,7 +25,9 @@ export default class Pot {
 	static async getState(name, options = {}) {
 		const pot = await Pot.getByName(name, options);
 		if (!pot) return {};
-		return pot.getState(options.instanceIndex);
+		const state = await pot.getState(options.instanceIndex);
+		pot.disconnect();
+		return state;
 	}
 
 	static getAllInstances = Instance.getAllInstances;
@@ -43,9 +46,7 @@ export default class Pot {
 	async getState(instanceIndex = 0) {
 		const instance = this.instances[instanceIndex];
 		if (!instance) return {};
-		const state = await instance.getState();
-		await this.disconnect();
-		return state;
+		return instance.getState();
 	}
 
 	async each(method, ...args) {
@@ -68,14 +69,12 @@ export default class Pot {
 			if (!state) continue;
 			const ok = await instance.restart();
 			if (isFunction(onProgress)) onProgress(ok, state);
-			await instance.disconnect();
 			await delay(eachTimeout);
 		}
 	}
 
 	async scale(number) {
 		const res = await this.instances[0].scale(number);
-		await this.disconnect();
 		return res;
 	}
 

@@ -7,6 +7,7 @@ export const flush = async function flush(options = {}) {
 	prepareRun(schema, options);
 	const { pot, targetName } = await prepareTarget(options);
 	await pot.flush();
+	pot.disconnect();
 	logger.info(`"${targetName}" flushed`);
 };
 

@@ -7,6 +7,7 @@ export const restart = async function restart(options = {}) {
 	prepareRun(schema, options);
 	const { pot, targetName } = await prepareTarget(options);
 	const ok = await pot.restart();
+	pot.disconnect();
 	if (ok) logger.info(`"${targetName}" restarted`);
 	else logger.error(`Failed to restart "${targetName}"`);
 };

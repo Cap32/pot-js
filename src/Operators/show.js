@@ -40,6 +40,8 @@ const show = async function show(options = {}) {
 		pot.instances.map((instance) => instance.getInfoVerbose()),
 	);
 
+	pot.disconnect();
+
 	stateList = stateList.filter(Boolean);
 
 	if (!stateList.length) {

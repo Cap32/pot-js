@@ -41,10 +41,10 @@ export async function prepareTarget(argv = {}, options = {}) {
 		getChoices: Pot.getNames,
 	});
 
-	const { noPot, ...potOption } = options;
+	const { noPot } = options;
 	if (noPot) return { targetName };
 
-	const pot = await Pot.getByName(targetName, potOption);
+	const pot = await Pot.getByName(targetName);
 	if (!pot || !pot.instances.length) {
 		throw new Error(`"${targetName}" NOT found`);
 	}

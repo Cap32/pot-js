@@ -76,7 +76,7 @@ const list = async function list(options = {}) {
 
 	if (!cells.length) cells.push();
 
-	const instances = await Pot.getAllInstances({ keepAlive: true });
+	const instances = await Pot.getAllInstances();
 
 	const loop = async () => {
 		const table = createTable({

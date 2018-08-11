@@ -137,15 +137,12 @@ export default class Instance {
 		return refs.map((ref) => new Instance(ref, options));
 	}
 
-	constructor({ socket }, options = {}) {
-		this._keepAlive = options.keepAlive;
+	constructor({ socket }) {
 		this._socket = socket;
 	}
 
 	async request(method, ...args) {
-		const response = await request(this._socket, method, ...args);
-		if (!this._keepAlive) this.disconnect();
-		return response;
+		return request(this._socket, method, ...args);
 	}
 
 	async publish(method, ...args) {

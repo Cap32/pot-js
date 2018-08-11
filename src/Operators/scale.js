@@ -34,6 +34,7 @@ export default async function scale(options = {}) {
 		errorMessage,
 	});
 	const { ok, added, removed, errors } = await pot.scale(instances);
+	pot.disconnect();
 
 	if (errors && errors.length) {
 		const { length } = errors;

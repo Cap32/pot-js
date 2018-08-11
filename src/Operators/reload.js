@@ -5,8 +5,7 @@ import { reload as schema } from '../Schemas/cli';
 
 export const reload = async function reload(options = {}) {
 	prepareRun(schema, options);
-	const potOptions = { keepAlive: true };
-	const { pot, targetName } = await prepareTarget(options, potOptions);
+	const { pot, targetName } = await prepareTarget(options);
 
 	await pot.reload({
 		...options,
@@ -20,6 +19,8 @@ export const reload = async function reload(options = {}) {
 			}
 		},
 	});
+
+	pot.disconnect();
 
 	logger.info(`"${targetName}" is all reload compeleted`);
 };
