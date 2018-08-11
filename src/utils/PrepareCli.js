@@ -19,12 +19,15 @@ export async function ensureArg(options) {
 	return anweser.value;
 }
 
+const unhandledRejection = function unhandledRejection(reason, promise) {
+	console.warn('unhandledRejection: ' + reason);
+	console.error(promise);
+};
+
 export function prepareRun(schema, argv) {
-	if (process.env !== 'production') {
-		process.on('unhandledRejection', (reason, promise) => {
-			console.warn('unhandledRejection: ' + reason);
-			console.error(promise);
-		});
+	if (process.env.NODE_ENV !== 'production') {
+		process.removeListener('unhandledRejection', unhandledRejection);
+		process.on('unhandledRejection', unhandledRejection);
 	}
 
 	validateBySchema(schema, argv);
