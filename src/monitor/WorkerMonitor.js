@@ -250,6 +250,7 @@ export default class WorkerMonitor extends EventEmitter {
 			...this.data,
 			pid: this.pid,
 			ppid: this.ppid,
+			cluster: this.cluster,
 			monitor: {
 				instanceId: this.id,
 				name: this.name,
