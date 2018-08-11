@@ -3,6 +3,7 @@ import inquirer from 'inquirer';
 import Pot from '../core/Pot';
 import workspace from '../utils/workspace';
 import validateBySchema from '../utils/validateBySchema';
+import listenToUnhandledRejection from '../utils/listenToUnhandledRejection';
 
 export async function ensureArg(options) {
 	const { value, errorMessage, getChoices, type = 'list', ...other } = options;
@@ -19,17 +20,8 @@ export async function ensureArg(options) {
 	return anweser.value;
 }
 
-const unhandledRejection = function unhandledRejection(reason, promise) {
-	console.warn('unhandledRejection: ' + reason);
-	console.error(promise);
-};
-
 export function init(schema, argv) {
-	if (process.env.NODE_ENV !== 'production') {
-		process.removeListener('unhandledRejection', unhandledRejection);
-		process.on('unhandledRejection', unhandledRejection);
-	}
-
+	listenToUnhandledRejection();
 	validateBySchema(schema, argv);
 	workspace.set(argv);
 	setLoggers('logLevel', argv.logLevel);

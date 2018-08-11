@@ -7,13 +7,6 @@ import chalk from 'chalk';
 import { init } from '../cli/initializer';
 import { list as schema } from '../Schemas/cli';
 
-if (process.env !== 'production') {
-	process.on('unhandledRejection', (reason, promise) => {
-		console.warn('unhandledRejection: ' + reason);
-		console.error(promise);
-	});
-}
-
 const paddingSpaces = '    ';
 
 const defaultCells = [
