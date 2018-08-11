@@ -1,4 +1,4 @@
-import { EventTypes } from '../utils/respawn';
+import EventTypes from '../utils/EventTypes';
 import { reduce } from 'lodash';
 
 export default {

@@ -4,6 +4,7 @@ import { Client } from 'promise-ws';
 
 const entry = 'test/fixtures/socket.js';
 const PORT = 3010;
+const logLevel = 'ERROR';
 
 let pot;
 
@@ -20,7 +21,7 @@ afterEach(async () => {
 
 describe('api module `exec`', () => {
 	test('should `entry` and `port` work', async () => {
-		pot = await Pot.exec({ env: { PORT }, entry });
+		pot = await Pot.exec({ env: { PORT }, entry, logLevel });
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
 		const text = await client.request('test', '掂');
@@ -31,6 +32,7 @@ describe('api module `exec`', () => {
 		pot = await Pot.exec({
 			entry: 'test/fixtures/crash.js',
 			maxRestarts: 1,
+			logLevel,
 		});
 		await delay(2000);
 		const pots = await Pot.getList();
@@ -44,6 +46,7 @@ describe('api module `exec`', () => {
 			env: { PORT },
 			entry,
 			hello,
+			logLevel,
 		});
 		await delay(1000);
 		const client = await Client.create('ws://127.0.0.1:3010');
@@ -58,7 +61,7 @@ describe('api module `exec`', () => {
 describe('api module `Pot.getList()`', () => {
 	test('should `getState` work', async () => {
 		const name = 'hello';
-		pot = await Pot.exec({ name, entry });
+		pot = await Pot.exec({ name, entry, logLevel });
 		await delay(1000);
 		const pots = await Pot.getList();
 		const state = await pots[0].getState();
@@ -71,7 +74,7 @@ describe('api module `Pot.getList()`', () => {
 
 	test('should `setState` work', async () => {
 		const name = 'hello';
-		pot = await Pot.exec({ name, entry });
+		pot = await Pot.exec({ name, entry, logLevel });
 		await delay(1000);
 		{
 			const pots = await Pot.getList();

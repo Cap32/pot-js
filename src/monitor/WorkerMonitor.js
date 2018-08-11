@@ -8,6 +8,7 @@ import fkill from 'fkill';
 import cluster from 'cluster';
 import { noop, isBoolean } from 'lodash';
 import isWin from '../utils/isWin';
+import EventTypes from '../utils/EventTypes';
 import { basename } from 'path';
 
 const defaultSleep = function defaultSleep(sleep) {
@@ -25,19 +26,6 @@ const ensureClusterMode = function ensureClusterMode({ cluster, execPath }) {
 
 const kill = async function kill(pid) {
 	return fkill(pid, { force: isWin }).catch(noop);
-};
-
-const EventTypes = {
-	SPAWN: 'spawn',
-	START: 'start',
-	RESTART: 'restart',
-	SLEEP: 'sleep',
-	CRASH: 'crash',
-	EXIT: 'exit',
-	STOP: 'stop',
-	STDOUT: 'stdout',
-	STDERR: 'stderr',
-	WARN: 'warn',
 };
 
 export default class WorkerMonitor extends EventEmitter {
