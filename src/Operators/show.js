@@ -36,17 +36,11 @@ const show = async function show(options = {}) {
 
 	const table = createTable({ padding: 4 });
 
-	let stateList = await Promise.all(
-		pot.instances.map((instance) => instance.getInfoVerbose()),
-	);
+	const stateList = await pot.getStateList({ verbose: true });
 
 	pot.disconnect();
 
-	stateList = stateList.filter(Boolean);
-
-	if (!stateList.length) {
-		return logger.warn('No process');
-	}
+	if (!stateList.length) return logger.warn('No process');
 
 	table.push(['']);
 

@@ -8,7 +8,6 @@ import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import fkill from 'fkill';
 import isWin from './isWin';
-import getKey from './getKey';
 
 const removePidFile = async function removePidFile(pidFile) {
 	logger.trace('remove pid file', pidFile);
@@ -31,17 +30,17 @@ const getPid = async function getPid(pidFile) {
 
 const parsePidFile = async function parsePidFile(pidFile) {
 	const pid = await getPid(pidFile);
-	const key = basename(pidFile, '.pid');
+	const fullName = basename(pidFile, '.pid');
 	if (!pid) return false;
-	return { key, pidFile };
+	const [name, instanceId] = fullName.split('.');
+	return { pidFile, pid, instanceId, name };
 };
 
 export { removePidFile };
 
-export async function getPidFile(keyOrMonitor) {
-	const key = getKey(keyOrMonitor);
+export async function getPidFile(name, id) {
 	const runDir = await workspace.getRunDir();
-	return join(runDir, `${key}.pid`);
+	return join(runDir, `${name}.${id}.pid`);
 }
 
 export async function getPids() {

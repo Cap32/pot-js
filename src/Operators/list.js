@@ -1,6 +1,6 @@
 import { logger } from 'pot-logger';
 import createTable from '../utils/createTable';
-import { isUndefined, isFunction } from 'lodash';
+import { isUndefined, isFunction, flatten } from 'lodash';
 import Pot from '../core/Pot';
 import logUpdate from 'log-update';
 import chalk from 'chalk';
@@ -69,7 +69,7 @@ const list = async function list(options = {}) {
 
 	if (!cells.length) cells.push();
 
-	const instances = await Pot.getAllInstances();
+	const pots = await Pot.getList();
 
 	const loop = async () => {
 		const table = createTable({
@@ -77,11 +77,10 @@ const list = async function list(options = {}) {
 			colWidths: cells.map(({ width }) => width || 10),
 		});
 
-		let stateList = await Promise.all(
-			instances.map((instance) => instance.getInfoVerbose()),
+		const list = await Promise.all(
+			pots.map(async (pot) => pot.getStateList({ verbose: true })),
 		);
-
-		stateList = stateList.filter(Boolean);
+		const stateList = flatten(list).filter(Boolean);
 
 		if (!stateList.length) {
 			logUpdate.clear();

@@ -9,7 +9,6 @@ import watch from '../utils/watch';
 import onSignalExit from '../utils/onSignalExit';
 import createScriptRunner from '../utils/createScriptRunner';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
-import getKey from '../utils/getKey';
 import Errors from '../utils/Errors';
 import ensureInstanceNumber from '../utils/ensureInstanceNumber';
 import { getPidFile, writePid, removePidFile } from '../utils/PidHelpers';
@@ -20,9 +19,6 @@ import {
 } from '../utils/SocketsHelpers';
 
 export default class MasterMonitor extends EventEmitter {
-	// will be set by server socket
-	currentWorkerMonitor = null;
-
 	constructor(options) {
 		super();
 
@@ -50,6 +46,8 @@ export default class MasterMonitor extends EventEmitter {
 
 		workspace.set(space);
 		process.title = monitorProcessTitle;
+
+		this.socket = null;
 
 		this._workerMonitorOptions = {
 			stdio: 'pipe',
@@ -134,6 +132,12 @@ export default class MasterMonitor extends EventEmitter {
 
 		const errors = new Errors();
 
+		if (!this.socket) {
+			const name = this._workerMonitorOptions.data.name;
+			const socketPath = await getSocketPath(name);
+			this.socket = await startServer(this, socketPath);
+		}
+
 		const bootstraps = workerMonitors.map((workerMonitor) => {
 			let displayName = workerMonitor.data.name;
 
@@ -197,17 +201,15 @@ export default class MasterMonitor extends EventEmitter {
 						const { data: options, id } = workerMonitor;
 						workspace.set(options);
 
-						const key = getKey(workerMonitor);
-						const pidFile = await getPidFile(key);
-						const socketPath = await getSocketPath(key);
+						const { name } = options;
+						const pidFile = await getPidFile(name, id);
+						const socketPath = await getSocketPath(name);
 
 						options.instanceId = id;
-						options.key = key;
 						options.pidFile = pidFile;
 						options.socketPath = socketPath;
 						options.displayName = options.name + (id ? ` #${id}` : '');
 
-						await startServer(this, workerMonitor);
 						await writePid(options);
 
 						workerMonitors.sort((a, b) => a.id - b.id);
@@ -237,12 +239,14 @@ export default class MasterMonitor extends EventEmitter {
 	}
 
 	async scale(number) {
-		const delta = ensureInstanceNumber(number) - this.workerMonitors.length;
+		const size = ensureInstanceNumber(number);
+		const delta = size - this.workerMonitors.length;
 		if (!delta) {
 			return { ok: true, errors: [] };
 		}
 		else if (delta > 0) {
-			return this.spawn({ instances: delta });
+			const res = await this.spawn({ instances: delta });
+			return res;
 		}
 		else {
 			const { workerMonitors } = this;
@@ -251,7 +255,7 @@ export default class MasterMonitor extends EventEmitter {
 			const removed = await Promise.all(
 				toRemove.map(async (workerMonitor) => {
 					const state = workerMonitor.toJSON();
-					await this.requestShutDown(workerMonitor).catch((err) =>
+					await this.requestShutDown(workerMonitor.id).catch((err) =>
 						errors.push(err),
 					);
 					return state;
@@ -266,34 +270,61 @@ export default class MasterMonitor extends EventEmitter {
 	}
 
 	async state(newState) {
-		const { currentWorkerMonitor } = this;
-		if (currentWorkerMonitor) {
-			if (newState) {
-				Object.assign(currentWorkerMonitor.data, newState);
+		return {
+			stateList: this.workerMonitors.map((workerMonitor) => {
+				if (newState) {
+					Object.assign(workerMonitor.data, newState);
+				}
+				return workerMonitor.toJSON();
+			}),
+		};
+	}
+
+	async restart(id) {
+		if (!id && id !== 0) {
+			await Promise.all(
+				this.workerMonitors.map(async (workerMonitor) => {
+					await workerMonitor.restart();
+				}),
+			);
+			return this.workerMonitors.length;
+		}
+		else {
+			const workerMonitor = this.workerMonitors.find(
+				(workerMonitor) => workerMonitor.id === id,
+			);
+			if (workerMonitor) {
+				await workerMonitor.restart();
+				return 1;
 			}
-			return currentWorkerMonitor.toJSON();
+			return 0;
 		}
 	}
 
-	async restart() {
-		const { currentWorkerMonitor } = this;
-		if (currentWorkerMonitor) {
-			await currentWorkerMonitor.restart();
-			return true;
+	async requestShutDown(id) {
+		if (!id && id !== 0) {
+			return Promise.all(
+				this.workerMonitors.map((workerMonitor) =>
+					this.requestShutDown(workerMonitor.id),
+				),
+			);
 		}
-		return false;
-	}
 
-	async requestShutDown(workerMonitor = this.currentWorkerMonitor) {
+		const workerMonitor = this.workerMonitors.find(
+			(workerMonitor) => workerMonitor.id === id,
+		);
 		await workerMonitor.stop();
-
 		const { socketPath, pidFile } = workerMonitor.toJSON();
 
 		const { workerMonitors } = this;
 		const index = workerMonitors.indexOf(workerMonitor);
 		workerMonitors.splice(index, 1);
-		await Promise.all([removeDomainSocket(socketPath), removePidFile(pidFile)]);
+		await removePidFile(pidFile);
 
-		if (!workerMonitors.length) process.exit(0);
+		if (!workerMonitors.length) {
+			removeDomainSocket(socketPath);
+			if (this.socket) this.socket.destroy();
+			process.exit(0);
+		}
 	}
 }

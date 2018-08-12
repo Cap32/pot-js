@@ -40,7 +40,7 @@ export async function ensureTarget(argv = {}, options = {}) {
 	if (noPot) return { targetName };
 
 	const pot = await Pot.getByName(targetName);
-	if (!pot || !pot.instances.length) {
+	if (!pot) {
 		throw new Error(`"${targetName}" NOT found`);
 	}
 	return { pot, targetName };

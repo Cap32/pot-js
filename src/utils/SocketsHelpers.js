@@ -4,9 +4,8 @@ import { ensureLocalDomainPath } from 'create-local-domain-socket';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
 import globby from 'globby';
-import { noop, isObject, isFunction } from 'lodash';
+import { noop, isString, isObject, isFunction } from 'lodash';
 import isWin from './isWin';
-import getKey from './getKey';
 import { REQUEST, PUBLISH } from './SocketEventTypes';
 import { createServer, createClient } from './nssocketPromise';
 import * as deprecatedIpcAdapter from './deprecatedIpcAdapter';
@@ -29,7 +28,7 @@ export async function getSocketDiscripers() {
 
 	return socketPaths.map((socketPath) => ({
 		socketPath,
-		key: basename(socketPath, '.sock'),
+		name: basename(socketPath, '.sock'),
 	}));
 }
 
@@ -44,24 +43,23 @@ export async function removeDomainSocket(socketPath) {
 	return remove(socketPath).catch(noop);
 }
 
-export async function getSocketPath(keyOrMonitor) {
+export async function getSocketPath(nameOrMonitor) {
 	const runDir = await workspace.getRunDir();
-	const key = getKey(keyOrMonitor);
-	return ensureLocalDomainPath(join(runDir, key) + '.sock');
+	const name = isString(nameOrMonitor) ?
+		nameOrMonitor :
+		nameOrMonitor.data.name;
+	return ensureLocalDomainPath(join(runDir, name) + '.sock');
 }
 
-export async function startServer(masterMonitor, workerMonitor) {
-	const { socketPath } = workerMonitor.data;
-
+export async function startServer(masterMonitor, socketPath) {
 	logger.trace('unix domain socket path', chalk.gray(socketPath));
-	await createServer(socketPath, (socket) => {
+	return createServer(socketPath, (socket) => {
 		const createListener = (event) => {
 			socket.data(event, async (data) => {
 				if (!data || !data.method) return;
 
 				const { args = [], method } = data;
 				try {
-					masterMonitor.currentWorkerMonitor = workerMonitor;
 					if (isFunction(masterMonitor[method])) {
 						const resp = await masterMonitor[method](...args);
 						if (event === REQUEST) {

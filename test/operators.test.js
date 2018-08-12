@@ -31,12 +31,13 @@ describe('operators', () => {
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
 			});
-			pot.disconnect();
-			expect(pot.size()).toBe(1);
+			pots.add(pot);
+
+			const size = await pot.size();
+			expect(size).toBe(1);
 			await Operators.scale({ instances: 2 });
-			const newPot = await Pot.getByName(pot.name);
-			pots.add(newPot);
-			expect(newPot.size()).toBe(2);
+			const newSize = await pot.size();
+			expect(newSize).toBe(2);
 		});
 	});
 
@@ -87,7 +88,7 @@ describe('operators', () => {
 			expect(t1 > t0).toBe(true);
 		});
 
-		test('should operator.stopAll work', async () => {
+		test('should operator.restartAll work', async () => {
 			const names = ['foo', 'bar'];
 			const newPots = await Promise.all(
 				names.map((name) =>

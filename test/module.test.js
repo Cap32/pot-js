@@ -71,22 +71,4 @@ describe('api module `Pot.getList()`', () => {
 		expect(state.name).toBe(name);
 		expect(state.entry).toBe(entry);
 	});
-
-	test('should `setState` work', async () => {
-		const name = 'hello';
-		pot = await Pot.exec({ name, entry, logLevel });
-		await delay(1000);
-		{
-			const pots = await Pot.getList();
-			const state = await pots[0].getState();
-			expect(state.name).toBe(name);
-			expect(state.hello).toBe(undefined);
-		}
-
-		{
-			const pots = await Pot.getList();
-			const state = await pots[0].setState({ hello: 'world' });
-			expect(state.hello).toBe('world');
-		}
-	});
 });

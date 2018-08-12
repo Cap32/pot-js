@@ -42,10 +42,8 @@ const startedLocal = (state) => {
 	return state;
 };
 
-export default async function handleInfoVerbose(state) {
-	if (!state) {
-		return;
-	}
+export default async function getStateVerbose(state) {
+	if (!state) return;
 
 	const exportState = function exportState(usages = {}) {
 		Object.assign(

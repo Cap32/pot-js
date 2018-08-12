@@ -33,6 +33,7 @@ export default async function scale(options = {}) {
 		message: 'Please input instances count (Integer)',
 		errorMessage,
 	});
+
 	const { ok, added, removed, errors } = await pot.scale(instances);
 	pot.disconnect();
 

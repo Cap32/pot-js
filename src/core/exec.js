@@ -37,6 +37,8 @@ const ensureName = (options) => {
 		const sepRegExp = new RegExp(isWin ? '\\\\' : '/', 'g');
 		options.name = cwd.replace(sepRegExp, '_');
 	}
+
+	options.name = options.name.replace(/\./g, '_');
 };
 
 const ensureWatch = (options) => {
@@ -205,7 +207,7 @@ export default async function run(options = {}) {
 	});
 
 	try {
-		const { name, force, baseDir, daemon } = await ensureOptions(options);
+		const { name, force, baseDir } = await ensureOptions(options);
 
 		await ensureDir(baseDir);
 		if (options.logsDir) {

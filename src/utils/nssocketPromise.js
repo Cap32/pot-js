@@ -6,9 +6,13 @@ import { logger } from 'pot-logger';
 import EventEmitter from 'events';
 
 export async function createServer(portOrPath, connect) {
+	const sockets = new Set();
+
 	const server = nssocket.createServer((socket) => {
 		const reqRepBus = new EventEmitter();
 		const pubSubBus = new EventEmitter();
+
+		sockets.add(socket);
 
 		socket.data(REQUEST, (data) => {
 			if (data && data.event) {
@@ -47,8 +51,26 @@ export async function createServer(portOrPath, connect) {
 			});
 		};
 
+		socket.once('close', () => {
+			sockets.delete(socket);
+		});
+
 		connect(socket);
 	});
+
+	server.broadcast = {
+		pub: (event, ...args) => {
+			for (const socket of sockets) {
+				socket.send(event, ...args);
+			}
+		},
+	};
+
+	server.destroy = () => {
+		sockets.clear();
+		server.close();
+	};
+
 	if (/^\d/.test(portOrPath)) {
 		return new Promise((resolve, reject) => {
 			server.once('error', reject);

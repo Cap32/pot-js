@@ -1,25 +1,31 @@
-import { uniq, isFunction } from 'lodash';
+import { isFunction } from 'lodash';
 import { logger, flush } from 'pot-logger';
-import Instance from '../Instance';
 import delay from 'delay';
 import flushOfflineDirs from '../utils/flushOfflineDirs';
+import workspace from '../utils/workspace';
+import { getByName, getAll, request, publish } from './PotHelpers';
+import getStateVerbose from './getStateVerbose';
 
 export default class Pot {
 	static async getNames(options) {
-		const instances = await Instance.getAllInstances(options);
-		const names = await Promise.all(
-			instances.map(async (instance) => {
-				const state = await instance.getState();
-				instance.disconnect();
-				return state && state.name;
-			}),
-		);
-		return uniq(names).filter(Boolean);
+		workspace.set(options);
+		const refs = await getAll();
+		return refs.map((ref) => {
+			ref.socket.end();
+			return ref.name;
+		});
+	}
+
+	static async getList(options) {
+		workspace.set(options);
+		const refs = await getAll();
+		return Promise.all(refs.map(Pot.create));
 	}
 
 	static async getByName(name, options) {
-		const instances = await Instance.getInstancesByName(name, options);
-		return instances.length ? new Pot(name, instances) : null;
+		workspace.set(options);
+		const ref = await getByName(name, options);
+		return ref ? Pot.create(ref) : null;
 	}
 
 	static async getState(name, options = {}) {
@@ -30,56 +36,75 @@ export default class Pot {
 		return state;
 	}
 
-	static getAllInstances = Instance.getAllInstances;
-	static getList = Pot.getAllInstances;
+	static async getStateList(name, options) {
+		const pot = await Pot.getByName(name, options);
+		if (!pot) return {};
+		const state = await pot.getStateList(options);
+		pot.disconnect();
+		return state;
+	}
 
 	static async flushOffline(onlinesNames) {
 		if (!onlinesNames) onlinesNames = await Pot.getNames();
 		return flushOfflineDirs(onlinesNames);
 	}
 
-	constructor(name, instances = []) {
+	static create({ name, socket }) {
+		return new Pot(name, socket);
+	}
+
+	constructor(name, socket) {
 		this.name = name;
-		this.instances = instances;
+		this.socket = socket;
 	}
 
-	async getState(instanceIndex = 0) {
-		const instance = this.instances[instanceIndex];
-		if (!instance) return {};
-		return instance.getState();
+	async request(method, ...args) {
+		return request(this.socket, method, ...args);
 	}
 
-	async each(method, ...args) {
-		return Promise.all(
-			this.instances.map((instance) => instance[method](...args)),
-		);
+	async publish(method, ...args) {
+		return publish(this.socket, method, ...args);
 	}
 
-	async restart() {
-		return this.each('restart');
+	async getStateList(options = {}) {
+		const { verbose } = options;
+		const { stateList } = await this.request('state');
+		if (verbose) {
+			const list = await Promise.all(stateList.map(getStateVerbose));
+			return list.filter(Boolean);
+		}
+		return stateList;
+	}
+
+	async getState(index = 0) {
+		const stateList = await this.getStateList();
+		return stateList[index];
+	}
+
+	async restart(id) {
+		return this.request('restart', id);
 	}
 
 	async reload(options = {}) {
-		const { instances } = this;
-		const { length } = instances;
+		const stateList = await this.getStateList();
+		const { length } = stateList;
 		const { delay: timeout, onProgress } = options;
 		const eachTimeout = length > 1 ? Math.max(100, timeout / length) : 0;
-		for (const instance of instances) {
-			const state = await instance.getState();
+		for (const state of stateList) {
 			if (!state) continue;
-			const ok = await instance.restart();
+			const count = await this.restart(state.monitor.instanceId);
+			const ok = count > 0;
 			if (isFunction(onProgress)) onProgress(ok, state);
 			await delay(eachTimeout);
 		}
 	}
 
-	async scale(number) {
-		const res = await this.instances[0].scale(number);
-		return res;
+	async scale(count) {
+		return this.request('scale', count);
 	}
 
 	async flush() {
-		const stateList = await this.each('getState');
+		const stateList = await this.getStateList();
 		const logs = stateList
 			.filter(({ logsDir }) => !!logsDir)
 			.map(({ logsDir, monitor }) => ({
@@ -89,16 +114,18 @@ export default class Pot {
 		return Promise.all(logs.map(flush));
 	}
 
-	size() {
-		return this.instances.length;
+	async size() {
+		const stateList = await this.getStateList();
+		return stateList.length;
 	}
 
 	async disconnect() {
-		return this.each('disconnect');
+		return this.socket.end();
 	}
 
 	async requestShutDown(options = {}) {
 		options.shouldLog && logger.info(`"${this.name}" stopped`);
-		return this.each('requestShutDown');
+		this.publish('requestShutDown');
+		this.disconnect();
 	}
 }
