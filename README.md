@@ -16,14 +16,16 @@ Process management module
 - [Node.js module API Reference](#nodejs-module-api-reference)
   - [Pot.exec([options])](#potexecoptions)
   - [Pot.getNames()](#potgetnames)
+  - [Pot.getList()](#potgetlist)
   - [Pot.getByName(name, options)](#potgetbynamename-options)
   - [Pot.getState(name, options)](#potgetstatename-options)
+  - [Pot.getStateList(name, options)](#potgetstatelistname-options)
   - [Pot.getAllInstances(options)](#potgetallinstancesoptions)
   - [Pot.flushOffline(options)](#potflushofflineoptions)
+  - [pot.createCli(pkg, commands)](#potcreateclipkg-commands)
+  - [pot.Commands](#potcommands)
   - [pot.Operators](#potoperators)
   - [pot.Schemas](#potschemas)
-  - [pot.Commands](#potcommands)
-  - [pot.createCli(pkg, commands)](#potcreateclipkg-commands)
   - [pot#getState(instanceId)](#potgetstateinstanceid)
   - [pot#restart()](#potrestart)
   - [pot#reload(options)](#potreloadoptions)
@@ -61,7 +63,7 @@ $ npm install -g pot-js
 
 ## CLI Reference
 
-```bash
+```config
 pot <command> [options]
 
 Commands:
@@ -140,7 +142,11 @@ Spawn and monitor a process. Returns a promise of a `Pot` instance.
 
 ### Pot.getNames()
 
-Get all running `pots`. Returns a promise of array.
+Get all running `pot` names. Returns a promise of array.
+
+### Pot.getList()
+
+Get all running `pot` instances. Returns a promise of array.
 
 ### Pot.getByName(name, options)
 
@@ -148,7 +154,11 @@ Get `pot` by name. Returns a promise of `Pot` instance.
 
 ### Pot.getState(name, options)
 
-Get `pot` state by name. Returns a promise of a state object.
+Get `pot` state by name. Returns a promise of state object.
+
+### Pot.getStateList(name, options)
+
+Get `pot` state list by name. Returns a promise of state array.
 
 ### Pot.getAllInstances(options)
 
@@ -158,11 +168,42 @@ Get all running process `instances`. Returns a promise of array.
 
 Flush offline processes (pid and log files).
 
+### pot.createCli(pkg, commands)
+
+A helper function to create CLI, built on top of [yargs](https://github.com/yargs/yargs)
+
+#### Arguments
+
+- `pkg` (Object|Function): An object that should contains `name` and `version` props. Could also be a function that returns an object.
+- `commands` (Object): A key/value object. Each value should be an object that contains `command`, `description`, `schema` and `operator`. Checkout [pot.Commands](#potcommands) to learn more.
+
+#### Example
+
+**bin/app**
+
+```js
+#!/usr/bin/env node
+
+import Pot from "pot-js";
+import pkg from "./package.json";
+
+Pot.createCli(pkg, Pot.Commands);
+```
+
+### pot.Commands
+
+`pot-js` commands descriptor. Useful to create or extend CLI via `createCli(pkg, commands)`
+
+A command may contain these props:
+
+- `command` (String): A string representing the command. eg: `stop [name]`
+- `description` (String): Command description
+- `schema` (Object): The JSON schema of options and positional arguments. eg: `Pot.Schema.stop`
+- `operator` (Function): The operator function of the command. eg: `Pot.Operators.stop`
+
 ### pot.Operators
 
 Command lines interface helper functions
-
-_(TODO)_
 
 - `Operators.start(options)`
 - `Operators.restart(options)`
@@ -181,27 +222,6 @@ _(TODO)_
 ### pot.Schemas
 
 Config and CLI json schemas
-
-_(TODO)_
-
-### pot.Commands
-
-`pot-js` commands descriptor. Useful to extend or modify command via `createCli()`
-
-A command may contain these props:
-
-- `command` (String): A string representing the command. eg: `stop [name]`
-- `description` (String): Command description
-- `schema` (Object): The JSON schema of options and positional arguments
-- `operator` (Function): The operator function of the command
-
-_(TODO)_
-
-### pot.createCli(pkg, commands)
-
-A helper function to create CLI, built on top of [yargs](https://github.com/yargs/yargs)
-
-_(TODO)_
 
 ### pot#getState(instanceId)
 
