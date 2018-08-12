@@ -18,21 +18,20 @@ Process management module
   - [Pot.getNames()](#potgetnames)
   - [Pot.getList()](#potgetlist)
   - [Pot.getByName(name, options)](#potgetbynamename-options)
-  - [Pot.getState(name, options)](#potgetstatename-options)
   - [Pot.getStateList(name, options)](#potgetstatelistname-options)
-  - [Pot.getAllInstances(options)](#potgetallinstancesoptions)
   - [Pot.flushOffline(options)](#potflushofflineoptions)
   - [pot.createCli(pkg, commands)](#potcreateclipkg-commands)
   - [pot.Commands](#potcommands)
   - [pot.Operators](#potoperators)
   - [pot.Schemas](#potschemas)
-  - [pot#getState(instanceId)](#potgetstateinstanceid)
+  - [pot#getStateList()](#potgetstatelist)
   - [pot#restart()](#potrestart)
   - [pot#reload(options)](#potreloadoptions)
   - [pot#scale(number)](#potscalenumber)
+  - [pot#size()](#potsize)
   - [pot#flush()](#potflush)
   - [pot#disconnect()](#potdisconnect)
-  - [pot#requestStopServer(options)](#potrequeststopserveroptions)
+  - [pot#requestShutDown(options)](#potrequestshutdownoptions)
 - [License](#license)
 
 ## Motivation
@@ -152,17 +151,9 @@ Get all running `pot` instances. Returns a promise of array.
 
 Get `pot` by name. Returns a promise of `Pot` instance.
 
-### Pot.getState(name, options)
-
-Get `pot` state by name. Returns a promise of state object.
-
 ### Pot.getStateList(name, options)
 
 Get `pot` state list by name. Returns a promise of state array.
-
-### Pot.getAllInstances(options)
-
-Get all running process `instances`. Returns a promise of array.
 
 ### Pot.flushOffline(options)
 
@@ -223,9 +214,9 @@ Command lines interface helper functions
 
 Config and CLI json schemas
 
-### pot#getState(instanceId)
+### pot#getStateList()
 
-Get pot state by instance id
+Get pot state list
 
 ### pot#restart()
 
@@ -239,6 +230,10 @@ Reload
 
 Scale
 
+### pot#size()
+
+Get instances size
+
 ### pot#flush()
 
 Flush pid and log files
@@ -247,7 +242,7 @@ Flush pid and log files
 
 Disconnect
 
-### pot#requestStopServer(options)
+### pot#requestShutDown(options)
 
 Request to shut down
 
