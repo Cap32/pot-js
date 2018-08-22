@@ -26,11 +26,15 @@ export async function createClient(socketPath) {
 		const serverId = basename(socketPath);
 		nodeIpc.connectTo(serverId, socketPath, () => {
 			const socket = nodeIpc.of[serverId];
+			if (socket.hasConnected) return resolve(socket);
+
+			socket.hasConnected = true;
+
 			socket.on('connect', () => {
 				let parentPid;
 
-				socket.send = function send(event, data) {
-					if (data && data.method === 'requestShutDown') {
+				socket.send = function send(method, args, reply) {
+					if (method === 'requestShutDown') {
 						if (parentPid) {
 							fkill(parentPid, { force: isWin, tree: true });
 						}
@@ -39,33 +43,31 @@ export async function createClient(socketPath) {
 						}
 					}
 					else {
-						socket.emit(DEPRECATED_BRIDGE);
-						socket.emit(DEPRECATED_GET_INFO);
+						const handler = (state) => {
+							socket.off(DEPRECATED_BRIDGE, handler);
+							socket.off(DEPRECATED_GET_INFO, handler);
+
+							if (state && state.data && state.started) {
+								if (state.data) {
+									const { data } = state;
+									delete state.data;
+									state.monitor = { ...state };
+									Object.assign(state, data);
+								}
+								if (state.parentPid && !state.ppid) {
+									state.ppid = state.parentPid;
+								}
+								if (state.ppid) parentPid = state.ppid;
+							}
+
+							reply({ stateList: [state] });
+						};
+						socket.on(DEPRECATED_BRIDGE, handler);
+						socket.on(DEPRECATED_GET_INFO, handler);
+
+						socket.emit(DEPRECATED_BRIDGE, args);
+						socket.emit(DEPRECATED_GET_INFO, args);
 					}
-				};
-
-				socket.dataOnce = function dataOnce(event, callback) {
-					const handler = (res) => {
-						socket.off(DEPRECATED_BRIDGE, handler);
-						socket.off(DEPRECATED_GET_INFO, handler);
-
-						if (res && res.data && res.started) {
-							if (res.data) {
-								const { data } = res;
-								delete res.data;
-								res.monitor = { ...res };
-								Object.assign(res, data);
-							}
-							if (res.parentPid && !res.ppid) {
-								res.ppid = res.parentPid;
-							}
-							if (res.ppid) parentPid = res.ppid;
-						}
-
-						callback(res);
-					};
-					socket.on(DEPRECATED_BRIDGE, handler);
-					socket.on(DEPRECATED_BRIDGE, handler);
 				};
 
 				socket.close = function disconnect() {

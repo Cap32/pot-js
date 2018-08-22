@@ -44,21 +44,25 @@ export async function getAll() {
 				socketRefs,
 				pidRefs,
 				(socketRef, pidRef) => socketRef.name === pidRef.name,
-			).map(async (socketRef) => {
-				const socket = await startClient(socketRef.socketPath);
-				if (socket) {
-					const stateList = await getStateList(socket);
-					if (stateList.length) {
-						const { pidFile, pid } = stateList[0];
-						refsList.push({
-							pidFile,
-							pid,
-							...socketRef,
-							socket,
-						});
+			)
+				.filter((socketRef) => {
+					return !refsList.find((ref) => ref.name === socketRef.name);
+				})
+				.map(async (socketRef) => {
+					const socket = await startClient(socketRef.socketPath);
+					if (socket) {
+						const stateList = await getStateList(socket);
+						if (stateList.length) {
+							const { pidFile, pid } = stateList[0];
+							refsList.push({
+								pidFile,
+								pid,
+								...socketRef,
+								socket,
+							});
+						}
 					}
-				}
-			}),
+				}),
 		);
 	}
 	return refsList;
