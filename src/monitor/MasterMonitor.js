@@ -7,7 +7,7 @@ import workspace from '../utils/workspace';
 import watch from '../utils/watch';
 import onceSignalExit from '../utils/onceSignalExit';
 import createScriptRunner from '../utils/createScriptRunner';
-import EventTypes from '../utils/EventTypes';
+import EventTypes from '../constants/EventTypes';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
 import Errors from '../utils/Errors';
 import ensureInstanceNumber from '../utils/ensureInstanceNumber';

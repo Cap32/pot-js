@@ -8,7 +8,7 @@ import fkill from 'fkill';
 import cluster from 'cluster';
 import { noop, isBoolean } from 'lodash';
 import isWin from '../utils/isWin';
-import EventTypes from '../utils/EventTypes';
+import EventTypes from '../constants/EventTypes';
 import { basename } from 'path';
 
 const defaultSleep = function defaultSleep(sleep) {

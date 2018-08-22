@@ -1,4 +1,4 @@
-import EventTypes from '../utils/EventTypes';
+import EventTypes from '../constants/EventTypes';
 import { DEFAULT_WORKSPACE } from '../constants/workspace';
 import { reduce } from 'lodash';
 
