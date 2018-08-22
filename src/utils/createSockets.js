@@ -2,11 +2,30 @@ import axon from 'pm2-axon';
 import { ensureLocalDomainPath } from 'create-local-domain-socket';
 import delay from 'delay';
 
+const once = (target, resolves, rejects) => {
+	const finalResolve = () => {
+		bind('removeListener');
+		resolves.resolve(target);
+	};
+	const finalReject = (err) => {
+		bind('removeListener');
+		rejects.reject(err);
+	};
+	const bind = (method) => {
+		resolves.events.forEach((event) => {
+			target[method](event, finalResolve);
+		});
+		rejects.events.forEach((event) => {
+			target[method](event, finalReject);
+		});
+	};
+	bind('on');
+};
+
 export async function createServer(socketPath) {
 	const server = axon.socket('rep');
 	return new Promise((resolve, reject) => {
-		server.once('bind', () => resolve(server));
-		server.once('error', reject);
+		once(server, { events: ['bind'], resolve }, { events: ['error'], reject });
 		server.bind(ensureLocalDomainPath(socketPath));
 	});
 }
@@ -21,8 +40,11 @@ export async function createClient(socketPath, timeout = 30000) {
 	const createClientPromise = (function () {
 		const client = axon.socket('req');
 		return new Promise((resolve, reject) => {
-			client.once('connect', () => resolve(client));
-			client.once('error', reject);
+			once(
+				client,
+				{ events: ['connect'], resolve },
+				{ events: ['error', 'ignored error', 'socket error'], reject },
+			);
 			client.connect(ensureLocalDomainPath(socketPath));
 		});
 	})();

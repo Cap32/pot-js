@@ -35,11 +35,12 @@ export async function createClient(socketPath) {
 
 				socket.send = function send(method, args, reply) {
 					if (method === 'requestShutDown') {
+						const logError = () => logger.error('Could not shut down');
 						if (parentPid) {
-							fkill(parentPid, { force: isWin, tree: true });
+							fkill(parentPid, { force: isWin, tree: true }).catch(logError);
 						}
 						else {
-							logger.error('Could not shut down');
+							logError();
 						}
 					}
 					else {
