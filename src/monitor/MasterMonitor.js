@@ -8,6 +8,7 @@ import workspace from '../utils/workspace';
 import watch from '../utils/watch';
 import onSignalExit from '../utils/onSignalExit';
 import createScriptRunner from '../utils/createScriptRunner';
+import EventTypes from '../utils/EventTypes';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
 import Errors from '../utils/Errors';
 import ensureInstanceNumber from '../utils/ensureInstanceNumber';
@@ -123,7 +124,6 @@ export default class MasterMonitor extends EventEmitter {
 
 	async spawn(options = {}) {
 		const newInstances = ensureInstanceNumber(options.instances);
-		const { EventTypes } = WorkerMonitor;
 		const runEvent = this._runEvent;
 
 		const workerMonitors = new Array(newInstances)

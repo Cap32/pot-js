@@ -1,11 +1,13 @@
 import { name as appspace } from '../../package.json';
 import nodeIpc from 'node-ipc';
 import { basename } from 'path';
-import { DEPRECATED_BRIDGE, DEPRECATED_GET_INFO } from './SocketEventTypes';
 import fkill from 'fkill';
 import isWin from './isWin';
 import delay from 'delay';
 import { logger } from 'pot-logger';
+
+const DEPRECATED_BRIDGE = 'bridge';
+const DEPRECATED_GET_INFO = 'getInfo';
 
 export async function createClient(socketPath) {
 	const timeoutPromise = delay(30000);

@@ -6,7 +6,6 @@ import chalk from 'chalk';
 import globby from 'globby';
 import { noop, isString, isObject, isFunction } from 'lodash';
 import isWin from './isWin';
-import { REQUEST, PUBLISH } from './SocketEventTypes';
 import { createServer, createClient } from './createSockets';
 import * as deprecatedIpcAdapter from './deprecatedIpcAdapter';
 import { basename, dirname, join } from 'path';

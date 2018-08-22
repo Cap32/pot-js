@@ -1,9 +1,7 @@
-import { REQUEST, PUBLISH } from '../utils/SocketEventTypes';
 import { getPids } from '../utils/PidHelpers';
 import {
 	getSocketDiscripers,
 	startClient,
-	getSocketPath,
 	removeDomainSocket,
 } from '../utils/SocketsHelpers';
 import { differenceWith } from 'lodash';
@@ -38,20 +36,8 @@ export async function getAll() {
 			}
 		}),
 	);
-	// await Promise.all(
-	// 	pidRefs.map(async ({ pid, name, pidFile }) => {
-	// 		const socketPath = await getSocketPath(name);
-	// 		const socket = await startClient(socketPath);
-	// 		if (socket) {
-	// 			refsList.push({ name, socket, pid, pidFile, socketPath });
-	// 		}
-	// 		else {
-	// 			removeDomainSocket(socketPath);
-	// 		}
-	// 	}),
-	// );
 
-	// remove zombie socket files
+	// remove dead socket files
 	if (!isWin) {
 		await Promise.all(
 			differenceWith(

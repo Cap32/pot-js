@@ -29,8 +29,6 @@ const kill = async function kill(pid) {
 };
 
 export default class WorkerMonitor extends EventEmitter {
-	static EventTypes = EventTypes;
-
 	constructor(opts) {
 		super();
 
