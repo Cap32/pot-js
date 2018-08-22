@@ -6,8 +6,6 @@ import { trim, noop } from 'lodash';
 import globby from 'globby';
 import { logger } from 'pot-logger';
 import chalk from 'chalk';
-import fkill from 'fkill';
-import isWin from './isWin';
 
 const removePidFile = async function removePidFile(pidFile) {
 	logger.trace('remove pid file', pidFile);
@@ -53,21 +51,6 @@ export async function getPids() {
 	const pidFiles = await globby(patterns, { absolute: true });
 	const pids = await Promise.all(pidFiles.map(parsePidFile));
 	return pids.filter(Boolean);
-}
-
-export async function killPid(key, ppid, options = {}) {
-	try {
-		const { shouldLog } = options;
-		await fkill(ppid, { force: isWin });
-		logger.trace(`killed pid ${ppid}`);
-		shouldLog && logger.info(`"${key}" stopped`);
-		return true;
-	}
-	catch (err) {
-		logger.error(`Stop "${key}" failed.`);
-		logger.debug(err);
-		return false;
-	}
 }
 
 export async function writePid({ pidFile, pid }) {

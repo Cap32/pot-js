@@ -2,11 +2,10 @@ import { EventEmitter } from 'events';
 import { ensureLogger, logger, setLoggers } from 'pot-logger';
 import chalk from 'chalk';
 import delay from 'delay';
-import Pot from '../core/Pot';
 import WorkerMonitor from './WorkerMonitor';
 import workspace from '../utils/workspace';
 import watch from '../utils/watch';
-import onSignalExit from '../utils/onSignalExit';
+import onceSignalExit from '../utils/onceSignalExit';
 import createScriptRunner from '../utils/createScriptRunner';
 import EventTypes from '../utils/EventTypes';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
@@ -84,15 +83,8 @@ export default class MasterMonitor extends EventEmitter {
 		this.workerMonitors = [];
 
 		const exit = async () => {
-			logger.debug('exit');
 			try {
-				const pot = await Pot.getByName(name);
-				if (pot) {
-					await pot.requestShutDown();
-				}
-				await Promise.all(
-					this.workerMonitors.map(async (monitor) => monitor.stop()),
-				);
+				await this.shutDown();
 			}
 			catch (err) {
 				logger.debug(err);
@@ -105,7 +97,7 @@ export default class MasterMonitor extends EventEmitter {
 			await exit();
 		});
 
-		onSignalExit(async () => {
+		onceSignalExit(async () => {
 			setLoggers('logLevel', 'OFF');
 			await exit();
 		});
@@ -255,7 +247,7 @@ export default class MasterMonitor extends EventEmitter {
 			const removed = await Promise.all(
 				toRemove.map(async (workerMonitor) => {
 					const state = workerMonitor.toJSON();
-					await this.requestShutDown(workerMonitor.id).catch((err) =>
+					await this.shutDown(workerMonitor.id).catch((err) =>
 						errors.push(err),
 					);
 					return state;
@@ -301,11 +293,11 @@ export default class MasterMonitor extends EventEmitter {
 		}
 	}
 
-	async requestShutDown(id) {
+	async shutDown(id) {
 		if (!id && id !== 0) {
 			return Promise.all(
 				this.workerMonitors.map((workerMonitor) =>
-					this.requestShutDown(workerMonitor.id),
+					this.shutDown(workerMonitor.id),
 				),
 			);
 		}

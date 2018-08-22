@@ -123,7 +123,7 @@ export default class Pot {
 
 	async requestShutDown(options = {}) {
 		options.shouldLog && logger.info(`"${this.name}" stopped`);
-		this.request('requestShutDown');
+		this.request('shutDown');
 		this.disconnect();
 	}
 }
