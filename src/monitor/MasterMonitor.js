@@ -323,7 +323,14 @@ export default class MasterMonitor extends EventEmitter {
 
 		if (!workerMonitors.length) {
 			removeDomainSocket(socketPath);
-			if (this.socket) this.socket.destroy();
+			if (this.socket) {
+				await new Promise((resolve, reject) => {
+					this.socket.close((err) => {
+						if (err) reject(err);
+						else resolve();
+					});
+				});
+			}
 			process.exit(0);
 		}
 	}

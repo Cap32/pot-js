@@ -66,7 +66,7 @@ export async function createClient(socketPath) {
 					socket.on(DEPRECATED_BRIDGE, handler);
 				};
 
-				socket.end = function end() {
+				socket.close = function disconnect() {
 					nodeIpc.disconnect(socket.id);
 				};
 

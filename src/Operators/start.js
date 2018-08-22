@@ -24,9 +24,7 @@ export default async function start(options = {}) {
 		logger.info(chalk.gray(`To get detail, run \`${command} show ${name}\``));
 		logger.info(chalk.gray(`To shut down, run \`${command} stop ${name}\``));
 		console.log();
-
-		await pot.disconnect();
 	}
 
-	return pot;
+	await pot.disconnect();
 }

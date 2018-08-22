@@ -7,7 +7,7 @@ describe('operators', () => {
 
 	afterEach(async () => {
 		for (const pot of pots) {
-			pot.requestShutDown();
+			await pot.requestShutDown();
 		}
 		pots.clear();
 		await delay(1000);
@@ -15,10 +15,12 @@ describe('operators', () => {
 
 	describe('operator.start', () => {
 		test('should operator.start work', async () => {
-			const pot = await Operators.start({
+			await Operators.start({
+				name: 'foo',
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
 			});
+			const pot = await Pot.getByName('foo');
 			pots.add(pot);
 			const state = await pot.getState();
 			expect(state.monitor.status).toBe('running');
@@ -27,7 +29,7 @@ describe('operators', () => {
 
 	describe('operator.scale', () => {
 		test('should operator.scale work', async () => {
-			const pot = await Operators.start({
+			const pot = await Pot.exec({
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
 			});
@@ -43,7 +45,7 @@ describe('operators', () => {
 
 	describe('operator.stop', () => {
 		test('should operator.stop work', async () => {
-			const pot = await Operators.start({
+			const pot = await Pot.exec({
 				name: 'foo',
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
@@ -58,7 +60,7 @@ describe('operators', () => {
 			const names = ['foo', 'bar'];
 			const newPots = await Promise.all(
 				names.map((name) =>
-					Operators.start({
+					Pot.exec({
 						name,
 						entry: 'test/fixtures/timeout.js',
 						logLevel: 'ERROR',
@@ -74,7 +76,7 @@ describe('operators', () => {
 
 	describe('operator.restart', () => {
 		test('should operator.restart work', async () => {
-			const pot = await Operators.start({
+			const pot = await Pot.exec({
 				name: 'foo',
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
@@ -92,7 +94,7 @@ describe('operators', () => {
 			const names = ['foo', 'bar'];
 			const newPots = await Promise.all(
 				names.map((name) =>
-					Operators.start({
+					Pot.exec({
 						name,
 						entry: 'test/fixtures/timeout.js',
 						logLevel: 'ERROR',
@@ -121,7 +123,7 @@ describe('operators', () => {
 		jest.setTimeout(30000);
 
 		test('should operator.reload work', async () => {
-			const pot = await Operators.start({
+			const pot = await Pot.exec({
 				name: 'foo',
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
@@ -140,7 +142,7 @@ describe('operators', () => {
 			const names = ['foo', 'bar'];
 			const newPots = await Promise.all(
 				names.map((name) =>
-					Operators.start({
+					Pot.exec({
 						name,
 						entry: 'test/fixtures/timeout.js',
 						logLevel: 'ERROR',

@@ -7,7 +7,7 @@ import globby from 'globby';
 import { noop, isString, isObject, isFunction } from 'lodash';
 import isWin from './isWin';
 import { REQUEST, PUBLISH } from './SocketEventTypes';
-import { createServer, createClient } from './nssocketPromise';
+import { createServer, createClient } from './createSockets';
 import * as deprecatedIpcAdapter from './deprecatedIpcAdapter';
 import { basename, dirname, join } from 'path';
 import deprecated from '../utils/deprecated';
@@ -53,33 +53,22 @@ export async function getSocketPath(nameOrMonitor) {
 
 export async function startServer(masterMonitor, socketPath) {
 	logger.trace('unix domain socket path', chalk.gray(socketPath));
-	return createServer(socketPath, (socket) => {
-		const createListener = (event) => {
-			socket.data(event, async (data) => {
-				if (!data || !data.method) return;
-
-				const { args = [], method } = data;
-				try {
-					if (isFunction(masterMonitor[method])) {
-						const resp = await masterMonitor[method](...args);
-						if (event === REQUEST) {
-							socket.send(method, resp);
-						}
-					}
-					else {
-						logger.warn(
-							`Received API call "${method}", but it's not supported`,
-						);
-					}
-				}
-				catch (err) {
-					logger.error(`Failed to handle API call "${method}".`, err);
-				}
-			});
-		};
-		createListener(REQUEST);
-		createListener(PUBLISH);
+	const socket = await createServer(socketPath);
+	socket.on('message', async (method, args, reply) => {
+		try {
+			if (isFunction(masterMonitor[method])) {
+				const resp = await masterMonitor[method](...args);
+				reply(resp);
+			}
+			else {
+				logger.warn(`Received API call "${method}", but it's not supported`);
+			}
+		}
+		catch (err) {
+			logger.error(`Failed to handle API call "${method}".`, err);
+		}
 	});
+	return socket;
 }
 
 export async function startClient(socketPath, options = {}) {

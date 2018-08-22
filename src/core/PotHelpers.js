@@ -9,26 +9,15 @@ import {
 import { differenceWith } from 'lodash';
 import isWin from '../utils/isWin';
 
-export async function request(socket, method, ...args) {
-	const data = { method, args };
-	socket.send(REQUEST, data);
-	return new Promise((resolve) => {
-		socket.dataOnce(method, resolve);
-	});
-}
-
-export async function publish(socket, method, ...args) {
-	const data = { method, args };
-	socket.send(PUBLISH, data);
-}
-
 export async function getStateList(socket, ...args) {
 	try {
-		const res = await request(socket, 'state', ...args);
+		const res = await new Promise((resolve) => {
+			socket.send('state', args, resolve);
+		});
 		return res && res.stateList;
 	}
 	catch (err) {
-		socket.end();
+		socket.close();
 		return null;
 	}
 }
@@ -98,7 +87,7 @@ export async function getByName(name) {
 			const stateList = await getStateList(socket);
 			if (stateList.length) {
 				if (name === stateList[0].name) matchedRef = ref;
-				else socket.end();
+				else socket.close();
 			}
 		}),
 	);

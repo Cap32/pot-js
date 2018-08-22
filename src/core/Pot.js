@@ -3,7 +3,7 @@ import { logger, flush } from 'pot-logger';
 import delay from 'delay';
 import flushOfflineDirs from '../utils/flushOfflineDirs';
 import workspace from '../utils/workspace';
-import { getByName, getAll, request, publish } from './PotHelpers';
+import { getByName, getAll } from './PotHelpers';
 import getStateVerbose from './getStateVerbose';
 
 export default class Pot {
@@ -11,7 +11,7 @@ export default class Pot {
 		workspace.set(options);
 		const refs = await getAll();
 		return refs.map((ref) => {
-			ref.socket.end();
+			ref.socket.close();
 			return ref.name;
 		});
 	}
@@ -59,11 +59,9 @@ export default class Pot {
 	}
 
 	async request(method, ...args) {
-		return request(this.socket, method, ...args);
-	}
-
-	async publish(method, ...args) {
-		return publish(this.socket, method, ...args);
+		return new Promise((resolve) => {
+			this.socket.send(method, args, resolve);
+		});
 	}
 
 	async getStateList(options = {}) {
@@ -120,12 +118,12 @@ export default class Pot {
 	}
 
 	async disconnect() {
-		return this.socket.end();
+		return this.socket.close();
 	}
 
 	async requestShutDown(options = {}) {
 		options.shouldLog && logger.info(`"${this.name}" stopped`);
-		this.publish('requestShutDown');
+		this.request('requestShutDown');
 		this.disconnect();
 	}
 }
