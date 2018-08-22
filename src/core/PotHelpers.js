@@ -1,6 +1,7 @@
 import { getPids } from '../utils/PidHelpers';
 import {
 	getSocketDiscripers,
+	getSocketPath,
 	startClient,
 	removeDomainSocket,
 } from '../utils/SocketsHelpers';
@@ -22,23 +23,37 @@ export async function getStateList(socket, ...args) {
 
 export async function getAll() {
 	const pidRefs = await getPids();
-	const socketRefs = await getSocketDiscripers();
 	const refsList = [];
 
-	await Promise.all(
-		socketRefs.map(async ({ socketPath, name }) => {
-			const socket = await startClient(socketPath);
-			if (socket) {
-				refsList.push({ name, socket, socketPath });
-			}
-			else {
-				removeDomainSocket(socketPath);
-			}
-		}),
-	);
+	if (isWin) {
+		await Promise.all(
+			pidRefs.map(async ({ name, pid }) => {
+				const socketPath = await getSocketPath(name);
+				const socket = await startClient(socketPath);
+				if (socket) {
+					refsList.push({ name, socket, socketPath });
+				}
+				else {
+					// TODO: remove pid file
+				}
+			}),
+		);
+	}
+	else {
+		const socketRefs = await getSocketDiscripers();
+		await Promise.all(
+			socketRefs.map(async ({ socketPath, name }) => {
+				const socket = await startClient(socketPath);
+				if (socket) {
+					refsList.push({ name, socket, socketPath });
+				}
+				else {
+					removeDomainSocket(socketPath);
+				}
+			}),
+		);
 
-	// remove dead socket files
-	if (!isWin) {
+		// remove dead socket files
 		await Promise.all(
 			differenceWith(
 				socketRefs,
