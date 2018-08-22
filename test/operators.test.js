@@ -34,10 +34,9 @@ describe('operators', () => {
 				logLevel: 'ERROR',
 			});
 			pots.add(pot);
-
 			const size = await pot.size();
 			expect(size).toBe(1);
-			await Operators.scale({ instances: 2 });
+			await Operators.scale({ instances: 2, logLevel: 'ERROR' });
 			const newSize = await pot.size();
 			expect(newSize).toBe(2);
 		});
@@ -51,7 +50,7 @@ describe('operators', () => {
 				logLevel: 'ERROR',
 			});
 			pots.add(pot);
-			await Operators.stop({ name: 'foo', force: true });
+			await Operators.stop({ name: 'foo', force: true, logLevel: 'ERROR' });
 			const exists = await Pot.getByName('foo');
 			expect(exists).toBeNull();
 		});
@@ -68,7 +67,7 @@ describe('operators', () => {
 				),
 			);
 			newPots.forEach((pot) => pots.add(pot));
-			await Operators.stopAll({ force: true });
+			await Operators.stopAll({ force: true, logLevel: 'ERROR' });
 			const potNames = await Pot.getNames();
 			expect(potNames.length).toBe(0);
 		});
@@ -84,7 +83,7 @@ describe('operators', () => {
 			pots.add(pot);
 			const state0 = await pot.getState();
 			const t0 = state0.monitor.started;
-			await Operators.restart({ name: 'foo' });
+			await Operators.restart({ name: 'foo', logLevel: 'ERROR' });
 			const state1 = await pot.getState();
 			const t1 = state1.monitor.started;
 			expect(t1 > t0).toBe(true);
@@ -108,7 +107,7 @@ describe('operators', () => {
 				const state = await newPot.getState();
 				ts0.push(state.monitor.started);
 			}
-			await Operators.restartAll();
+			await Operators.restartAll({ logLevel: 'ERROR' });
 			for (const newPot of newPots) {
 				const state = await newPot.getState();
 				ts1.push(state.monitor.started);
@@ -132,7 +131,7 @@ describe('operators', () => {
 			pots.add(pot);
 			const state0 = await pot.getState();
 			const t0 = state0.monitor.started;
-			await Operators.reload({ name: 'foo' });
+			await Operators.reload({ name: 'foo', logLevel: 'ERROR' });
 			const state1 = await pot.getState();
 			const t1 = state1.monitor.started;
 			expect(t1 > t0).toBe(true);
@@ -157,7 +156,7 @@ describe('operators', () => {
 				const state = await newPot.getState();
 				ts0.push(state.monitor.started);
 			}
-			await Operators.reloadAll();
+			await Operators.reloadAll({ logLevel: 'ERROR' });
 			for (const newPot of newPots) {
 				const state = await newPot.getState();
 				ts1.push(state.monitor.started);

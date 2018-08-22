@@ -1,6 +1,7 @@
-import start from './config';
+import getConfig from './getConfig';
 import { cloneDeep, omit } from 'lodash';
 
+const start = getConfig();
 const { properties } = start;
 const logLevel = cloneDeep(properties.logLevel);
 const workspace = cloneDeep(properties.workspace);

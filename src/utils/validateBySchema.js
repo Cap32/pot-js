@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { isFunction } from 'lodash';
 
 const ajv = new Ajv({
 	useDefaults: true,
@@ -8,6 +9,7 @@ const ajv = new Ajv({
 });
 
 export default function validateBySchema(schema, config = {}) {
+	schema = isFunction(schema) ? schema(config) : schema;
 	const valid = ajv.validate(schema, config);
 	if (!valid) {
 		const error = new Error(

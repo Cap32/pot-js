@@ -4,7 +4,7 @@ import { ensureDir } from 'fs-extra';
 import isWin from '../utils/isWin';
 import { init } from '../cli/initializer';
 import workspace from '../utils/workspace';
-import schema from '../Schemas/config';
+import schema from '../Schemas/getConfig';
 import { logger } from 'pot-logger';
 import { isNumber, isObject, isUndefined, noop } from 'lodash';
 import chalk from 'chalk';

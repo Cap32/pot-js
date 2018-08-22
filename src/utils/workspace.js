@@ -1,6 +1,6 @@
 import homeOrTmp from 'home-or-tmp';
 import { isObject } from 'lodash';
-import schema from '../Schemas/config';
+import { DEFAULT_WORKSPACE } from '../constants/workspace';
 import { ensureDir } from 'fs-extra';
 import { join } from 'path';
 import { name as pkgName } from '../../package.json';
@@ -8,7 +8,7 @@ import { name as pkgName } from '../../package.json';
 const base = join(homeOrTmp, '.config', pkgName);
 
 const workspace = {
-	default: process.env.POT_WORKSPACE || schema.properties.workspace.default,
+	default: process.env.POT_WORKSPACE || DEFAULT_WORKSPACE,
 
 	async _getDir(...paths) {
 		const dir = join(

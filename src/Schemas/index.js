@@ -1,4 +1,4 @@
-import config from './config';
+import getConfig from './getConfig';
 import * as cliSchema from './cli';
 
-export default { ...cliSchema, config };
+export default { ...cliSchema, config: getConfig(), getConfig };

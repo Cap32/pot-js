@@ -41,7 +41,8 @@ const handler = async function handler(argv) {
 				argv = await resolveConfig(argv, configFileKey, schema);
 			}
 			if (validate && schema) {
-				validateBySchema(schema, argv);
+				const finalSchema = isFunction(schema) ? schema(argv) : schema;
+				validateBySchema(finalSchema, argv);
 			}
 			await operator(argv);
 		}

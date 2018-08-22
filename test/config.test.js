@@ -1,9 +1,11 @@
-import schema from '../src/Schemas/config';
+import Pot from '../src';
 import validateBySchema from '../src/utils/validateBySchema';
 
 describe('default config', () => {
 	test('production config', async () => {
-		const config = validateBySchema(schema, { production: true });
+		const options = { production: true };
+		const schema = Pot.Schemas.getConfig(options);
+		const config = validateBySchema(schema, options);
 		expect(config).toMatchObject({
 			production: true,
 			cwd: expect.stringContaining('pot-js'),
@@ -21,7 +23,9 @@ describe('default config', () => {
 	});
 
 	test('development config', async () => {
-		const config = validateBySchema(schema, { production: false });
+		const options = { production: false };
+		const schema = Pot.Schemas.getConfig(options);
+		const config = validateBySchema(schema, options);
 		expect(config).toMatchObject({
 			production: false,
 			cwd: expect.stringContaining('pot-js'),
