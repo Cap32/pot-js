@@ -29,6 +29,7 @@ describe('operators', () => {
 
 	describe('operator.scale', () => {
 		test('should operator.scale work', async () => {
+			jest.setTimeout(20000);
 			const pot = await Pot.exec({
 				entry: 'test/fixtures/timeout.js',
 				logLevel: 'ERROR',
@@ -56,6 +57,7 @@ describe('operators', () => {
 		});
 
 		test('should operator.stopAll work', async () => {
+			jest.setTimeout(20000);
 			const names = ['foo', 'bar'];
 			const newPots = await Promise.all(
 				names.map((name) =>
@@ -90,6 +92,7 @@ describe('operators', () => {
 		});
 
 		test('should operator.restartAll work', async () => {
+			jest.setTimeout(20000);
 			const names = ['foo', 'bar'];
 			const newPots = await Promise.all(
 				names.map((name) =>
