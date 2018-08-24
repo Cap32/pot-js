@@ -56,6 +56,19 @@ describe('operators', () => {
 			expect(exists).toBeNull();
 		});
 
+		test('should operator.stop instance work', async () => {
+			const pot = await Pot.exec({
+				name: 'foo',
+				entry: 'test/fixtures/timeout.js',
+				instances: 2,
+				logLevel: 'ERROR',
+			});
+			pots.add(pot);
+			await Operators.stop({ name: 'foo', force: true, logLevel: 'ERROR' });
+			const exists = await Pot.getByName('foo');
+			expect(exists).toBeNull();
+		});
+
 		test('should operator.stopAll work', async () => {
 			jest.setTimeout(20000);
 			const names = ['foo', 'bar'];

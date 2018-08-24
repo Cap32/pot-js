@@ -3,6 +3,7 @@ import { logger, flush } from 'pot-logger';
 import delay from 'delay';
 import flushOfflineDirs from '../utils/flushOfflineDirs';
 import workspace from '../utils/workspace';
+import getInstanceDisplayName from '../utils/getInstanceDisplayName';
 import { getByName, getAll } from './PotHelpers';
 import getStateVerbose from './getStateVerbose';
 
@@ -79,6 +80,13 @@ export default class Pot {
 		return stateList[index];
 	}
 
+	async hasInstance(instance) {
+		const stateList = await this.getStateList();
+		return (
+			stateList.findIndex(({ instanceId }) => instanceId === instance) > -1
+		);
+	}
+
 	async restart(id) {
 		return this.request('restart', id);
 	}
@@ -122,8 +130,11 @@ export default class Pot {
 	}
 
 	async requestShutDown(options = {}) {
-		options.shouldLog && logger.info(`"${this.name}" stopped`);
-		this.request('shutDown');
+		const { shouldLog, instance } = options;
+		if (shouldLog) {
+			logger.info(`"${getInstanceDisplayName(this.name, instance)}" stopped`);
+		}
+		this.request('shutDown', instance);
 		this.disconnect();
 	}
 }

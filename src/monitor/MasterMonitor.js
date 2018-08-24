@@ -11,6 +11,7 @@ import EventTypes from '../constants/EventTypes';
 import { ENV_VAR_KEY } from '../utils/EnvVar';
 import Errors from '../utils/Errors';
 import ensureInstanceNumber from '../utils/ensureInstanceNumber';
+import getInstanceDisplayName from '../utils/getInstanceDisplayName';
 import { getPidFile, writePid, removePidFile } from '../utils/PidHelpers';
 import {
 	startServer,
@@ -200,7 +201,7 @@ export default class MasterMonitor extends EventEmitter {
 						options.instanceId = id;
 						options.pidFile = pidFile;
 						options.socketPath = socketPath;
-						options.displayName = options.name + (id ? ` #${id}` : '');
+						options.displayName = getInstanceDisplayName(options.name, id);
 
 						await writePid(options);
 
@@ -305,6 +306,12 @@ export default class MasterMonitor extends EventEmitter {
 		const workerMonitor = this.workerMonitors.find(
 			(workerMonitor) => workerMonitor.id === id,
 		);
+
+		if (!workerMonitor) {
+			logger.warn(`Can not stop instance id "${id}"`);
+			return;
+		}
+
 		await workerMonitor.stop();
 		const { socketPath, pidFile } = workerMonitor.toJSON();
 
