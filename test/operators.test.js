@@ -71,10 +71,9 @@ describe('operators', () => {
 				force: true,
 				logLevel: 'ERROR',
 			});
-			const potToGetInstance = await Pot.getByName('foo');
-			pots.add(potToGetInstance);
-			expect(await potToGetInstance.hasInstanceNum(1)).toBe(false);
-			expect(await potToGetInstance.hasInstanceNum(2)).toBe(true);
+			await delay(1000);
+			expect(await pot.hasInstanceNum(1)).toBe(false);
+			expect(await pot.hasInstanceNum(2)).toBe(true);
 		});
 
 		test('should operator.stopAll work', async () => {
@@ -107,6 +106,28 @@ describe('operators', () => {
 			const state0 = await pot.getState();
 			const t0 = state0.monitor.started;
 			await Operators.restart({ name: 'foo', logLevel: 'ERROR' });
+			const state1 = await pot.getState();
+			const t1 = state1.monitor.started;
+			expect(t1 > t0).toBe(true);
+		});
+
+		test.only('should operator.restart by instanceNum work', async () => {
+			jest.setTimeout(20000);
+			const pot = await Pot.exec({
+				name: 'foo',
+				entry: 'test/fixtures/timeout.js',
+				instances: 2,
+				logLevel: 'ERROR',
+			});
+			pots.add(pot);
+			const state0 = await pot.getState();
+			const t0 = state0.monitor.started;
+			await Operators.restart({
+				name: 'foo',
+				instanceNum: 1,
+				logLevel: 'ERROR',
+			});
+			await delay(1000);
 			const state1 = await pot.getState();
 			const t1 = state1.monitor.started;
 			expect(t1 > t0).toBe(true);
