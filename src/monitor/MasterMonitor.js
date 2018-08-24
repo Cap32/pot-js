@@ -186,26 +186,29 @@ export default class MasterMonitor extends EventEmitter {
 					try {
 						const { workerMonitors } = this;
 						const numbers = workerMonitors.length ?
-							workerMonitors.map((wm) => wm.id) :
+							workerMonitors.map((wm) => wm.instanceNum) :
 							[0];
-						workerMonitor.id = Math.max(...numbers) + 1;
+						workerMonitor.instanceNum = Math.max(...numbers) + 1;
 						workerMonitors.push(workerMonitor);
 
-						const { data: options, id } = workerMonitor;
+						const { data: options, instanceNum } = workerMonitor;
 						workspace.set(options);
 
 						const { name } = options;
-						const pidFile = await getPidFile(name, id);
+						const pidFile = await getPidFile(name, instanceNum);
 						const socketPath = await getSocketPath(name);
 
-						options.instanceId = id;
+						options.instanceNum = instanceNum;
 						options.pidFile = pidFile;
 						options.socketPath = socketPath;
-						options.displayName = getInstanceDisplayName(options.name, id);
+						options.displayName = getInstanceDisplayName(
+							options.name,
+							instanceNum,
+						);
 
 						await writePid(options);
 
-						workerMonitors.sort((a, b) => a.id - b.id);
+						workerMonitors.sort((a, b) => a.instanceNum - b.instanceNum);
 
 						displayName = workerMonitor.data.displayName;
 						logger.info(`"${displayName}" started`);
@@ -248,7 +251,7 @@ export default class MasterMonitor extends EventEmitter {
 			const removed = await Promise.all(
 				toRemove.map(async (workerMonitor) => {
 					const state = workerMonitor.toJSON();
-					await this.shutDown(workerMonitor.id).catch((err) =>
+					await this.shutDown(workerMonitor.instanceNum).catch((err) =>
 						errors.push(err),
 					);
 					return state;
@@ -273,8 +276,8 @@ export default class MasterMonitor extends EventEmitter {
 		};
 	}
 
-	async restart(id) {
-		if (!id && id !== 0) {
+	async restart(instanceNum) {
+		if (!instanceNum && instanceNum !== 0) {
 			await Promise.all(
 				this.workerMonitors.map(async (workerMonitor) => {
 					await workerMonitor.restart();
@@ -284,7 +287,7 @@ export default class MasterMonitor extends EventEmitter {
 		}
 		else {
 			const workerMonitor = this.workerMonitors.find(
-				(workerMonitor) => workerMonitor.id === id,
+				(workerMonitor) => workerMonitor.instanceNum === instanceNum,
 			);
 			if (workerMonitor) {
 				await workerMonitor.restart();
@@ -294,21 +297,21 @@ export default class MasterMonitor extends EventEmitter {
 		}
 	}
 
-	async shutDown(id) {
-		if (!id && id !== 0) {
+	async shutDown(instanceNum) {
+		if (!instanceNum && instanceNum !== 0) {
 			return Promise.all(
 				this.workerMonitors.map((workerMonitor) =>
-					this.shutDown(workerMonitor.id),
+					this.shutDown(workerMonitor.instanceNum),
 				),
 			);
 		}
 
 		const workerMonitor = this.workerMonitors.find(
-			(workerMonitor) => workerMonitor.id === id,
+			(workerMonitor) => workerMonitor.instanceNum === instanceNum,
 		);
 
 		if (!workerMonitor) {
-			logger.warn(`Can not stop instance id "${id}"`);
+			logger.warn(`Can not stop instance number "${instanceNum}"`);
 			return;
 		}
 

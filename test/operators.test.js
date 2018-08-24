@@ -56,7 +56,7 @@ describe('operators', () => {
 			expect(exists).toBeNull();
 		});
 
-		test('should operator.stop instance work', async () => {
+		test('should operator.stop by instanceNum work', async () => {
 			const pot = await Pot.exec({
 				name: 'foo',
 				entry: 'test/fixtures/timeout.js',

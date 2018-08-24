@@ -32,7 +32,7 @@ export default class WorkerMonitor extends EventEmitter {
 	constructor(opts) {
 		super();
 
-		this.id = 0;
+		this.instanceNum = 0;
 		this.status = 'stopped';
 		this.execPath = opts.execPath;
 		this.execArgv = opts.execArgv;
@@ -238,7 +238,7 @@ export default class WorkerMonitor extends EventEmitter {
 			ppid: this.ppid,
 			cluster: this.cluster,
 			monitor: {
-				instanceId: this.id,
+				instanceNum: this.instanceNum,
 				name: this.name,
 				status: this.status,
 				started: this.started,

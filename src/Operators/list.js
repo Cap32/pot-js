@@ -14,7 +14,7 @@ const defaultCells = [
 	{
 		title: 'Instance',
 		width: 10,
-		get: (state) => `#${state.monitor.instanceId || 0}`,
+		get: (state) => state.monitor.instanceNum || 0,
 	},
 	{
 		title: 'Status',

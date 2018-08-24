@@ -80,15 +80,17 @@ export default class Pot {
 		return stateList[index];
 	}
 
-	async hasInstance(instance) {
+	async hasInstanceNum(instanceNum) {
 		const stateList = await this.getStateList();
 		return (
-			stateList.findIndex(({ instanceId }) => instanceId === instance) > -1
+			stateList.findIndex(
+				(state) => state.monitor.instanceNum === instanceNum,
+			) > -1
 		);
 	}
 
-	async restart(id) {
-		return this.request('restart', id);
+	async restart(instanceNum) {
+		return this.request('restart', instanceNum);
 	}
 
 	async reload(options = {}) {
@@ -98,7 +100,7 @@ export default class Pot {
 		const eachTimeout = length > 1 ? Math.max(100, timeout / length) : 0;
 		for (const state of stateList) {
 			if (!state) continue;
-			const count = await this.restart(state.monitor.instanceId);
+			const count = await this.restart(state.monitor.instanceNum);
 			const ok = count > 0;
 			if (isFunction(onProgress)) onProgress(ok, state);
 			await delay(eachTimeout);
@@ -130,11 +132,13 @@ export default class Pot {
 	}
 
 	async requestShutDown(options = {}) {
-		const { shouldLog, instance } = options;
+		const { shouldLog, instanceNum } = options;
 		if (shouldLog) {
-			logger.info(`"${getInstanceDisplayName(this.name, instance)}" stopped`);
+			logger.info(
+				`"${getInstanceDisplayName(this.name, instanceNum)}" stopped`,
+			);
 		}
-		this.request('shutDown', instance);
+		this.request('shutDown', instanceNum);
 		this.disconnect();
 	}
 }

@@ -8,12 +8,12 @@ import getInstanceDisplayName from '../utils/getInstanceDisplayName';
 export const stop = async function stop(options = {}) {
 	init(schema, options);
 	const { pot, targetName } = await ensureTarget(options);
-	const { force, instance } = options;
-	const displayName = getInstanceDisplayName(targetName, instance);
+	const { force, instanceNum } = options;
+	const displayName = getInstanceDisplayName(targetName, instanceNum);
 
-	if (instance) {
-		const hasInstance = await pot.hasInstance(instance);
-		if (!hasInstance) {
+	if (instanceNum) {
+		const hasInstanceNum = await pot.hasInstanceNum(instanceNum);
+		if (!hasInstanceNum) {
 			await pot.disconnect();
 			logger.warn(`"${displayName}" is NOT running`);
 			return;
@@ -35,7 +35,7 @@ export const stop = async function stop(options = {}) {
 		}
 	}
 
-	return pot.requestShutDown({ shouldLog: true, instance });
+	return pot.requestShutDown({ shouldLog: true, instanceNum });
 };
 
 export const stopAll = async function stopAll(options = {}) {

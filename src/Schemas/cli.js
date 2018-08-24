@@ -8,7 +8,7 @@ const workspace = cloneDeep(properties.workspace);
 const name = cloneDeep(properties.name);
 const instances = omit(properties.instances, ['default']);
 const cells = { type: 'array', hidden: true };
-const instance = { type: 'number' };
+const instanceNum = { type: 'number' };
 
 export { start };
 
@@ -19,7 +19,7 @@ export const stop = {
 			description: 'Stop without confirming',
 			type: 'boolean',
 		},
-		instance,
+		instanceNum,
 		logLevel,
 		name,
 		workspace,
@@ -27,12 +27,12 @@ export const stop = {
 };
 
 export const stopAll = {
-	properties: omit(stop.properties, ['name', 'instance']),
+	properties: omit(stop.properties, ['name', 'instanceNum']),
 };
 
 export const restart = {
 	properties: {
-		instance,
+		instanceNum,
 		logLevel,
 		name,
 		workspace,
@@ -40,7 +40,7 @@ export const restart = {
 };
 
 export const restartAll = {
-	properties: omit(restart.properties, ['name', 'instance']),
+	properties: omit(restart.properties, ['name', 'instanceNum']),
 };
 
 export const reload = {
@@ -78,7 +78,7 @@ export const list = {
 export const show = {
 	properties: {
 		cells,
-		instance,
+		instanceNum,
 		logLevel,
 		name,
 		workspace,

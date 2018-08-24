@@ -30,15 +30,15 @@ const parsePidFile = async function parsePidFile(pidFile) {
 	const pid = await getPid(pidFile);
 	const fullName = basename(pidFile, '.pid');
 	if (!pid) return false;
-	const [name, instanceId] = fullName.split('.');
-	return { pidFile, pid, instanceId, name };
+	const [name, instanceNum] = fullName.split('.');
+	return { pidFile, pid, instanceNum, name };
 };
 
 export { removePidFile };
 
-export async function getPidFile(name, id) {
+export async function getPidFile(name, instanceNum) {
 	const runDir = await workspace.getRunDir();
-	return join(runDir, `${name}.${id}.pid`);
+	return join(runDir, `${name}.${instanceNum}.pid`);
 }
 
 export async function getPids() {
