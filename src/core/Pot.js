@@ -25,7 +25,7 @@ export default class Pot {
 
 	static async getByName(name, options) {
 		workspace.set(options);
-		const ref = await getByName(name, options);
+		const ref = await getByName(name);
 		return ref ? Pot.create(ref) : null;
 	}
 
