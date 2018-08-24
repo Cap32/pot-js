@@ -22,11 +22,13 @@ const defaultCells = [
 	['memory', (state) => state.memoryUsage.styled],
 	['name', (state) => state.name],
 	['pid', (state) => state.pid],
+	['pidFile', (state) => state.pidFile],
 	['ppid', (state) => state.ppid],
 	['production', (state) => state.production],
 	['started', (state) => state.monitor.startedLocal],
 	['status', (state) => state.monitor.status],
 	['watch', (state) => state.watch.enable],
+	['_version', (state) => state.potjs.version],
 ];
 
 const show = async function show(options = {}) {
