@@ -4,8 +4,6 @@ const unhandledRejection = function unhandledRejection(reason, promise) {
 };
 
 export default function listenToUnhandledRejection() {
-	if (process.env.NODE_ENV !== 'production') {
-		process.removeListener('unhandledRejection', unhandledRejection);
-		process.on('unhandledRejection', unhandledRejection);
-	}
+	process.removeListener('unhandledRejection', unhandledRejection);
+	process.on('unhandledRejection', unhandledRejection);
 }
