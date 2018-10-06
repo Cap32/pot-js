@@ -27,7 +27,10 @@ export default async function log(options = {}) {
 		value: category,
 		message: 'Please select a log file',
 		errorMessage: 'Log file NOT found',
-		getChoices: () => globby('*.log', { cwd: logsDir }),
+		getChoices: async () => {
+			const list = await globby('*.log', { cwd: logsDir });
+			return list.filter((path) => !/\d+\.log$/.test(path));
+		},
 	});
 
 	if (!appCategory.endsWith('.log')) {
